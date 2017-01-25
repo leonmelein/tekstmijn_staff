@@ -1,0 +1,776 @@
+{
+    "_readme": [
+        "This file locks the dependencies of your project to a known state",
+        "Read more about it at https://getcomposer.org/doc/01-basic-usage.md#composer-lock-the-lock-file",
+        "This file is @generated automatically"
+    ],
+    "content-hash": "07d0d3220dd1544efc5760ff921a054c",
+    "packages": [
+        {
+            "name": "altorouter/altorouter",
+            "version": "v1.2.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/dannyvankooten/AltoRouter.git",
+                "reference": "39c50092470128c12284d332bb57f306bb5b58e4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/dannyvankooten/AltoRouter/zipball/39c50092470128c12284d332bb57f306bb5b58e4",
+                "reference": "39c50092470128c12284d332bb57f306bb5b58e4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "codeclimate/php-test-reporter": "dev-master",
+                "phpunit/phpunit": "4.5.*"
+            },
+            "type": "library",
+            "autoload": {
+                "classmap": [
+                    "AltoRouter.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Danny van Kooten",
+                    "email": "dannyvankooten@gmail.com",
+                    "homepage": "http://dannyvankooten.com/"
+                },
+                {
+                    "name": "Koen Punt",
+                    "homepage": "https://github.com/koenpunt"
+                },
+                {
+                    "name": "niahoo",
+                    "homepage": "https://github.com/niahoo"
+                }
+            ],
+            "description": "A lightning fast router for PHP",
+            "homepage": "https://github.com/dannyvankooten/AltoRouter",
+            "keywords": [
+                "lightweight",
+                "router",
+                "routing"
+            ],
+            "time": "2015-11-30T00:47:43+00:00"
+        },
+        {
+            "name": "bootpress/bootstrap",
+            "version": "v1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Kylob/Bootstrap.git",
+                "reference": "c009a151f9f0dd325a702437372b2b34675909f6"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Kylob/Bootstrap/zipball/c009a151f9f0dd325a702437372b2b34675909f6",
+                "reference": "c009a151f9f0dd325a702437372b2b34675909f6",
+                "shasum": ""
+            },
+            "require": {
+                "bootpress/form": "^1.0",
+                "bootpress/page": "^1.1",
+                "bootpress/pagination": "^1.0",
+                "bootpress/table": "^1.0",
+                "bootpress/validator": "^1.0",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "bootpress/htmlunit": "^1.0",
+                "friendsofphp/php-cs-fixer": "^1.0",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BootPress\\Bootstrap\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kyle Gadd",
+                    "email": "kyle.gadd@gmail.com"
+                }
+            ],
+            "description": "Create Bootstrap grids, tables, forms, buttons, dropdowns, groups, navs, breadcrumbs, pagination, panels, accordions, carousels, etc ... all without touching a single div!",
+            "keywords": [
+                "bootpress",
+                "bootstrap",
+                "bootstrap3",
+                "css",
+                "framework"
+            ],
+            "time": "2017-01-03T22:53:02+00:00"
+        },
+        {
+            "name": "bootpress/form",
+            "version": "v1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Kylob/Form.git",
+                "reference": "c32c475f9b39b1ca37401fc8fe50fe5560346a43"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Kylob/Form/zipball/c32c475f9b39b1ca37401fc8fe50fe5560346a43",
+                "reference": "c32c475f9b39b1ca37401fc8fe50fe5560346a43",
+                "shasum": ""
+            },
+            "require": {
+                "bootpress/page": "^1.0",
+                "bootpress/validator": "^1.0",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "bootpress/htmlunit": "^1.0",
+                "friendsofphp/php-cs-fixer": "^1.0",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BootPress\\Form\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kyle Gadd",
+                    "email": "kyle.gadd@gmail.com"
+                }
+            ],
+            "description": "Coordinates form validation, errors, messages, values, and inputs in a DRY KISS way.",
+            "time": "2016-10-20T21:10:36+00:00"
+        },
+        {
+            "name": "bootpress/page",
+            "version": "v1.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Kylob/Page.git",
+                "reference": "4a6b614fff643e136ffc7e7073c33aa3f4cfae8e"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Kylob/Page/zipball/4a6b614fff643e136ffc7e7073c33aa3f4cfae8e",
+                "reference": "4a6b614fff643e136ffc7e7073c33aa3f4cfae8e",
+                "shasum": ""
+            },
+            "require": {
+                "altorouter/altorouter": "^1.0",
+                "php": ">=5.4",
+                "pimple/pimple": "^3.0",
+                "symfony/http-foundation": "^2.3||^3.0"
+            },
+            "require-dev": {
+                "bootpress/htmlunit": "^1.0",
+                "friendsofphp/php-cs-fixer": "^1.0",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BootPress\\Page\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kyle Gadd",
+                    "email": "kyle.gadd@gmail.com"
+                }
+            ],
+            "description": "Manipulate every part of an HTML Page at any time.",
+            "keywords": [
+                "bootpress",
+                "framework",
+                "html",
+                "page",
+                "uri",
+                "url"
+            ],
+            "time": "2017-01-11T00:25:51+00:00"
+        },
+        {
+            "name": "bootpress/pagination",
+            "version": "v1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Kylob/Pagination.git",
+                "reference": "d6dbd4e2b030bdf244a1af49ca3e319ad2da80d7"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Kylob/Pagination/zipball/d6dbd4e2b030bdf244a1af49ca3e319ad2da80d7",
+                "reference": "d6dbd4e2b030bdf244a1af49ca3e319ad2da80d7",
+                "shasum": ""
+            },
+            "require": {
+                "bootpress/page": "^1.0",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "bootpress/htmlunit": "^1.0",
+                "friendsofphp/php-cs-fixer": "^1.0",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BootPress\\Pagination\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kyle Gadd",
+                    "email": "kyle.gadd@gmail.com"
+                }
+            ],
+            "description": "Creates customizable pagination and pager links.  Limits and offsets arrays and database queries.  Built-in styles for Bootstrap, Zurb Foundation, Semantic UI, Materialize, and UIkit.",
+            "homepage": "https://www.bootpress.org/components/pagination/",
+            "keywords": [
+                "bootpress",
+                "pager",
+                "paginate",
+                "pagination",
+                "paginator"
+            ],
+            "time": "2016-10-03T00:02:29+00:00"
+        },
+        {
+            "name": "bootpress/table",
+            "version": "v1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Kylob/Table.git",
+                "reference": "9a3b521c62762dcd0027ec52cb2b60da173c9bd8"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Kylob/Table/zipball/9a3b521c62762dcd0027ec52cb2b60da173c9bd8",
+                "reference": "9a3b521c62762dcd0027ec52cb2b60da173c9bd8",
+                "shasum": ""
+            },
+            "require": {
+                "bootpress/page": "^1.0",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "bootpress/htmlunit": "^1.0",
+                "friendsofphp/php-cs-fixer": "^1.0",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BootPress\\Table\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kyle Gadd",
+                    "email": "kyle.gadd@gmail.com"
+                }
+            ],
+            "description": "Create HTML tables that are easy to visualize and see what is going on.",
+            "keywords": [
+                "bootpress",
+                "html",
+                "tables"
+            ],
+            "time": "2016-10-19T16:55:29+00:00"
+        },
+        {
+            "name": "bootpress/validator",
+            "version": "v1.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Kylob/Validator.git",
+                "reference": "99e32542e726cf18a467a5dfea7fe2a622c926cf"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Kylob/Validator/zipball/99e32542e726cf18a467a5dfea7fe2a622c926cf",
+                "reference": "99e32542e726cf18a467a5dfea7fe2a622c926cf",
+                "shasum": ""
+            },
+            "require": {
+                "bootpress/page": "^1.0",
+                "php": ">=5.4"
+            },
+            "require-dev": {
+                "friendsofphp/php-cs-fixer": "^1.0",
+                "phpunit/phpunit": "^4.0",
+                "squizlabs/php_codesniffer": "^2.5"
+            },
+            "suggest": {
+                "bootpress/form": "Coordinates form validation, errors, messages, values, and inputs in a DRY KISS way."
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "BootPress\\Validator\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Kyle Gadd",
+                    "email": "kyle.gadd@gmail.com"
+                }
+            ],
+            "description": "Form validation that is designed to simplify and work seamlessly with Jörn's jQuery Validation Plugin.",
+            "keywords": [
+                "bootpress",
+                "form",
+                "validation"
+            ],
+            "time": "2016-10-20T21:40:43+00:00"
+        },
+        {
+            "name": "bramus/router",
+            "version": "1.1",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/bramus/router.git",
+                "reference": "7fcdede2846b59f4e812833032e579b1705ea375"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/bramus/router/zipball/7fcdede2846b59f4e812833032e579b1705ea375",
+                "reference": "7fcdede2846b59f4e812833032e579b1705ea375",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/php-code-coverage": "~1.2",
+                "phpunit/phpunit": "~3.7"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Bramus": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Bram(us) Van Damme",
+                    "email": "bramus@bram.us",
+                    "homepage": "http://www.bram.us"
+                }
+            ],
+            "description": "A lightweight and simple object oriented PHP Router",
+            "homepage": "https://github.com/bramus/router",
+            "keywords": [
+                "router",
+                "routing"
+            ],
+            "time": "2016-05-26T19:40:20+00:00"
+        },
+        {
+            "name": "carrooi/docx-extractor",
+            "version": "1.0.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/Carrooi/PHP-DocxExtractor.git",
+                "reference": "aac4f974f6077043fc77801c854a92a4eb2b99ff"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/Carrooi/PHP-DocxExtractor/zipball/aac4f974f6077043fc77801c854a92a4eb2b99ff",
+                "reference": "aac4f974f6077043fc77801c854a92a4eb2b99ff",
+                "shasum": ""
+            },
+            "require-dev": {
+                "nette/tester": "~1.3.0"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-4": {
+                    "Carrooi\\DocxExtractor\\": "src/"
+                },
+                "classmap": [
+                    "src/exceptions.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "David Kudera",
+                    "email": "kudera.d@gmail.com",
+                    "homepage": "http://davidkudera.com"
+                }
+            ],
+            "description": "DOCX text extractor",
+            "keywords": [
+                "carrooi",
+                "docx",
+                "extract",
+                "extractor",
+                "text"
+            ],
+            "time": "2015-02-11T14:28:43+00:00"
+        },
+        {
+            "name": "catfan/medoo",
+            "version": "v1.1.3",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/catfan/Medoo.git",
+                "reference": "2601ffd53971866695c544c955d580d3d36b3848"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/catfan/Medoo/zipball/2601ffd53971866695c544c955d580d3d36b3848",
+                "reference": "2601ffd53971866695c544c955d580d3d36b3848",
+                "shasum": ""
+            },
+            "require": {
+                "ext-pdo": "*",
+                "php": ">=5.1"
+            },
+            "suggest": {
+                "ext-pdo_dblib": "For MSSQL or Sybase databases on Linux/UNIX platform",
+                "ext-pdo_mysql": "For MySQL or MariaDB databases",
+                "ext-pdo_oci": "For Oracle databases",
+                "ext-pdo_pqsql": "For PostgreSQL databases",
+                "ext-pdo_sqlite": "For SQLite databases",
+                "ext-pdo_sqlsrv": "For MSSQL databases on Windows platform"
+            },
+            "type": "framework",
+            "autoload": {
+                "files": [
+                    "medoo.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Angel Lai",
+                    "email": "angel@catfan.me"
+                }
+            ],
+            "description": "The Lightest PHP database framework to accelerate development",
+            "homepage": "http://medoo.in",
+            "keywords": [
+                "database",
+                "lightweight",
+                "mssql",
+                "mysql",
+                "php framework",
+                "sql",
+                "sqlite"
+            ],
+            "time": "2016-09-05T07:18:35+00:00"
+        },
+        {
+            "name": "codeguy/upload",
+            "version": "1.3.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/codeguy/Upload.git",
+                "reference": "6a9e5e1fb58d65346d0e557db2d46fb25efd3e37"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/codeguy/Upload/zipball/6a9e5e1fb58d65346d0e557db2d46fb25efd3e37",
+                "reference": "6a9e5e1fb58d65346d0e557db2d46fb25efd3e37",
+                "shasum": ""
+            },
+            "require": {
+                "ext-fileinfo": "*",
+                "php": ">=5.3.0"
+            },
+            "require-dev": {
+                "phpunit/phpunit": "3.7.*"
+            },
+            "type": "library",
+            "autoload": {
+                "psr-0": {
+                    "Upload": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Josh Lockhart",
+                    "email": "info@joshlockhart.com",
+                    "homepage": "http://www.joshlockhart.com/"
+                }
+            ],
+            "description": "Handle file uploads with extensible validation and storage strategies",
+            "homepage": "http://github.com/codeguy/Upload",
+            "keywords": [
+                "file",
+                "upload",
+                "validation"
+            ],
+            "time": "2013-07-07T17:01:41+00:00"
+        },
+        {
+            "name": "league/plates",
+            "version": "3.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/thephpleague/plates.git",
+                "reference": "b1684b6f127714497a0ef927ce42c0b44b45a8af"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/thephpleague/plates/zipball/b1684b6f127714497a0ef927ce42c0b44b45a8af",
+                "reference": "b1684b6f127714497a0ef927ce42c0b44b45a8af",
+                "shasum": ""
+            },
+            "require": {
+                "php": "^5.3 | ^7.0"
+            },
+            "require-dev": {
+                "mikey179/vfsstream": "^1.4",
+                "phpunit/phpunit": "~4.0",
+                "squizlabs/php_codesniffer": "~1.5"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "League\\Plates\\": "src"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Jonathan Reinink",
+                    "email": "jonathan@reinink.ca",
+                    "role": "Developer"
+                }
+            ],
+            "description": "Plates, the native PHP template system that's fast, easy to use and easy to extend.",
+            "homepage": "http://platesphp.com",
+            "keywords": [
+                "league",
+                "package",
+                "templates",
+                "templating",
+                "views"
+            ],
+            "time": "2016-12-28T00:14:17+00:00"
+        },
+        {
+            "name": "pimple/pimple",
+            "version": "v3.0.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/silexphp/Pimple.git",
+                "reference": "a30f7d6e57565a2e1a316e1baf2a483f788b258a"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/silexphp/Pimple/zipball/a30f7d6e57565a2e1a316e1baf2a483f788b258a",
+                "reference": "a30f7d6e57565a2e1a316e1baf2a483f788b258a",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.0.x-dev"
+                }
+            },
+            "autoload": {
+                "psr-0": {
+                    "Pimple": "src/"
+                }
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                }
+            ],
+            "description": "Pimple, a simple Dependency Injection Container",
+            "homepage": "http://pimple.sensiolabs.org",
+            "keywords": [
+                "container",
+                "dependency injection"
+            ],
+            "time": "2015-09-11T15:10:35+00:00"
+        },
+        {
+            "name": "symfony/http-foundation",
+            "version": "v3.2.2",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/http-foundation.git",
+                "reference": "33eb76bf1d833c705433e5361a646c164696394b"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/http-foundation/zipball/33eb76bf1d833c705433e5361a646c164696394b",
+                "reference": "33eb76bf1d833c705433e5361a646c164696394b",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.5.9",
+                "symfony/polyfill-mbstring": "~1.1"
+            },
+            "require-dev": {
+                "symfony/expression-language": "~2.8|~3.0"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "3.2-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Component\\HttpFoundation\\": ""
+                },
+                "exclude-from-classmap": [
+                    "/Tests/"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Fabien Potencier",
+                    "email": "fabien@symfony.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony HttpFoundation Component",
+            "homepage": "https://symfony.com",
+            "time": "2017-01-08T20:47:33+00:00"
+        },
+        {
+            "name": "symfony/polyfill-mbstring",
+            "version": "v1.3.0",
+            "source": {
+                "type": "git",
+                "url": "https://github.com/symfony/polyfill-mbstring.git",
+                "reference": "e79d363049d1c2128f133a2667e4f4190904f7f4"
+            },
+            "dist": {
+                "type": "zip",
+                "url": "https://api.github.com/repos/symfony/polyfill-mbstring/zipball/e79d363049d1c2128f133a2667e4f4190904f7f4",
+                "reference": "e79d363049d1c2128f133a2667e4f4190904f7f4",
+                "shasum": ""
+            },
+            "require": {
+                "php": ">=5.3.3"
+            },
+            "suggest": {
+                "ext-mbstring": "For best performance"
+            },
+            "type": "library",
+            "extra": {
+                "branch-alias": {
+                    "dev-master": "1.3-dev"
+                }
+            },
+            "autoload": {
+                "psr-4": {
+                    "Symfony\\Polyfill\\Mbstring\\": ""
+                },
+                "files": [
+                    "bootstrap.php"
+                ]
+            },
+            "notification-url": "https://packagist.org/downloads/",
+            "license": [
+                "MIT"
+            ],
+            "authors": [
+                {
+                    "name": "Nicolas Grekas",
+                    "email": "p@tchwork.com"
+                },
+                {
+                    "name": "Symfony Community",
+                    "homepage": "https://symfony.com/contributors"
+                }
+            ],
+            "description": "Symfony polyfill for the Mbstring extension",
+            "homepage": "https://symfony.com",
+            "keywords": [
+                "compatibility",
+                "mbstring",
+                "polyfill",
+                "portable",
+                "shim"
+            ],
+            "time": "2016-11-14T01:06:16+00:00"
+        }
+    ],
+    "packages-dev": [],
+    "aliases": [],
+    "minimum-stability": "stable",
+    "stability-flags": [],
+    "prefer-stable": false,
+    "prefer-lowest": false,
+    "platform": [],
+    "platform-dev": []
+}
