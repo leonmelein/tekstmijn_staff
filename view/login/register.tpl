@@ -25,7 +25,7 @@
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="name">Naam</label>
                     <div class="col-md-4">
-                        <p class="form-control-static">De Docent</p>
+                        <p class="form-control-static"><?=$this->e($name)?></p>
                     </div>
                 </div>
 
@@ -33,7 +33,8 @@
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="name">E-mailadres</label>
                     <div class="col-md-4">
-                        <p class="form-control-static">de.docent@school.nl</p>
+                        <p class="form-control-static"><?=$this->e($email)?></p>
+                        <input type="hidden" name="username" value="<?=$this->e($email)?>"/>
                     </div>
                 </div>
 

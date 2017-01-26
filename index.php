@@ -4,6 +4,7 @@
      */
     require("vendor/autoload.php");
     require("model/index.php");
+    require("model/login.php");
     use BootPress\Bootstrap\v3\Component as Bootstrap;
 
     function getDatabase(){
@@ -44,10 +45,18 @@
 
     //  Authentication check: check if each request has a user ID set in session.
     //  TODO: use tokens?
-    $router->before('GET|POST', '/account/.*', function() {
+    $router->before('GET|POST', 'account/', function() {
         session_start("staff");
-        if (!isset($_SESSION['staff_user'])) {
+        if (!isset($_SESSION['staff_id'])) {
             getRedirect("/staff/login");
+            exit();
+        }
+    });
+
+    // Prerouting check for initial setup
+    $router->before('GET', 'register/', function() {
+        if (!isset($_GET["token"])) {
+            getRedirect("/staff/login?failed_registration=true");
             exit();
         }
     });
@@ -62,14 +71,12 @@
 
     $router->post("login/", function (){
         $db = getDatabase();
-       //if(check_login($db, $_POST['username'], $_POST['password'])){
-       if(true == true){
+       if(check_login($db, $_POST['username'], $_POST['password'])){
            session_start("staff");
-           $_SESSION['staff_user'] = $_POST['username'];
-           $_SESSION['staff_name'] = "D. Docent";
-//           $userinfo = getUserInfo($db, $_POST['username']);
-//           $_SESSION['class'] = $userinfo["class"];
-//           $_SESSION['name'] = $userinfo["name"];
+           $info = getUserInfo($db, $_POST['username']);
+           $_SESSION['staff_id'] = $info["id"];
+           $_SESSION["staff_email"] = $_POST["username"];
+           $_SESSION['staff_name'] = $info["name"];
            getRedirect("../account/");
        } else {
            getRedirect("/staff/login/?failed=true");
@@ -83,27 +90,53 @@
         });
 
     $router->get("register/", function (){
-        echo getTemplates()->render("login::register", ["title" => "Hofstad | Registreren"]);
+        $db = getDatabase();
+        $registration = getRegistrationInfo($db, $_GET["token"]);
+
+        if($registration){
+            echo getTemplates()->render("login::register",
+                                        ["title" => "Hofstad | Registreren",
+                                            "name" => $registration["name"],
+                                            "email" => $registration["email"],
+                                            "page_js" => "../vendor/application/register_validate.js"
+                                        ]
+            );
+        } else {
+            getRedirect("/staff/login/?failed_registration=true");
+        }
+
+
     });
 
     $router->post("register/", function(){
         $db = getDatabase();
         if(set_initial_password($db, $_POST["username"], $_POST["password"])){
-            getRedirect("/login/?registration=true");
+            getRedirect("/staff/login/?registration=true");
         } else {
-            getRedirect("/register/?failed=true");
+            getRedirect("/staff/register/?failed=true");
         }
     });
 
     $router->get("account/", function (){
         $bp = getBootstrap();
+
         session_start("staff");
         // Generate menu
         $menu = generateMenu($bp, ["active" => "Mijn account", "align" => "stacked"]);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Mijn account" => "#"]);
 
         echo getTemplates()->render("login::account", ["title" => "Hofstad | Mijn account",
-            "page_title" => "Mijn account", "menu" => $menu, "breadcrumbs" => $breadcrumbs]);
+            "page_title" => "Mijn account", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+            "name" => $_SESSION["staff_name"], "email" => $_SESSION["staff_email"], "page_js" => "../vendor/application/register_validate.js"]);
+    });
+
+    $router->post("account/", function(){
+        $db = getDatabase();
+        if(change_password($db, $_POST["username"], $_POST["password"])){
+            getRedirect("/staff/account/?password_changed=true");
+        } else {
+            getRedirect("/staff/register/?password_changed=true");
+        }
     });
 
 

@@ -43,17 +43,22 @@
                 if($_GET["logged_out"] == "true") {
                     echo '<div class="alert alert-success alert-dismissable" role="alert">
                            <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
-                           <strong>Uitgelogd.</strong> Je bent uitgelogd.
+                           <strong>Uitgelogd.</strong> U bent uitgelogd.
                       </div>';
                 } else if ($_GET["failed"] == "true") {
                     echo '<div class="alert alert-danger alert-dismissable" role="alert">
                         <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
-                        <b>Inloggen mislukt.</b> Probeer het opnieuw of vraag je docent.
+                        <b>Inloggen mislukt.</b> Probeer het opnieuw of vraag uw sectievoorzitter.
                       </div>';
                 } else if ($_GET["registration"] == "true") {
                     echo '<div class="alert alert-success alert-dismissable" role="alert">
                            <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
-                           <strong>Gelukt.</strong> Je bent geregistreerd.
+                           <strong>Gelukt.</strong> U bent geregistreerd.
+                      </div>';
+                } else if ($_GET["failed_registration"] == "true") {
+                    echo '<div class="alert alert-danger alert-dismissable" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
+                        <b>Registreren mislukt.</b> U bent niet bekend bij ons. Probeer het nogmaals of vraag uw sectievoorzitter.
                       </div>';
                 }
                 ?>

@@ -17,11 +17,11 @@ $(function() {
         messages: {
             password: {
                 required: "Voer een wachtwoord in.",
-                minlength: "Je wachtwoord moet minstens vijf tekens lang zijn."
+                minlength: "Uw wachtwoord moet minstens vijf tekens lang zijn."
             },
             password_confirm: {
                 required: "Herhaal je wachtwoord.",
-                equalTo: "Je wachtwoorden komen niet overeen."
+                equalTo: "Uw wachtwoorden komen niet overeen."
             }
 
         },
