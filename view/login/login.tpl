@@ -29,15 +29,16 @@
     <div class="container signin-container">
 
 
-        <form class="form-signin" method="post" action="/login/">
+        <form class="form-signin" method="post" action="/staff/login/">
 
             <div class="row">
                 <div class="col-md-3"></div>
                 <div class="col-md-6">
-                    <img src="/assets/img/logo.svg" alt="Hofstad" class="img-rounded img-responsive" height="350" width="350"><br><br>
+                    <img src="/assets/img/logo.svg" alt="Hofstad" class="img-rounded img-responsive" height="350" width="350">
                 </div>
             </div>
             <div class="row">
+                <h3 class="text-center">Hofstad Medewerkers</h3><br>
                 <?php
                 if($_GET["logged_out"] == "true") {
                     echo '<div class="alert alert-success alert-dismissable" role="alert">
@@ -57,12 +58,12 @@
                 }
                 ?>
             </div>
-            <label for="username" class="sr-only">Gebruikersnaam</label>
-            <input type="text" name="username" id="username" class="form-control" placeholder="160001" aria-label="Gebruikersnaam" required autofocus>
+            <label for="username" class="sr-only">E-mailadres</label>
+            <input type="text" name="username" id="username" class="form-control" placeholder="de.docent@school.nl" aria-label="E-mailadres" required autofocus>
             <label for="password" class="sr-only">Wachtwoord</label>
             <input type="password" name="password" id="password" class="form-control" placeholder="Wachtwoord" aria-label="Wachtwoord" required>
             <button class="btn btn-lg btn-primary btn-block" type="submit" aria-label="Inloggen">Inloggen</button>
-            <a class="btn btn-lg btn-primary btn-block" href="/register/" aria-label="Registreren">Registreren</a>
+            <button class="btn btn-lg btn-primary btn-block" href="#" aria-label="Wachtwoord vergeten?">Wachtwoord vergeten?</button>
         </form>
 
     </div> <!-- /container -->

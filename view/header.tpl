@@ -15,6 +15,6 @@
     <ul class="nav navbar-nav">
     </ul>
     <ul class="nav navbar-nav navbar-right">
-        <li><a href="/logout"><span class="glyphicon glyphicon-off"></span> Uitloggen</a></li>
+        <li><a href="/staff/logout"><span class="glyphicon glyphicon-off"></span> Uitloggen</a></li>
     </ul>
 </div><!--/.nav-collapse -->

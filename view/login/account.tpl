@@ -1,23 +1,16 @@
-<?php $this->layout('main_layout_public', ['title' => $title, 'pageJS' => $page_js]); ?>
+<?php $this->layout('main_layout', ['title' => $title]); ?>
 <div class="row">
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
-        <?php
-        if($_GET["failed"] == "true") {
-            echo '<div class="alert alert-danger alert-dismissable" role="alert">
-                                   <button type="button" class="close" data-dismiss="alert" aria-label="Close"><span aria-hidden="true">&times;</span></button>
-                                   <strong>Mislukt.</strong> We konden je wachtwoord niet instellen. Probeer het opnieuw of vraag je docent.
-                              </div>';
-        }
-        ?>
+    <div class="col-md-12">
+        <?php echo $breadcrumbs; ?>
     </div>
-    <div class="col-md-2"></div>
 </div>
 
 <div class="row">
-    <div class="col-md-2"></div>
-    <div class="col-md-8">
-        <h1 class="page_title">Registreren</h1>
+    <div class="col-md-3">
+        <?php echo $menu; ?>
+    </div>
+    <div class="col-md-9">
+        <h1 class="page_title"><?php echo $page_title; ?></h1>
         <form class="form-horizontal" id="register" method="post" action="/staff/register/">
             <fieldset>
 
@@ -56,12 +49,11 @@
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="submit"></label>
                     <div class="col-md-4">
-                        <button id="submit" name="submit" type="submit" class="btn btn-primary" style="width: 100%">Instellen</button>
+                        <button id="submit" name="submit" type="submit" class="btn btn-primary" style="width: 100%">Wachtwoord wijzigen</button>
                     </div>
                 </div>
 
             </fieldset>
         </form>
     </div>
-    <div class="col-md-2"></div>
 </div>
