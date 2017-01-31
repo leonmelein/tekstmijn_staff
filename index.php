@@ -5,6 +5,7 @@
     require("vendor/autoload.php");
     require("model/index.php");
     require("model/login.php");
+    require("model/students.php");
     use BootPress\Bootstrap\v3\Component as Bootstrap;
 
     function getDatabase(){
@@ -22,6 +23,7 @@
     function getTemplates(){
         $templates = new League\Plates\Engine('view', 'tpl');
         $templates->addFolder("login", "view/login");
+        $templates->addFolder("classes", "view/classes");
         return $templates;
     }
 
@@ -77,7 +79,7 @@
            $_SESSION['staff_id'] = $info["id"];
            $_SESSION["staff_email"] = $_POST["username"];
            $_SESSION['staff_name'] = $info["name"];
-           getRedirect("../account/");
+           getRedirect("../classes/");
        } else {
            getRedirect("/staff/login/?failed=true");
        }
@@ -137,6 +139,59 @@
         } else {
             getRedirect("/staff/register/?password_changed=true");
         }
+    });
+
+    $router->get("classes/", function (){
+        session_start("staff");
+        $bp = getBootstrap();
+        $db = getDatabase();
+
+        $menu = generateMenu($bp, ["active" => "Klassen", "align" => "stacked"]);
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Klassen" => "#"]);
+
+        $classes = getClassesForStaff($db, $_SESSION["staff_id"]);
+        $columns = [
+            ["Naam", "name"],
+            ["Niveau", "level"],
+            ["Jaar", "year"]
+        ];
+        $table = generateTable($bp, $columns, $classes, null, '<a href="%s/">%s</a>');
+        echo getTemplates()->render("classes::index", ["title" => "Hofstad | Klassen",
+            "page_title" => "Klassen", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+            "table" => $table]);
+    });
+
+    $router->get("classes/(\d+)/", function ($class_id){
+        session_start("staff");
+        $bp = getBootstrap();
+        $db = getDatabase();
+
+        $name = sprintf("Klas %s", getClassName($db, $class_id));
+        $menu = generateMenu($bp, ["active" => "Klassen", "align" => "stacked"]);
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Klassen" => "/staff/classes/",
+            $name => "#"]);
+
+        $students =  getClassStudents($db, $class_id);
+        $columns = [
+            ["#", "id"],
+            ["Naam", "name"]
+        ];
+        $options = [
+            ["<a class='btn btn-primary pull-right' id='%s' onclick='reset_student_pwd(%s, self.document)'>Wachtwoord resetten</a>", "id", ""]
+        ];
+
+        $table = generateTable($bp, $columns, $students, $options);
+        echo getTemplates()->render("classes::class", ["title" => "Hofstad | Klassen",
+            "page_title" => $name, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+            "table" => $table, "page_js" => "/staff/vendor/application/reset_pwd_students.js"]);
+    });
+
+    $router->get("reset/(\d+)/", function($student_id){
+       if(resetStudentPassword(getDatabase(), $student_id)){
+           echo '{"status": "success"}';
+       } else {
+           echo '{"status": "failure"}';
+       }
     });
 
 
