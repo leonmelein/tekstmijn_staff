@@ -6,6 +6,7 @@
     require("model/index.php");
     require("model/login.php");
     require("model/students.php");
+    require("model/submissions.php");
     use BootPress\Bootstrap\v3\Component as Bootstrap;
 
     function getDatabase(){
@@ -24,6 +25,7 @@
         $templates = new League\Plates\Engine('view', 'tpl');
         $templates->addFolder("login", "view/login");
         $templates->addFolder("classes", "view/classes");
+        $templates->addFolder("submissions", "view/submissions");
         return $templates;
     }
 
@@ -194,5 +196,73 @@
        }
     });
 
+    $router->get("submissions/", function (){
+        session_start("staff");
+        $bp = getBootstrap();
+        $db = getDatabase();
+
+        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"]);
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Inzendingen" => "#"]);
+
+        $classes = getSubmissionsForStaff($db, $_SESSION["staff_id"]);
+        $columns = [
+            ["Jaar", "year"],
+            ["Niveau", "level"],
+            ["Klas", "class"]
+        ];
+        $table = generateTable($bp, $columns, $classes, null, '<a href="%s/">%s</a>');
+        echo getTemplates()->render("submissions::index", ["title" => "Hofstad | Klassen",
+            "page_title" => "Inzendingen", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+            "table" => $table]);
+    });
+
+    $router->get("submissions/(\d+)/", function ($class_id){
+        session_start("staff");
+        $bp = getBootstrap();
+        $db = getDatabase();
+
+        $class = getClassName($db, $class_id);
+        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"]);
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/",
+            sprintf("Klas %s", $class) => "#"]);
+
+        $students =  getAssignmentsforClass($db, $class_id);
+        $columns = [
+            ["Titel", "title"],
+            ["Status", "status"],
+            ["Startdatum", "start_date"],
+            ["Uiterste inleverdatum", "end_date"],
+        ];
+
+        $table = generateTable($bp, $columns, $students, null, '<a href="%s/">%s</a>');
+        echo getTemplates()->render("submissions::submissions", ["title" => "Hofstad | Inzendingen",
+            "page_title" => "Inzendingen", "page_subtitle" => sprintf("Klas %s", $class),  "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+            "table" => $table]);
+    });
+
+    $router->get("submissions/(\d+)/(.*)/", function ($class_id, $assignment_id){
+        session_start("staff");
+        $bp = getBootstrap();
+        $db = getDatabase();
+
+        $title = getAssignmentName($db, $assignment_id);
+        $class = getClassName($db, $class_id);
+        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"]);
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/", sprintf("Klas %s", $class) => "/staff/submissions/$class_id",
+            $title => "#"]);
+
+        $students =  getSubmissionsForAssignment($db, $class_id, $assignment_id);
+        $columns = [
+            ["Leerlingnummer", "id"],
+            ["Naam", "name"],
+            ["Inleverdatum", "submission_date"],
+            ["Aantal pogingen", "submission_count"],
+        ];
+
+        $table = generateTable($bp, $columns, $students);
+        echo getTemplates()->render("submissions::submissions", ["title" => "Hofstad | Inzendingen",
+            "page_title" => "Inzendingen", "page_subtitle" => $title, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+            "table" => $table]);
+    });
 
     $router->run();
