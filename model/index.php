@@ -53,3 +53,10 @@ function generateMenu($bp, $active){
 function generateBreadcrumbs($bp, $path){
     return $bp->breadcrumbs($path);
 }
+
+function generateTabs($bp, $tabsarray, $active = 'Info'){
+    return $bp->tabs($tabsarray, array(
+        'active' => $active,
+        'toggle' => "tab",
+    ));
+}

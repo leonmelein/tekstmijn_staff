@@ -235,34 +235,77 @@
         ];
 
         $table = generateTable($bp, $columns, $students, null, '<a href="%s/">%s</a>');
-        echo getTemplates()->render("submissions::submissions", ["title" => "Hofstad | Inzendingen",
+        echo getTemplates()->render("submissions::classes", ["title" => "Hofstad | Inzendingen",
             "page_title" => "Inzendingen", "page_subtitle" => sprintf("Klas %s", $class),  "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table]);
     });
 
-    $router->get("submissions/(\d+)/(.*)/", function ($class_id, $assignment_id){
+    $router->get("submissions/(\d+)/([a-z0-9_-]+)/", function ($class_id, $assignment_id){
         session_start("staff");
         $bp = getBootstrap();
         $db = getDatabase();
 
         $title = getAssignmentName($db, $assignment_id);
         $class = getClassName($db, $class_id);
+        $tabs = generateTabs($bp, ["Ingeleverd" => "#ingeleverd", "Te laat" => "#telaat", "Niet ingeleverd" => "#nietingeleverd"], 'Ingeleverd');
         $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"]);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/", sprintf("Klas %s", $class) => "/staff/submissions/$class_id",
             $title => "#"]);
 
         $students =  getSubmissionsForAssignment($db, $class_id, $assignment_id);
         $columns = [
-            ["Leerlingnummer", "id"],
+            ["Leerlingnummer", "student_id"],
             ["Naam", "name"],
             ["Inleverdatum", "submission_date"],
             ["Aantal pogingen", "submission_count"],
         ];
 
-        $table = generateTable($bp, $columns, $students);
+        $table_ingeleverd = generateTable($bp, $columns, $students, null, '<a href="%s/">%s</a>');
+
+        $students = getSubmissionsForAssignmentToLate($db, $class_id, $assignment_id);
+        $table_telaat = generateTable($bp, $columns, $students, null, '<a href="%s/">%s</a>');
+
+        $students = getSubmissionsForAssignmentNoShow($db, $class_id, $assignment_id);
+        $columns = [
+            ["Leerlingnummer", "id"],
+            ["Naam", "name"],
+        ];
+        $table_nietingeleverd = generateTable($bp, $columns, $students);
         echo getTemplates()->render("submissions::submissions", ["title" => "Hofstad | Inzendingen",
             "page_title" => "Inzendingen", "page_subtitle" => $title, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
-            "table" => $table]);
+            "table_ingeleverd" => $table_ingeleverd, "table_telaat" => $table_telaat, "table_nietingeleverd" => $table_nietingeleverd, "tabs" => $tabs]);
+    });
+
+    $router->get("submissions/(\d+)/([a-z0-9_-]+)/(\d+)", function ($class_id, $assignment_id, $submission_id) {
+        session_start("staff");
+        $bp = getBootstrap();
+        $db = getDatabase();
+
+        $title = "Inzendingen";
+        $assignment_name = getAssignmentName($db, $assignment_id);
+        $student_name = getStudentName($db, $submission_id);
+        $subtitle = sprintf("%s : %s", $assignment_name, $student_name);
+        $class = getClassName($db, $class_id);
+        $tabs = generateTabs($bp, ["De inzending" => "#deinzending", "Beoordelen" => "#beoordelen"], 'De inzending');
+        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"]);
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/", sprintf("Klas %s", $class) => "/staff/submissions/$class_id", $assignment_name => "/staff/submissions/$class_id/$assignment_id", $title => "#"]);
+
+        $submission_info = getSubmissionInfo($db, $submission_id);
+        $page_js = "/staff/vendor/application/add_field.js";
+
+        echo getTemplates()->render("submissions::grading", ["title" => "Hofstad | Inzendingen",
+            "page_title" => $title, "page_subtitle" => $subtitle, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+            "tabs" => $tabs, "page_js" => $page_js,
+            "submission_date" => $submission_info["submission_date"],
+            "submission_file" => $submission_info["submission_file"],
+            "submission_count" => $submission_info["submission_count"],
+            "submission_originalfile" => $submission_info["submission_originalfile"],
+        ]);
+    });
+
+    $router->post("/submissions/(.*)/grade", function () {
+        $grading = $_POST;
+        print_r($grading);
     });
 
     $router->run();

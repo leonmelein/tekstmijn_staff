@@ -12,17 +12,6 @@
     <div class="col-md-9">
         <h1 class="page_title"><?php echo $page_title; ?></h1>
         <h3 class="page_title"><?php echo $page_subtitle; ?></h3>
-        <?php echo $tabs; ?>
-        <div class="tab-content">
-            <div id="ingeleverd" class="tab-pane active">
-                <?php echo $table_ingeleverd; ?>
-            </div>
-            <div id="telaat" class="tab-pane">
-                <?php echo $table_telaat; ?>
-            </div>
-            <div id="nietingeleverd" class="tab-pane">
-                <?php echo $table_nietingeleverd; ?>
-            </div>
-        </div>
+        <?php echo $table; ?>
     </div>
 </div>
