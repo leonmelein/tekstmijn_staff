@@ -18,7 +18,7 @@
     <div class="col-md-2"></div>
     <div class="col-md-8">
         <h1 class="page_title">Wachtwoord vergeten</h1>
-        <form class="form-horizontal" id="register" method="post" action="/staff/reset/">
+        <form class="form-horizontal" id="register" method="post" action="/staff/reset_password/">
             <fieldset>
 
                 <!-- Text input-->

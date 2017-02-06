@@ -60,6 +60,26 @@
                         <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
                         <b>Registreren mislukt.</b> U bent niet bekend bij ons. Probeer het nogmaals of vraag uw sectievoorzitter.
                       </div>';
+                } else if ($_GET["reset"] == "true") {
+                    echo '<div class="alert alert-success alert-dismissable" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
+                        <b>Wachtwoordresetlink verzonden.</b> Kijk in uw mail voor de vervolgstappen.
+                      </div>';
+                } else if ($_GET["reset"] == "false") {
+                    echo '<div class="alert alert-danger alert-dismissable" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
+                        <b>Kon niet resetten.</b> We konden uw wachtwoord niet opnieuw instellen.
+                      </div>';
+                } else if ($_GET["pwd_reset"] == "true") {
+                    echo '<div class="alert alert-success alert-dismissable" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
+                        <b>Uw wachtwoord is opnieuw ingesteld.</b> U kunt nu inloggen.
+                      </div>';
+                } else if ($_GET["pwd_reset"] == "false") {
+                    echo '<div class="alert alert-danger alert-dismissable" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
+                        <b>Uw wachtwoord kon niet opnieuw worden ingesteld.</b> Probeer het nogmaals of vraag uw sectievoorzitter.
+                      </div>';
                 }
                 ?>
             </div>

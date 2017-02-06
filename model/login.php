@@ -23,6 +23,14 @@ function getRegistrationInfo($database, $token){
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
 }
 
+function getResetInfo($database, $token){
+    $quoted_token = $database->quote($token);
+    $query = "SELECT CONCAT_WS(' ', firstname, prefix, lastname) as name, email 
+              FROM staff
+              WHERE setuptoken = $quoted_token";
+    return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
+}
+
 function hash_password($password){
     $cost = 10;
     $salt = strtr(base64_encode(mcrypt_create_iv(16, MCRYPT_DEV_URANDOM)), "+", ".");
@@ -52,7 +60,8 @@ function change_password($database, $username, $password){
 
     if (strlen($password) > 0){
         $rows_affected = $database->update("staff",
-            ["password" => hash_password($password)],
+            ["password" => hash_password($password),
+            "setuptoken" => null],
             ["email" => $username]
         );
     }
@@ -63,11 +72,15 @@ function change_password($database, $username, $password){
 
 function set_setup_token($database, $username){
     $rows_affected = $database->update("staff",
-        ["setuptoken" => "UUID()"],
+        ["#setuptoken" => "UUID()"],
         ["email" => $username]
     );
 
     return $rows_affected;
+}
+
+function get_setup_token($database, $username){
+    return $database->select("staff", ["setuptoken"], ["email" => $username])[0]['setuptoken'];
 }
 
 function reset_password($database, $username, $password){
