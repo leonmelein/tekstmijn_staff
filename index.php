@@ -89,15 +89,20 @@
                 $mail->isHTML(true);                                  // Set email format to HTML
                 $mail->Subject = 'Project Hofstad - Wachtwoord wijzigen';
                 $token = get_setup_token($db, $sanitized_email);
-                $mail->Body    = sprintf("Beste %s, <br><br> Er is onlangs verzocht om uw wachtwoord te wijzigen. 
-                                            Dit kunt u via deze link doen: <a href='http://hofstad.reinardvandalen.nl/staff/reset_password/?token=%s'>http://hofstad.reinardvandalen.nl/staff/register/?token=%s
-                                            </a><br><br>Met vriendelijke groet,<br><br>Project Hofstad",
-                    $info['name'], $token, $token);
+                // Retrieve the email template required
+                $message = file_get_contents('/volume1/hofstad/staff/assets/mail/reset.html');
+                // Replace the % with the actual information
+                $message = str_replace('%name%', $info['name'], $message);
+                $message = str_replace('%link%', $token, $message);
+
+
+                $mail->Body    = $message;
                 $mail->AltBody = 'Zet HTML aan in uw e-mailclient.';
 
                 if(!$mail->send()) {
                     getRedirect("/staff/login/?reset=false");
                 } else {
+                    echo $mail->ErrorInfo;
                     getRedirect("/staff/login/?reset=true");
                 }
             }
