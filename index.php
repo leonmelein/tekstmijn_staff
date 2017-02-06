@@ -75,16 +75,57 @@
 
     $router->post("login/", function (){
         $db = getDatabase();
-       if(check_login($db, $_POST['username'], $_POST['password'])){
-           session_start("staff");
-           $info = getUserInfo($db, $_POST['username']);
-           $_SESSION['staff_id'] = $info["id"];
-           $_SESSION["staff_email"] = $_POST["username"];
-           $_SESSION['staff_name'] = $info["name"];
-           getRedirect("../classes/");
-       } else {
-           getRedirect("/staff/login/?failed=true");
-       }
+        $info = getUserInfo($db, $_POST['username']);
+
+        if ($_POST['password_forgotten'] == 1) {
+            $sanitized_email = filter_var($_POST['username'], FILTER_SANITIZE_EMAIL);
+            if (filter_var($sanitized_email, FILTER_VALIDATE_EMAIL)) {
+                set_setup_token($db, $_POST['username']);
+
+                // Password forgotten
+                $mail = new PHPMailer;
+                $mail->SMTPDebug = 3;                               // Enable verbose debug output
+                $mail->isSMTP();                                      // Set mailer to use SMTP
+                $mail->Host = 'smtp.gmail.com';  // Specify main and backup SMTP servers
+                $mail->SMTPAuth = true;                               // Enable SMTP authentication
+                $mail->Username = 'hofstad@thesociallions.nl';                 // SMTP username
+                $mail->Password = 'LR_hdh4@26';                           // SMTP password
+                $mail->SMTPSecure = 'tls';                            // Enable TLS encryption, `ssl` also accepted
+                $mail->Port = 587;                                    // TCP port to connect to
+
+                $mail->setFrom('hofstad@thesociallions.nl', 'Project Hofstad');
+                $mail->addAddress($sanitized_email);
+                $mail->isHTML(true);                                  // Set email format to HTML
+
+                $mail->Subject = 'Project Hofstad - Wachtwoord wijzigen';
+                $mail->Body    = sprintf('Beste %s, <br><br> Er is onlangs verzocht om uw wachtwoord te wijzigen. Dit kunt u via deze link doen: %s<br><br>Met vriendelijke groet,<br><br>Project Hofstad',
+                    $info['name'], $info['setuptoken']);
+                $mail->AltBody = 'Zet HTML aan in uw e-mailclient.';
+
+                if(!$mail->send()) {
+                    echo 'Message could not be sent.';
+                    echo 'Mailer Error: ' . $mail->ErrorInfo;
+                } else {
+                    echo 'Message has been sent';
+                }
+            }
+
+
+
+
+        } else {
+            // Regular login
+            if(check_login($db, $_POST['username'], $_POST['password'])){
+                session_start("staff");
+                $_SESSION['staff_id'] = $info["id"];
+                $_SESSION["staff_email"] = $_POST["username"];
+                $_SESSION['staff_name'] = $info["name"];
+                getRedirect("../classes/");
+            } else {
+                getRedirect("/staff/login/?failed=true");
+            }
+        }
+
     });
 
     $router->get('logout/', function (){

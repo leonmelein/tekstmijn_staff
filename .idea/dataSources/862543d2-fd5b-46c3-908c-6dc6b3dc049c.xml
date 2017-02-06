@@ -437,132 +437,136 @@ type</ColNames>
       <ColNames>setuptoken</ColNames>
       <UnderlyingIndexName>staff_setuptoken_uindex</UnderlyingIndexName>
     </key>
-    <column id="94" parent="20" name="id">
+    <trigger id="94" parent="19" name="before_staff_insert">
+      <Turn>before-row</Turn>
+      <Events>I</Events>
+    </trigger>
+    <column id="95" parent="20" name="id">
       <Position>1</Position>
       <Comment>Stamnummer leerling</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="95" parent="20" name="school_id">
+    <column id="96" parent="20" name="school_id">
       <Position>2</Position>
       <Comment>School leerling</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="96" parent="20" name="class_id">
+    <column id="97" parent="20" name="class_id">
       <Position>3</Position>
       <Comment>Klas leerling</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="97" parent="20" name="firstname">
+    <column id="98" parent="20" name="firstname">
       <Position>4</Position>
       <Comment>Voornaam leerling</Comment>
       <DataType>varchar(255)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="98" parent="20" name="prefix">
+    <column id="99" parent="20" name="prefix">
       <Position>5</Position>
       <Comment>Tussenvoegsel leerling</Comment>
       <DataType>varchar(255)|0</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;&apos;</DefaultExpression>
     </column>
-    <column id="99" parent="20" name="lastname">
+    <column id="100" parent="20" name="lastname">
       <Position>6</Position>
       <Comment>Achternaam leerling</Comment>
       <DataType>varchar(255)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="100" parent="20" name="birthday">
+    <column id="101" parent="20" name="birthday">
       <Position>7</Position>
       <Comment>Geboortedatum leerling</Comment>
       <DataType>date|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="101" parent="20" name="password">
+    <column id="102" parent="20" name="password">
       <Position>8</Position>
       <Comment>Wachtwoord leerling</Comment>
       <DataType>varchar(255)|0</DataType>
     </column>
-    <key id="102" parent="20" name="PRIMARY">
+    <key id="103" parent="20" name="PRIMARY">
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="103" parent="21" name="id">
+    <column id="104" parent="21" name="id">
       <Position>1</Position>
       <Comment>ID uitwerking</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>1</SequenceIdentity>
     </column>
-    <column id="104" parent="21" name="time">
+    <column id="105" parent="21" name="time">
       <Position>2</Position>
       <Comment>Datum inleveren uitwerking</Comment>
       <DataType>timestamp|0</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
     </column>
-    <column id="105" parent="21" name="student_id">
+    <column id="106" parent="21" name="student_id">
       <Position>3</Position>
       <Comment>Leerling uitwerking</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="106" parent="21" name="assignment_id">
+    <column id="107" parent="21" name="assignment_id">
       <Position>4</Position>
       <Comment>Opdracht uitwerking</Comment>
       <DataType>varchar(36)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="107" parent="21" name="file">
+    <column id="108" parent="21" name="file">
       <Position>5</Position>
       <Comment>Bestandsnaam uitwerking</Comment>
       <DataType>varchar(255)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="108" parent="21" name="original_file">
+    <column id="109" parent="21" name="original_file">
       <Position>6</Position>
       <DataType>varchar(255)|0</DataType>
     </column>
-    <column id="109" parent="21" name="text">
+    <column id="110" parent="21" name="text">
       <Position>7</Position>
       <Comment>Ruwe tekst uitwerking</Comment>
       <DataType>longtext|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="110" parent="21" name="submission_count">
+    <column id="111" parent="21" name="submission_count">
       <Position>8</Position>
       <DataType>int(11)|0</DataType>
       <DefaultExpression>&apos;1&apos;</DefaultExpression>
     </column>
-    <key id="111" parent="21" name="PRIMARY">
+    <key id="112" parent="21" name="PRIMARY">
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="112" parent="22" name="submission_id">
+    <column id="113" parent="22" name="submission_id">
       <Position>1</Position>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="113" parent="22" name="staff_id">
+    <column id="114" parent="22" name="staff_id">
       <Position>2</Position>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="114" parent="23" name="staff_id">
+    <column id="115" parent="23" name="staff_id">
       <Position>1</Position>
       <Comment>ID beoordelaar</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="115" parent="23" name="submission_id">
+    <column id="116" parent="23" name="submission_id">
       <Position>2</Position>
       <Comment>ID uitwerking</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="116" parent="23" name="final_grade">
+    <column id="117" parent="23" name="final_grade">
       <Position>3</Position>
       <DataType>decimal(5,2)|0</DataType>
     </column>

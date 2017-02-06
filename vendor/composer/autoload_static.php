@@ -126,6 +126,7 @@ class ComposerStaticInit85726f4fb9ea8f61594adc488cdc3511
         'Carrooi\\DocxExtractor\\InvalidArgumentException' => __DIR__ . '/..' . '/carrooi/docx-extractor/src/exceptions.php',
         'Carrooi\\DocxExtractor\\InvalidStateException' => __DIR__ . '/..' . '/carrooi/docx-extractor/src/exceptions.php',
         'Carrooi\\DocxExtractor\\RuntimeException' => __DIR__ . '/..' . '/carrooi/docx-extractor/src/exceptions.php',
+        'EasyPeasyICS' => __DIR__ . '/..' . '/phpmailer/phpmailer/extras/EasyPeasyICS.php',
         'League\\Plates\\Engine' => __DIR__ . '/..' . '/league/plates/src/Engine.php',
         'League\\Plates\\Extension\\Asset' => __DIR__ . '/..' . '/league/plates/src/Extension/Asset.php',
         'League\\Plates\\Extension\\ExtensionInterface' => __DIR__ . '/..' . '/league/plates/src/Extension/ExtensionInterface.php',
@@ -139,6 +140,10 @@ class ComposerStaticInit85726f4fb9ea8f61594adc488cdc3511
         'League\\Plates\\Template\\Functions' => __DIR__ . '/..' . '/league/plates/src/Template/Functions.php',
         'League\\Plates\\Template\\Name' => __DIR__ . '/..' . '/league/plates/src/Template/Name.php',
         'League\\Plates\\Template\\Template' => __DIR__ . '/..' . '/league/plates/src/Template/Template.php',
+        'PHPMailer' => __DIR__ . '/..' . '/phpmailer/phpmailer/class.phpmailer.php',
+        'PHPMailerOAuth' => __DIR__ . '/..' . '/phpmailer/phpmailer/class.phpmaileroauth.php',
+        'PHPMailerOAuthGoogle' => __DIR__ . '/..' . '/phpmailer/phpmailer/class.phpmaileroauthgoogle.php',
+        'POP3' => __DIR__ . '/..' . '/phpmailer/phpmailer/class.pop3.php',
         'Pimple\\Container' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Container.php',
         'Pimple\\ServiceProviderInterface' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/ServiceProviderInterface.php',
         'Pimple\\Tests\\Fixtures\\Invokable' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Tests/Fixtures/Invokable.php',
@@ -147,6 +152,7 @@ class ComposerStaticInit85726f4fb9ea8f61594adc488cdc3511
         'Pimple\\Tests\\Fixtures\\Service' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Tests/Fixtures/Service.php',
         'Pimple\\Tests\\PimpleServiceProviderInterfaceTest' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Tests/PimpleServiceProviderInterfaceTest.php',
         'Pimple\\Tests\\PimpleTest' => __DIR__ . '/..' . '/pimple/pimple/src/Pimple/Tests/PimpleTest.php',
+        'SMTP' => __DIR__ . '/..' . '/phpmailer/phpmailer/class.smtp.php',
         'Symfony\\Component\\HttpFoundation\\AcceptHeader' => __DIR__ . '/..' . '/symfony/http-foundation/AcceptHeader.php',
         'Symfony\\Component\\HttpFoundation\\AcceptHeaderItem' => __DIR__ . '/..' . '/symfony/http-foundation/AcceptHeaderItem.php',
         'Symfony\\Component\\HttpFoundation\\ApacheRequest' => __DIR__ . '/..' . '/symfony/http-foundation/ApacheRequest.php',
@@ -218,6 +224,8 @@ class ComposerStaticInit85726f4fb9ea8f61594adc488cdc3511
         'Upload\\Validation\\Extension' => __DIR__ . '/..' . '/codeguy/upload/src/Upload/Validation/Extension.php',
         'Upload\\Validation\\Mimetype' => __DIR__ . '/..' . '/codeguy/upload/src/Upload/Validation/Mimetype.php',
         'Upload\\Validation\\Size' => __DIR__ . '/..' . '/codeguy/upload/src/Upload/Validation/Size.php',
+        'ntlm_sasl_client_class' => __DIR__ . '/..' . '/phpmailer/phpmailer/extras/ntlm_sasl_client.php',
+        'phpmailerException' => __DIR__ . '/..' . '/phpmailer/phpmailer/class.phpmailer.php',
     );
 
     public static function getInitializer(ClassLoader $loader)

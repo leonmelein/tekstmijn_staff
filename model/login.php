@@ -10,7 +10,7 @@ function check_login($database, $username, $password){
 
 function getUserInfo($database, $username){
     $quoted_username = $database->quote($username);
-    $query = "SELECT id, CONCAT_WS(' ', firstname, prefix, lastname) as name FROM staff WHERE email = $quoted_username";
+    $query = "SELECT id, CONCAT_WS(' ', firstname, prefix, lastname) as name, setuptoken FROM staff WHERE email = $quoted_username";
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
 }
 
@@ -60,3 +60,27 @@ function change_password($database, $username, $password){
 
     return $rows_affected;
 }
+
+function set_setup_token($database, $username){
+    $rows_affected = $database->update("staff",
+        ["setuptoken" => "UUID()"],
+        ["email" => $username]
+    );
+
+    return $rows_affected;
+}
+
+function reset_password($database, $username, $password){
+    $rows_affected = 0;
+
+    if (strlen($password) > 0){
+        $rows_affected = $database->update("staff",
+            ["password" => hash_password($password), "setuptoken" => null],
+            ["email" => $username]
+        );
+    }
+
+
+    return $rows_affected;
+}
+

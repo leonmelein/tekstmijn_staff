@@ -67,8 +67,8 @@
             <input type="text" name="username" id="username" class="form-control" placeholder="de.docent@school.nl" aria-label="E-mailadres" required autofocus>
             <label for="password" class="sr-only">Wachtwoord</label>
             <input type="password" name="password" id="password" class="form-control" placeholder="Wachtwoord" aria-label="Wachtwoord" required>
-            <button class="btn btn-lg btn-primary btn-block" type="submit" aria-label="Inloggen">Inloggen</button>
-            <button class="btn btn-lg btn-primary btn-block" href="#" aria-label="Wachtwoord vergeten?">Wachtwoord vergeten?</button>
+            <button class="btn btn-lg btn-primary btn-block" type="submit" name="password_forgotten" value="0" aria-label="Inloggen">Inloggen</button>
+            <button class="btn btn-lg btn-primary btn-block" type="submit" name="password_forgotten" value="1" href="#" aria-label="Wachtwoord vergeten?">Wachtwoord vergeten?</button>
         </form>
 
     </div> <!-- /container -->
