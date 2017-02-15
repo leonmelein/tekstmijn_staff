@@ -97,3 +97,22 @@ function getSubmissionInfo($database, $id){
                 WHERE submissions.id = $quoted_id";
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
 }
+
+function insertGrading($database, $staff_id, $submission_id, $type, $grade){
+    $last_user_id = $database->insert("grading", [
+        "staff_id" => $staff_id,
+        "submission_id" => $submission_id,
+        "type" => $type,
+        "grade" => $grade
+    ]);
+
+    return $last_user_id;
+}
+
+function getAssignmentID($database, $id){
+    $quoted_id = $database->quote($id);
+    $query = "SELECT submissions.assignment_id
+                FROM submissions
+                WHERE submissions.id = $quoted_id";
+    return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['title'];
+}

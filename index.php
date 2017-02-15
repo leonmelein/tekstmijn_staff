@@ -330,6 +330,9 @@
 
         echo getTemplates()->render("submissions::grading", ["title" => "Hofstad | Inzendingen",
             "page_title" => $title, "page_subtitle" => $subtitle, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+            "class_id" => $class_id,
+            "assignment_id" => $assignment_id,
+            "submission_id" => $submission_id,
             "tabs" => $tabs, "page_js" => $page_js,
             "submission_date" => $submission_info["submission_date"],
             "submission_file" => $submission_info["submission_file"],
@@ -339,8 +342,18 @@
     });
 
     $router->post("/submissions/(.*)/grade", function () {
-        $grading = $_POST;
-        print_r($grading);
+        session_start("staff");
+        $staff_id = $_SESSION['staff_id'];
+        $db = getDatabase();
+        $submission_id = $_POST["submission_id"];
+        $grading_name = $_POST["grading_name"];
+        $grading_grade = $_POST["grading_grade"];
+        $assignment_id = getAssignmentID($db, $submission_id);
+        foreach($grading_name as $index => $type) {
+            $grade = str_replace(",",".",$grading_grade[$index]);
+            insertGrading($db, $staff_id, $submission_id, $type, $grade);
+        }
+        getRedirect("../?success=true");
     });
 
     $router->get("/reset_password/", function (){
