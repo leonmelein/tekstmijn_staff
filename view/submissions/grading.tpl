@@ -5,9 +5,14 @@
         <?php
             if($_GET["success"] == "true") {
                 echo '<div class="alert alert-success alert-dismissable" role="alert">
-                <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
-                <strong>Gelukt.</strong> Uw beoordeling is opgeslagen.
-            </div>';
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
+                        <strong>Gelukt.</strong> Uw beoordeling is opgeslagen.
+                     </div>';
+            } else if($_GET["success"] == "true") {
+                echo '<div class="alert alert-success alert-dismissable" role="alert">
+                        <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
+                        <strong>Oeps.</strong> Uw beoordeling kon niet worden verwerkt. Probeer het nogmaals of vraag uw sectievoorzitter.
+                     </div>';
             }
         ?>
     </div>

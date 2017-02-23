@@ -282,12 +282,12 @@
 
         $title = getAssignmentName($db, $assignment_id);
         $class = getClassName($db, $class_id);
-        $tabs = generateTabs($bp, ["Ingeleverd" => "#ingeleverd", "Te laat" => "#telaat", "Niet ingeleverd" => "#nietingeleverd"], 'Ingeleverd');
+        $tabs = generateTabs($bp, ["Ingeleverd" => "#ingeleverd", "Te laat" => "#telaat", "Niet ingeleverd" => "#nietingeleverd", "Beoordelen" => "#beoordelen"], 'Ingeleverd');
         $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"]);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/", sprintf("Klas %s", $class) => "/staff/submissions/$class_id",
             $title => "#"]);
 
-        $students =  getSubmissionsForAssignment($db, $class_id, $assignment_id);
+        $students_ingeleverd =  getSubmissionsForAssignment($db, $class_id, $assignment_id);
         $columns = [
             ["Leerlingnummer", "student_id"],
             ["Naam", "name"],
@@ -295,7 +295,7 @@
             ["Aantal pogingen", "submission_count"],
         ];
 
-        $table_ingeleverd = generateTable($bp, $columns, $students, null, '<a href="%s/">%s</a>');
+        $table_ingeleverd = generateTable($bp, $columns, $students_ingeleverd, null, '<a href="%s/">%s</a>');
 
         $students = getSubmissionsForAssignmentToLate($db, $class_id, $assignment_id);
         $table_telaat = generateTable($bp, $columns, $students, null, '<a href="%s/">%s</a>');
@@ -306,9 +306,12 @@
             ["Naam", "name"],
         ];
         $table_nietingeleverd = generateTable($bp, $columns, $students);
+
+        $page_js = "/staff/vendor/application/add_pencil.js";
+
         echo getTemplates()->render("submissions::submissions", ["title" => "Hofstad | Inzendingen",
             "page_title" => "Inzendingen", "page_subtitle" => $title, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
-            "table_ingeleverd" => $table_ingeleverd, "table_telaat" => $table_telaat, "table_nietingeleverd" => $table_nietingeleverd, "tabs" => $tabs]);
+            "table_ingeleverd" => $table_ingeleverd, "table_telaat" => $table_telaat, "table_nietingeleverd" => $table_nietingeleverd, "students_ingeleverd" => $students_ingeleverd, "tabs" => $tabs, "page_js" => $page_js]);
     });
 
     $router->get("submissions/(\d+)/([a-z0-9_-]+)/(\d+)", function ($class_id, $assignment_id, $submission_id) {
@@ -343,18 +346,21 @@
     });
 
     $router->post("/submissions/(.*)/grade", function () {
+        $db = getDatabase();
+
         session_start("staff");
         $staff_id = $_SESSION['staff_id'];
-        $db = getDatabase();
         $submission_id = $_POST["submission_id"];
         $grading_name = $_POST["grading_name"];
         $grading_grade = $_POST["grading_grade"];
-        $assignment_id = getAssignmentID($db, $submission_id);
-        foreach($grading_name as $index => $type) {
-            $grade = str_replace(",",".",$grading_grade[$index]);
-            insertGrading($db, $staff_id, $submission_id, $type, $grade);
+
+        $result = insertGrades($db, $staff_id, $submission_id, $grading_name, $grading_grade);
+        if ($result){
+            getRedirect("../?success=true");
+        } else {
+            getRedirect("../?success=false");
         }
-        getRedirect("../?success=true");
+
     });
 
     $router->get("/reset_password/", function (){

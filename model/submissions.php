@@ -100,15 +100,32 @@ submissions.text as text
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
 }
 
-function insertGrading($database, $staff_id, $submission_id, $type, $grade){
-    $last_user_id = $database->insert("grading", [
-        "staff_id" => $staff_id,
-        "submission_id" => $submission_id,
-        "type" => $type,
-        "grade" => $grade
-    ]);
+function insertGrades($database, $staff_id, $submission_id, $types, $grades){
+    $database->action(function($database) use ($types, $grades, $staff_id, $submission_id) {
+        foreach($types as $index => $type) {
+            $grade = str_replace(",",".", $grades[$index]);
+            try {
+                $rows_affected = $database->insert("grading", [
+                    "staff_id" => $staff_id,
+                    "submission_id" => $submission_id,
+                    "type" => $type,
+                    "grade" => $grade
+                ]);
+            } catch (PDOException $PDOException){
+                return false;
+            }
 
-    return $last_user_id;
+            if ($rows_affected == 0){
+                return false;
+            } else if ($database->has("grading",
+                ["staff_id" => $staff_id, "submission_id" => $submission_id, "type" => $type])){
+                return false;
+            }
+        }
+    });
+
+    return true;
+
 }
 
 function getAssignmentID($database, $id){
