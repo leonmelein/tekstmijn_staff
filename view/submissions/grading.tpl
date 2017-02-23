@@ -36,6 +36,19 @@
                     <div class="col-md-2"><strong>Aantal pogingen</strong></div>
                     <div class="col-md-4"><?php echo $submission_count; ?></div>
                 </div>
+                <div class="row">
+                    <div class="col-md-2"><strong>Tekst</strong></div>
+                    <div class="col-md-4"></div>
+                </div>
+                <div class="row">
+                    <!-- Textarea -->
+                    <div class="form-group">
+                        <div class="col-md-12 ">
+                            <textarea readonly class="form-control" id="text" name="text" rows="40"><?php echo $text; ?></textarea>
+                        </div>
+                    </div>
+                </div>
+                <div class="row" style="height: 20px;"></div>
             </div>
             <div id="beoordelen" class="tab-pane">
                 <br>

@@ -92,7 +92,9 @@ function getStudentName($database, $id){
 
 function getSubmissionInfo($database, $id){
     $quoted_id = $database->quote($id);
-    $query = "SELECT submissions.time as submission_date, submissions.file as submission_file, submissions.submission_count as submission_count, submissions.original_file as submission_originalfile
+    $query = "SELECT submissions.time as submission_date, submissions.file as submission_file, 
+submissions.submission_count as submission_count, submissions.original_file as submission_originalfile,
+submissions.text as text
                 FROM submissions
                 WHERE submissions.id = $quoted_id";
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];

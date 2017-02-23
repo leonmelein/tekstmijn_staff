@@ -338,6 +338,7 @@
             "submission_file" => $submission_info["submission_file"],
             "submission_count" => $submission_info["submission_count"],
             "submission_originalfile" => $submission_info["submission_originalfile"],
+            "text" => $submission_info["text"]
         ]);
     });
 

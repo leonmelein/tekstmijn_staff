@@ -204,3 +204,7 @@ input.input-file {
 .hide {
     display: none;
 }
+
+textarea#text {
+    background: #ffffff !important;
+}
