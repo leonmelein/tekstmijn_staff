@@ -100,32 +100,81 @@ submissions.text as text
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
 }
 
-function insertGrades($database, $staff_id, $submission_id, $types, $grades){
-    $database->action(function($database) use ($types, $grades, $staff_id, $submission_id) {
-        foreach($types as $index => $type) {
-            $grade = str_replace(",",".", $grades[$index]);
-            try {
-                $rows_affected = $database->insert("grading", [
-                    "staff_id" => $staff_id,
-                    "submission_id" => $submission_id,
-                    "type" => $type,
-                    "grade" => $grade
-                ]);
-            } catch (PDOException $PDOException){
-                return false;
-            }
+//function insertGrades($database, $staff_id, $submission_id, $types, $grades){
+//    $database->action(function($database) use ($types, $grades, $staff_id, $submission_id) {
+//        foreach($types as $index => $type) {
+//            $grade = str_replace(",",".", $grades[$index]);
+//            try {
+//                $rows_affected = $database->insert("grading", [
+//                    "staff_id" => $staff_id,
+//                    "submission_id" => $submission_id,
+//                    "type" => $type,
+//                    "grade" => $grade
+//                ]);
+//            } catch (PDOException $PDOException){
+//                return false;
+//            }
+//
+//            if ($rows_affected == 0){
+//                return false;
+//            } else if ($database->has("grading",
+//                ["staff_id" => $staff_id, "submission_id" => $submission_id, "type" => $type])){
+//                return false;
+//            }
+//        }
+//    });
+//
+//    return true;
+//
+//}
 
-            if ($rows_affected == 0){
-                return false;
-            } else if ($database->has("grading",
-                ["staff_id" => $staff_id, "submission_id" => $submission_id, "type" => $type])){
-                return false;
-            }
-        }
-    });
+function insertGrades($database, $staff_id, $submission_id, $types, $grades, $grading_notes){
+    $database->delete("grading", [
+        "AND" => [
+            "staff_id" => $staff_id,
+            "submission_id" => $submission_id
+        ]
+    ]);
+    foreach($types as $index => $type) {
+        $grade = str_replace(",",".", $grades[$index]);
+        $database->insert("grading", [
+            "staff_id" => $staff_id,
+            "submission_id" => $submission_id,
+            "type" => $type,
+            "grade" => $grade
+        ]);
+    }
+    if ($grading_notes != "") {
+        $database->insert("grading", [
+            "staff_id" => $staff_id,
+            "submission_id" => $submission_id,
+            "type" => "Notes",
+            "notes" => $grading_notes
+        ]);
+    }
+    return 1;
+}
 
-    return true;
-
+function getGrades($database, $staff_id, $submission_id, $types){
+    $current_grades = [];
+    $quoted_staff_id = $database->quote($staff_id);
+    $quoted_submission_id = $database->quote($submission_id);
+    $query = "SELECT notes FROM grading
+                       WHERE grading.staff_id = $quoted_staff_id
+                       AND grading.submission_id = $quoted_submission_id
+                       AND grading.type = 'Notes'";
+    $note_txt = $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0][notes];
+    $current_grades['Notes'] = $note_txt;
+    foreach ($types as $type) {
+        $quoted_type = $database->quote($type);
+        $query = "SELECT grade FROM grading
+                     WHERE grading.staff_id = $quoted_staff_id
+                     AND grading.submission_id = $quoted_submission_id
+                     AND grading.type = $quoted_type";
+        $grade = $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0][grade];
+        $current_grades[$type] = $grade;
+    }
+    return $current_grades;
 }
 
 function getAssignmentID($database, $id){

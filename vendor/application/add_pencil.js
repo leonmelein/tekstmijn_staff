@@ -1,15 +1,26 @@
-function addPencil() {
-    var div_form_group = document.createElement('div');
-    div_form_group.className = 'row';
-    div_form_group.innerHTML = '' +
-        '<div class="col-md-9">' +
-        '</br>' +
-        '<textarea name="grade_Opmerkingen" class="form-control input-md" rows="3"></textarea>' +
-        '</div>';
-    document.getElementById('content').appendChild(div_form_group);
-    this.value=="test";
+function addPencil(input, button) {
+    console.log(input);
+    console.log(button);
+    contentdiv = input.childNodes[3];
+    console.log(contentdiv);
+    contentdiv.style.display = "inline";
+    button.parentNode.innerHTML="<button id='add_button' type='button' onclick='removePencil(this.parentNode.parentNode.parentNode, this)' class='btn btn-default'><i class='glyphicon glyphicon-floppy-disk'></i></button>";
 }
 
-function removeRow(input) {
-    document.getElementById('content').removeChild(input.parentNode);
+function removePencil(input, button) {
+    button.parentNode.innerHTML="<button id='add_button' type='button' onclick='addPencil(this.parentNode.parentNode.parentNode, this)' class='btn btn-default'><i class='glyphicon glyphicon-pencil'></i></button>";
+    textfield = input.childNodes[3];
+    textfield.style.display = "none";
+
 }
+
+$(document).ready(function() {
+    // bind submit handler to form
+    $('#grade').on('submit', function(e) {
+        e.preventDefault(); // prevent native submit
+        $(this).ajaxSubmit({
+            target: 'myResultsDiv'
+        });
+        alert("De beoordeling is opgeslagen!");
+    });
+});

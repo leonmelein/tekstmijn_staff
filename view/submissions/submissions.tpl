@@ -35,45 +35,67 @@
                             <th>Naam</th>
                             <th colspan="4">
                                 <div class="row">
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         Spelling
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         Stijl
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-2">
                                         Vorm
                                     </div>
                                     <div class="col-md-3">
                                         Opmerkingen
+                                    </div>
+                                    <div class="col-md-3">
+                                        Opslaan
                                     </div>
                                 </div>
                             </th>
                         </tr>
                     </thead>
                     <tbody>
-                        <tr>
-                            <td>131457</td>
-                            <td>Reinard van Dalen</td>
-                            <td colspan="4">
-                                <div class="row">
-                                    <div class="col-md-3">
-                                        <input name="grade_Spelling" type="number" placeholder="8,0" min="1.0" max="10.0" step="0.1" class="form-control input-md">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input name="grade_Stijl" type="number" placeholder="8,0" min="1.0" max="10.0" step="0.1" class="form-control input-md">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <input name="grade_Vorm" type="number" placeholder="8,0" min="1.0" max="10.0" step="0.1" class="form-control input-md">
-                                    </div>
-                                    <div class="col-md-3">
-                                        <button id="add_button" type="button" onclick="addPencil()" class="btn btn-default"><i class="glyphicon glyphicon-pencil"></i></button>
-                                    </div>
-                                </div>
-                                <div id="content">
-                                </div>
-                            </td>
-                        </tr>
+                        <?php foreach ($students_ingeleverd as $key => $value) {
+                            $current_grades = getGrades($db, $staff_id, $value['id'], ["Stijl","Spelling","Vorm"]);
+                            ?>
+                            <form id="grade" method="post" action="grade/">
+                                <input name="class_id"type="hidden" value="<?php echo $class_id; ?>">
+                                <input name="assignment_id"type="hidden" value="<?php echo $assignment_id; ?>">
+                                <input name="submission_id"type="hidden" value="<?php echo $value['id']; ?>">
+                                <tr>
+                                    <td><?php echo $value['student_id']; ?></td>
+                                    <td><?php echo $value['name']; ?></td>
+                                    <td colspan="4">
+                                        <div class="row">
+                                            <div class="col-md-2">
+                                                <input name="grading_name[]" type="hidden" placeholder="Type beoordeling" class="form-control input-md" value="Stijl">
+                                                <input value="<?php echo $current_grades['Stijl']; ?>" name="grading_grade[]" type="number" placeholder="8,0" min="1.0" max="10.0" step="0.1" class="form-control input-md">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input name="grading_name[]" type="hidden" placeholder="Type beoordeling" class="form-control input-md" value="Spelling">
+                                                <input value="<?php echo $current_grades['Spelling']; ?>"name="grading_grade[]" type="number" placeholder="8,0" min="1.0" max="10.0" step="0.1" class="form-control input-md">
+                                            </div>
+                                            <div class="col-md-2">
+                                                <input name="grading_name[]" type="hidden" placeholder="Type beoordeling" class="form-control input-md" value="Vorm">
+                                                <input value="<?php echo $current_grades['Vorm']; ?>" name="grading_grade[]" type="number" placeholder="8,0" min="1.0" max="10.0" step="0.1" class="form-control input-md">
+                                            </div>
+                                            <div class="col-md-3">
+                                                <button id="add_button" type="button" onclick="addPencil(this.parentNode.parentNode.parentNode, this)" class="btn btn-default"><i class="glyphicon glyphicon-pencil"></i></button>
+                                            </div>
+                                            <div class="col-md-3">
+                                                <button type="submit" class="btn btn-default"><i class="glyphicon glyphicon-floppy-open"></i></button>
+                                            </div>
+                                        </div>
+                                        <div id="content" style="display: none;">
+                                            <div class="col-md-9">
+                                                </br>
+                                                <textarea name="grade_Opmerkingen" class="form-control input-md" rows="3"><?php echo $current_grades['Notes']; ?></textarea>
+                                            </div>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </form>
+                        <?php }; ?>
                     </tbody>
                 </table>
             </div>
