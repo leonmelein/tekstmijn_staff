@@ -24,6 +24,17 @@
                 <?php echo $table_nietingeleverd; ?>
             </div>
             <div id="beoordelen" class="tab-pane">
+                <?php
+                    $submission_ids = Array();
+                    foreach ($students_ingeleverd as $key => $value) {
+                    $submission_id = $value['id'];
+                    array_push($submission_ids, $submission_id);
+                    }
+                    foreach ($submission_ids as $submission_id){
+                        $submission_array = $submission_array.$submission_id.",";
+                    }
+                    $submissions = substr($submission_array, 0, -1);
+                ?>
                 <table class="table table-hover">
                     <thead>
                         <tr>
@@ -44,10 +55,10 @@
                                     <div class="col-md-2">
                                         Vorm
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3 text-center">
                                         Opmerkingen
                                     </div>
-                                    <div class="col-md-3">
+                                    <div class="col-md-3 text-center">
                                         Opslaan
                                     </div>
                                 </div>
@@ -56,11 +67,9 @@
                     </thead>
                     <tbody>
                         <?php
-                            $submission_ids = Array();
                             foreach ($students_ingeleverd as $key => $value) {
                             $current_grades = getGrades($db, $staff_id, $value['id'], ["Stijl","Spelling","Vorm"]);
                             $submission_id = $value['id'];
-                            array_push($submission_ids, $submission_id);
                             ?>
                             <form id="grade_<?php echo $submission_id; ?>" class="grade" method="post" action="grade/">
                                 <input name="class_id"type="hidden" value="<?php echo $class_id; ?>">
@@ -83,10 +92,10 @@
                                                 <input name="grading_name[]" type="hidden" placeholder="Type beoordeling" class="form-control input-md" value="Vorm">
                                                 <input value="<?php echo $current_grades['Vorm']; ?>" name="grading_grade[]" type="number" placeholder="8,0" min="1.0" max="10.0" step="0.1" class="form-control input-md">
                                             </div>
-                                            <div id="notes_button_<?php echo $submission_id; ?>" class="col-md-3">
+                                            <div id="notes_button_<?php echo $submission_id; ?>" class="col-md-3 text-center">
                                                 <button id="add_button" type="submit" onclick="addPencil(this.parentNode.parentNode.parentNode, this)" class="btn btn-default"><i class="glyphicon glyphicon-pencil"></i></button>
                                             </div>
-                                            <div class="col-md-3">
+                                            <div class="col-md-3 text-center">
                                                 <button type="submit" class="btn btn-default"><i class="glyphicon glyphicon-floppy-open"></i></button>
                                             </div>
                                         </div>
@@ -105,17 +114,11 @@
                 <div class="row">
                     <div class="col-md-8"></div>
                     <div class="col-md-4">
-                        <?php
-                            foreach ($submission_ids as $submission_id){
-                                $submission_array = $submission_array.$submission_id.",";
-                            }
-                            $submissions = substr($submission_array, 0, -1);
-                        ?>
-
                         <button type="button" onclick="saveAll('<?php echo $submissions; ?>')" class="btn btn-default"><i class="glyphicon glyphicon-floppy-open"></i> Alle beoordelingen opslaan</button>
                     </div>
                 </div>
             </div>
+            </br></br>
         </div>
     </div>
 </div>
