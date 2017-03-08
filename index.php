@@ -114,7 +114,7 @@
                 $_SESSION['staff_id'] = $info["id"];
                 $_SESSION["staff_email"] = $_POST["username"];
                 $_SESSION['staff_name'] = $info["name"];
-                getRedirect("../classes/");
+                getRedirect("../submissions/");
             } else {
                 getRedirect("/staff/login/?failed=true");
             }
@@ -183,8 +183,8 @@
         $bp = getBootstrap();
         $db = getDatabase();
 
-        $menu = generateMenu($bp, ["active" => "Klassen", "align" => "stacked"]);
-        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Klassen" => "#"]);
+        $menu = generateMenu($bp, ["active" => "Leerlingen", "align" => "stacked"]);
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Leerlingen" => "#"]);
 
         $classes = getClassesForStaff($db, $_SESSION["staff_id"]);
         $columns = [
@@ -193,8 +193,8 @@
             ["Jaar", "year"]
         ];
         $table = generateTable($bp, $columns, $classes, null, '<a href="%s/">%s</a>');
-        echo getTemplates()->render("classes::index", ["title" => "Hofstad | Klassen",
-            "page_title" => "Klassen", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+        echo getTemplates()->render("classes::index", ["title" => "Hofstad | Leerlingen",
+            "page_title" => "Leerlingen", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table]);
     });
 

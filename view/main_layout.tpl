@@ -44,6 +44,7 @@
 <script src="/vendor/bootstrap/dist/js/bootstrap.min.js"></script>
 <script src="/vendor/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="/staff/vendor/jquery_form/jquery.form.js"></script>
+<script src="/staff/vendor/jquery-color/jquery.color-2.1.2.min.js"></script>
 <script src="<?php echo $pageJS; ?>"></script>
 </body>
 </html>
