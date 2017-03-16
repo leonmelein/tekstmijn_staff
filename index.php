@@ -409,4 +409,79 @@
         }
     });
 
+    $router->get("review/", function (){
+        session_start("staff");
+        $bp = getBootstrap();
+        $db = getDatabase();
+
+        $class = getClassName($db, $class_id);
+        $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"]);
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/review/"]);
+
+        $students =  getAssignmentsforBeoordelaar($db, $class_id);
+        $columns = [
+            ["Titel", "title"],
+            ["Status", "status"],
+            ["Startdatum", "start_date"],
+            ["Uiterste inleverdatum", "end_date"],
+        ];
+
+        $table = generateTable($bp, $columns, $students, null, '<a href="%s/">%s</a>');
+        echo getTemplates()->render("submissions::classes", ["title" => "Tekstmijn | Beoordelen",
+            "page_title" => "Beoordelen", "page_subtitle" => $_SESSION["staff_name",  "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+            "table" => $table]);
+    });
+
+    $router->get("review/([a-z0-9_-]+)/", function ($class_id, $assignment_id){
+        session_start("staff");
+        $bp = getBootstrap();
+        $db = getDatabase();
+
+        $staff_id = $_SESSION['staff_id'];
+
+        $title = getAssignmentName($db, $assignment_id);
+        $tabs = generateTabs($bp, ["Te beoordelen" => "#tebeoordelen", "Beoordelen" => "#beoordelen"], 'Te beoordelen');
+        $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"]);
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/staff/review/", $title => "#"]);
+
+        $students_ingeleverd =  getSubmissionsForAssignment($db, $class_id, $assignment_id);
+        $columns = [
+            ["Leerlingnummer", "student_id"],
+            ["Naam", "name"],
+            ["Inleverdatum", "submission_date"],
+            ["Aantal pogingen", "submission_count"],
+        ];
+
+        $table_ingeleverd = generateTable($bp, $columns, $students_ingeleverd, null, '<a href="%s/">%s</a>');
+
+        $students = getSubmissionsForAssignmentToLate($db, $class_id, $assignment_id);
+        $table_telaat = generateTable($bp, $columns, $students, null, '<a href="%s/">%s</a>');
+
+        $students = getSubmissionsForAssignmentNoShow($db, $class_id, $assignment_id);
+        $columns = [
+            ["Leerlingnummer", "id"],
+            ["Naam", "name"],
+        ];
+        $table_nietingeleverd = generateTable($bp, $columns, $students);
+
+        $page_js = "/staff/vendor/application/add_pencil.js";
+
+        echo getTemplates()->render("submissions::submissions", [
+            "title" => "Tekstmijn | Beoordelen",
+            "page_title" => "Beoordelen",
+            "page_subtitle" => $title,
+            "menu" => $menu,
+            "breadcrumbs" => $breadcrumbs,
+            "table_ingeleverd" => $table_ingeleverd,
+            "table_telaat" => $table_telaat,
+            "table_nietingeleverd" => $table_nietingeleverd,
+            "students_ingeleverd" => $students_ingeleverd,
+            "tabs" => $tabs,
+            "page_js" => $page_js,
+            "class_id" => $class_id,
+            "assignment_id" => $assignment_id,
+            "staff_id" => $staff_id,
+            "db" => $db]);
+    });
+
     $router->run();
