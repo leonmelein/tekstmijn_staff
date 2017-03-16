@@ -188,3 +188,26 @@ function getAssignmentID($database, $id){
                 WHERE submissions.id = $quoted_id";
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['title'];
 }
+
+function getAssignmentforBeoordelaar($database, $staff){
+    $quoted_staff_id = $database->quote($staff);
+    $query = "SELECT DISTINCT assignments.title, assignments.id
+    FROM assignments, submissions_staff, submissions
+    WHERE submissions_staff.submission_id = submissions.id
+    AND submissions.assignment_id = assignments.id
+    AND submissions_staff.staff_id = $quoted_staff_id";
+    return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+}
+
+function getSubmissionsforBeoordelaar($database, $assignment, $staff){
+    $quoted_assignment_id = $database->quote($assignment);
+    $quoted_staff_id = $database->quote($staff);
+    $query = "SELECT submissions.id, student_id, CONCAT_WS(' ',students.firstname, students.prefix, students.lastname) as name, DATE_FORMAT(submissions.time, '%d %M %Y, %H:%i') as submission_date, submissions.submission_count as submission_count
+            FROM students, submissions, submissions_staff
+            WHERE submissions.id = submissions_staff.submission_id
+            AND staff_id = $quoted_staff_id
+            AND students.id = submissions.student_id
+            AND submissions.assignment_id = $quoted_assignment_id
+            ORDER BY name;";
+    return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+}
