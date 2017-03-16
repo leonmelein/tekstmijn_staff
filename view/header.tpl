@@ -7,7 +7,7 @@
     </button>
     <div class="navbar-header">
         <a class="navbar-brand" href="/staff/classes/">
-            <img alt="Brand" src="/staff/assets/img/logo.svg"> Hofstad
+            <img alt="Brand" src="/staff/assets/img/logo.svg"> Tekstmijn
         </a>
     </div>
 </div>

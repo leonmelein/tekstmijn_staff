@@ -34,11 +34,11 @@
             <div class="row">
                 <div class="col-md-3"></div>
                 <div class="col-md-6">
-                    <img src="/assets/img/logo.svg" alt="Hofstad" class="img-rounded img-responsive" height="350" width="350">
+                    <img src="/staff/assets/img/logo.svg" alt="Tekstmijn" class="img-rounded img-responsive" height="350" width="350">
                 </div>
             </div>
             <div class="row">
-                <h3 class="text-center">Hofstad Medewerkers</h3><br>
+                <h3 class="text-center">Tekstmijn Medewerkers</h3><br>
                 <?php
                 if($_GET["logged_out"] == "true") {
                     echo '<div class="alert alert-success alert-dismissable" role="alert">

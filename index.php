@@ -70,7 +70,7 @@
     });
 
     $router->get("login/", function (){
-        echo getTemplates()->render("login::login", ["title" => "Hofstad | Inloggen"]);
+        echo getTemplates()->render("login::login", ["title" => "Tekstmijn | Inloggen"]);
     });
 
     $router->post("login/", function (){
@@ -84,10 +84,10 @@
 
                 // Password forgotten
                 $mail = new PHPMailer;
-                $mail->setFrom('hofstad@thesociallions.nl', 'Project Hofstad');
+                $mail->setFrom('hofstad@thesociallions.nl', 'Project Tekstmijn');
                 $mail->addAddress($sanitized_email);
                 $mail->isHTML(true);                                  // Set email format to HTML
-                $mail->Subject = 'Project Hofstad - Wachtwoord wijzigen';
+                $mail->Subject = 'Project Tekstmijn - Wachtwoord wijzigen';
                 $token = get_setup_token($db, $sanitized_email);
                 // Retrieve the email template required
                 $message = file_get_contents('/volume1/hofstad/staff/assets/mail/reset.html');
@@ -134,7 +134,7 @@
 
         if($registration){
             echo getTemplates()->render("login::register",
-                                        ["title" => "Hofstad | Registreren",
+                                        ["title" => "Tekstmijn | Registreren",
                                             "name" => $registration["name"],
                                             "email" => $registration["email"],
                                             "page_js" => "../vendor/application/register_validate.js"
@@ -164,7 +164,7 @@
         $menu = generateMenu($bp, ["active" => "Mijn account", "align" => "stacked"]);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Mijn account" => "#"]);
 
-        echo getTemplates()->render("login::account", ["title" => "Hofstad | Mijn account",
+        echo getTemplates()->render("login::account", ["title" => "Tekstmijn | Mijn account",
             "page_title" => "Mijn account", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "name" => $_SESSION["staff_name"], "email" => $_SESSION["staff_email"], "page_js" => "../vendor/application/register_validate.js"]);
     });
@@ -193,7 +193,7 @@
             ["Jaar", "year"]
         ];
         $table = generateTable($bp, $columns, $classes, null, '<a href="%s/">%s</a>');
-        echo getTemplates()->render("classes::index", ["title" => "Hofstad | Leerlingen",
+        echo getTemplates()->render("classes::index", ["title" => "Tekstmijn | Leerlingen",
             "page_title" => "Leerlingen", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table]);
     });
@@ -204,8 +204,8 @@
         $db = getDatabase();
 
         $name = sprintf("Klas %s", getClassName($db, $class_id));
-        $menu = generateMenu($bp, ["active" => "Klassen", "align" => "stacked"]);
-        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Klassen" => "/staff/classes/",
+        $menu = generateMenu($bp, ["active" => "Leerlingen", "align" => "stacked"]);
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Leerlingen" => "/staff/classes/",
             $name => "#"]);
 
         $students =  getClassStudents($db, $class_id);
@@ -218,7 +218,7 @@
         ];
 
         $table = generateTable($bp, $columns, $students, $options);
-        echo getTemplates()->render("classes::class", ["title" => "Hofstad | Klassen",
+        echo getTemplates()->render("classes::class", ["title" => "Tekstmijn | Leerlingen",
             "page_title" => $name, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table, "page_js" => "/staff/vendor/application/reset_pwd_students.js"]);
     });
@@ -241,12 +241,12 @@
 
         $classes = getSubmissionsForStaff($db, $_SESSION["staff_id"]);
         $columns = [
-            ["Jaar", "year"],
+            ["Klas", "class"],
             ["Niveau", "level"],
-            ["Klas", "class"]
+            ["Jaar", "year"]
         ];
         $table = generateTable($bp, $columns, $classes, null, '<a href="%s/">%s</a>');
-        echo getTemplates()->render("submissions::index", ["title" => "Hofstad | Klassen",
+        echo getTemplates()->render("submissions::index", ["title" => "Tekstmijn | Inzendingen",
             "page_title" => "Inzendingen", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table]);
     });
@@ -270,7 +270,7 @@
         ];
 
         $table = generateTable($bp, $columns, $students, null, '<a href="%s/">%s</a>');
-        echo getTemplates()->render("submissions::classes", ["title" => "Hofstad | Inzendingen",
+        echo getTemplates()->render("submissions::classes", ["title" => "Tekstmijn | Inzendingen",
             "page_title" => "Inzendingen", "page_subtitle" => sprintf("Klas %s", $class),  "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table]);
     });
@@ -334,12 +334,11 @@
         $bp = getBootstrap();
         $db = getDatabase();
 
-        $title = "Inzendingen";
+        $title = "Inzending";
         $assignment_name = getAssignmentName($db, $assignment_id);
         $student_name = getStudentName($db, $submission_id);
         $subtitle = sprintf("%s : %s", $assignment_name, $student_name);
         $class = getClassName($db, $class_id);
-        $tabs = generateTabs($bp, ["De inzending" => "#deinzending", "Beoordelen" => "#beoordelen"], 'De inzending');
         $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"]);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/", sprintf("Klas %s", $class) => "/staff/submissions/$class_id", $assignment_name => "/staff/submissions/$class_id/$assignment_id", $title => "#"]);
 
@@ -349,12 +348,12 @@
         $staff_id = $_SESSION['staff_id'];
         $current_grades= getGrades($db, $staff_id, $submission_id, ["Score"]);
 
-        echo getTemplates()->render("submissions::grading", ["title" => "Hofstad | Inzendingen",
+        echo getTemplates()->render("submissions::grading", ["title" => "Tekstmijn | Inzendingen",
             "page_title" => $title, "page_subtitle" => $subtitle, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "class_id" => $class_id,
             "assignment_id" => $assignment_id,
             "submission_id" => $submission_id,
-            "tabs" => $tabs, "page_js" => $page_js,
+            "page_js" => $page_js,
             "submission_date" => $submission_info["submission_date"],
             "submission_file" => $submission_info["submission_file"],
             "submission_count" => $submission_info["submission_count"],
@@ -389,7 +388,7 @@
 
         if($registration){
             echo getTemplates()->render("login::reset",
-                ["title" => "Hofstad | Registreren",
+                ["title" => "Tekstmijn | Registreren",
                     "name" => $registration["name"],
                     "email" => $registration["email"],
                     "page_js" => "../vendor/application/register_validate.js"

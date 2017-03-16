@@ -9,7 +9,7 @@ function getSubmissionsForStaff($database, $id){
                   FROM class_staff
                   WHERE class_staff.staff_id = $quoted_id
                 )
-                ORDER BY level, year ASC";
+                ORDER BY year, class ASC";
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -25,7 +25,8 @@ function getAssignmentsforClass($database, $id){
                         FROM assignments, assignments_class
                         WHERE assignments_class.class_id = $quoted_id
                         AND assignments_class.assignment_id = assignments.id
-                    ) AS classwork";
+                    ) AS classwork
+                    ORDER BY title, start_date";
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -36,7 +37,8 @@ function getSubmissionsForAssignment($database, $id_class, $id_assignment){
                 FROM students, submissions
                 WHERE students.class_id = $quoted_id_class
                       AND submissions.assignment_id = $quoted_id_assignment
-                      AND students.id = submissions.student_id";
+                      AND students.id = submissions.student_id
+                      ORDER BY name";
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -53,7 +55,8 @@ function getSubmissionsForAssignmentToLate($database, $id_class, $id_assignment)
                         FROM assignments_class
                         WHERE assignments_class.assignment_id = $quoted_id_assignment
                         AND assignments_class.class_id = $quoted_id_class
-                      )";
+                      )
+                ORDER BY name";
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
 }
 
@@ -66,7 +69,8 @@ function getSubmissionsForAssignmentNoShow($database, $id_class, $id_assignment)
                   AND students.id NOT IN (
                   SELECT student_id FROM submissions
                   WHERE assignment_id = $quoted_id_assignment
-                )";
+                )
+                ORDER BY name";
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
 }
 

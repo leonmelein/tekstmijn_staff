@@ -46,7 +46,7 @@ function generateMenu($bp, $active){
                        <div class="panel-body">%s</div>
                     </div>';
 
-    $menu_options = ["Klassen" => "/staff/classes/", "Inzendingen" => "/staff/submissions/", "Mijn account" => "/staff/account/"];
+    $menu_options = ["Inzendingen" => "/staff/submissions/", "Leerlingen" => "/staff/classes/", "Mijn account" => "/staff/account/"];
     return sprintf($menu_panel, $bp->pills($menu_options, $active));
 }
 

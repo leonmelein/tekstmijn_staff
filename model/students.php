@@ -16,7 +16,7 @@ function getClassesForStaff($database, $id){
                   FROM class_staff
                   WHERE class_staff.staff_id = $quoted_id
                 )
-                ORDER BY level, year ASC";
+                ORDER BY year, name, level ASC";
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
 }
 
