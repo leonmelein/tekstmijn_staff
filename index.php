@@ -347,7 +347,7 @@
         $page_js = "/staff/vendor/application/add_field.js";
 
         $staff_id = $_SESSION['staff_id'];
-        $current_grades= getGrades($db, $staff_id, $submission_id, ["Stijl","Spelling","Vorm"]);
+        $current_grades= getGrades($db, $staff_id, $submission_id, ["Score"]);
 
         echo getTemplates()->render("submissions::grading", ["title" => "Hofstad | Inzendingen",
             "page_title" => $title, "page_subtitle" => $subtitle, "menu" => $menu, "breadcrumbs" => $breadcrumbs,

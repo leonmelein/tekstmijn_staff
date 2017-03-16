@@ -46,14 +46,8 @@
                             <th>Naam</th>
                             <th colspan="4">
                                 <div class="row">
-                                    <div class="col-md-2">
-                                        Spelling
-                                    </div>
-                                    <div class="col-md-2">
-                                        Stijl
-                                    </div>
-                                    <div class="col-md-2">
-                                        Vorm
+                                    <div class="col-md-6">
+                                        Score
                                     </div>
                                     <div class="col-md-3 text-center">
                                         Opmerkingen
@@ -68,7 +62,7 @@
                     <tbody>
                         <?php
                             foreach ($students_ingeleverd as $key => $value) {
-                            $current_grades = getGrades($db, $staff_id, $value['id'], ["Stijl","Spelling","Vorm"]);
+                            $current_grades = getGrades($db, $staff_id, $value['id'], ["Score"]);
                             $submission_id = $value['id'];
                             ?>
                             <form id="grade_<?php echo $submission_id; ?>" class="grade" method="post" action="grade/">
@@ -80,17 +74,9 @@
                                     <td><?php echo $value['name']; ?></td>
                                     <td colspan="4">
                                         <div class="row">
-                                            <div class="col-md-2">
-                                                <input name="grading_name[]" type="hidden" placeholder="Type beoordeling" class="form-control input-md" value="Stijl">
-                                                <input value="<?php echo $current_grades['Stijl']; ?>" name="grading_grade[]" type="number" placeholder="8,0" min="1.0" max="10.0" step="0.1" class="form-control input-md">
-                                            </div>
-                                            <div class="col-md-2">
-                                                <input name="grading_name[]" type="hidden" placeholder="Type beoordeling" class="form-control input-md" value="Spelling">
-                                                <input value="<?php echo $current_grades['Spelling']; ?>"name="grading_grade[]" type="number" placeholder="8,0" min="1.0" max="10.0" step="0.1" class="form-control input-md">
-                                            </div>
-                                            <div class="col-md-2">
-                                                <input name="grading_name[]" type="hidden" placeholder="Type beoordeling" class="form-control input-md" value="Vorm">
-                                                <input value="<?php echo $current_grades['Vorm']; ?>" name="grading_grade[]" type="number" placeholder="8,0" min="1.0" max="10.0" step="0.1" class="form-control input-md">
+                                            <div class="col-md-6">
+                                                <input name="grading_name[]" type="hidden" placeholder="Type beoordeling" class="form-control input-md" value="Score">
+                                                <input value="<?php echo $current_grades['Score']; ?>" name="grading_grade[]" type="number" placeholder="50" min="50" max="150" step="1" class="form-control input-md">
                                             </div>
                                             <div id="notes_button_<?php echo $submission_id; ?>" class="col-md-3 text-center">
                                                 <button id="add_button" type="submit" onclick="addPencil(this.parentNode.parentNode.parentNode, this)" class="btn btn-default"><i class="glyphicon glyphicon-pencil"></i></button>

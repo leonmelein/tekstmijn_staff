@@ -58,35 +58,11 @@
                     <fieldset>
                         <div class="form-group">
                             <div class="col-md-6">
-                                <p class="form-control-static">Stijl</p>
-                                <input name="grading_name[]" type="hidden" placeholder="Type beoordeling" class="form-control input-md" value="Stijl">
+                                <p class="form-control-static">Score</p>
+                                <input name="grading_name[]" type="hidden" placeholder="Type beoordeling" class="form-control input-md" value="Score">
                             </div>
                             <div class="col-md-4">
-                                <input value="<?php echo $current_grades['Stijl']; ?>" name="grading_grade[]" type="number" placeholder="8,0" min="1.0" max="10.0" step="0.1" class="form-control input-md">
-                            </div>
-                            <!--<div class="col-xs-2">
-                                <button id="add_button" type="button" onclick="addRow()" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i></button>
-                            </div>-->
-                        </div>
-                        <div class="form-group">
-                            <div class="col-md-6">
-                                <p class="form-control-static">Spelling</p>
-                                <input name="grading_name[]" type="hidden" placeholder="Type beoordeling" class="form-control input-md" value="Spelling">
-                            </div>
-                            <div class="col-md-4">
-                                <input value="<?php echo $current_grades['Spelling']; ?>"name="grading_grade[]" type="number" placeholder="8,0" min="1.0" max="10.0" step="0.1" class="form-control input-md">
-                            </div>
-                            <!--<div class="col-xs-2">
-                                <button id="add_button" type="button" onclick="addRow()" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i></button>
-                            </div>-->
-                        </div>
-                        <div class="form-group">
-                            <div class="col-md-6">
-                                <p class="form-control-static">Vorm</p>
-                                <input name="grading_name[]" type="hidden" placeholder="Type beoordeling" class="form-control input-md" value="Vorm">
-                            </div>
-                            <div class="col-md-4">
-                                <input value="<?php echo $current_grades['Vorm']; ?>" name="grading_grade[]" type="number" placeholder="8,0" min="1.0" max="10.0" step="0.1" class="form-control input-md">
+                                <input value="<?php echo $current_grades['Score']; ?>" name="grading_grade[]" type="number" placeholder="50" min="50" max="150" step="1" class="form-control input-md">
                             </div>
                             <!--<div class="col-xs-2">
                                 <button id="add_button" type="button" onclick="addRow()" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i></button>
