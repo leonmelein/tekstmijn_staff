@@ -472,7 +472,6 @@
             ["Inleverdatum", "submission_date"],
             ["Aantal pogingen", "submission_count"],
         ];
-
         $table_ingeleverd = generateTable($bp, $columns, $students_ingeleverd, null, '<a href="%s/">%s</a>');
 
         $page_js = "/staff/vendor/application/add_pencil.js";
@@ -561,7 +560,6 @@
         } else {
             getRedirect("../?success=false");
         }
-
     });
 
     $router->run();
