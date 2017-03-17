@@ -10,7 +10,7 @@ function check_login($database, $username, $password){
 
 function getUserInfo($database, $username){
     $quoted_username = $database->quote($username);
-    $query = "SELECT id, CONCAT_WS(' ', firstname, prefix, lastname) as name, setuptoken FROM staff WHERE email = $quoted_username";
+    $query = "SELECT id, CONCAT_WS(' ', firstname, prefix, lastname) as name, setuptoken, type FROM staff WHERE email = $quoted_username";
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
 }
 

@@ -40,13 +40,23 @@ function generateTable($bp, $columns, $data, $options = null, $format = "", $cla
     return $table;
 }
 
-function generateMenu($bp, $active){
-    $menu_panel = '<div class="panel panel-default">
-                       <div class="panel-heading">Menu</div>
-                       <div class="panel-body">%s</div>
-                    </div>';
+function generateMenu($bp, $active, $type){
+    if ($type == 0) {
+        $menu_panel = '<div class="panel panel-default">
+                           <div class="panel-heading">Menu</div>
+                           <div class="panel-body">%s</div>
+                        </div>';
 
-    $menu_options = ["Inzendingen" => "/staff/submissions/", "Leerlingen" => "/staff/classes/", "Mijn account" => "/staff/account/"];
+        $menu_options = ["Inzendingen" => "/staff/submissions/", "Leerlingen" => "/staff/classes/", "Mijn account" => "/staff/account/"];
+    }
+    elseif ($type == 1) {
+        $menu_panel = '<div class="panel panel-default">
+                           <div class="panel-heading">Menu</div>
+                           <div class="panel-body">%s</div>
+                        </div>';
+
+        $menu_options = ["Beoordelen" => "/staff/review/", "Mijn account" => "/staff/account/"];
+    }
     return sprintf($menu_panel, $bp->pills($menu_options, $active));
 }
 
