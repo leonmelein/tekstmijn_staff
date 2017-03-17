@@ -7,6 +7,7 @@
     require("model/login.php");
     require("model/students.php");
     require("model/submissions.php");
+    require("model/download.php");
     use BootPress\Bootstrap\v3\Component as Bootstrap;
 
     function getDatabase(){
@@ -481,6 +482,25 @@
             "assignment_id" => $assignmentid,
             "staff_id" => $staff_id,
             "db" => $db]);
+    });
+
+    $router->get("/download/(\d+)", function($id){
+        $db = getDatabase();
+        $files = getFiles($db, $id);
+        $filename = sprintf("download_%s.zip", $id);
+        $zip = \Comodojo\Zip\Zip::create($filename);
+
+        foreach ($files as $file){
+            $filepath = sprintf('/volume1/hofstad/assets/submissions/%s', $file);
+            $zip->add($filepath);
+        }
+        $zip->close();
+
+        header("Content-Description: File Transfer");
+        header("Content-Type: application/octet-stream");
+        header("Content-Disposition: attachment; filename=$filename");
+        readfile($filename);
+        exit();
     });
 
     $router->run();

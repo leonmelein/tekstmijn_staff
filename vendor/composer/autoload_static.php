@@ -23,6 +23,8 @@ class ComposerStaticInit85726f4fb9ea8f61594adc488cdc3511
         ),
         'C' => 
         array (
+            'Comodojo\\Zip\\' => 13,
+            'Comodojo\\Exception\\' => 19,
             'Carrooi\\DocxExtractor\\' => 22,
         ),
         'B' => 
@@ -48,6 +50,14 @@ class ComposerStaticInit85726f4fb9ea8f61594adc488cdc3511
         'League\\Plates\\' => 
         array (
             0 => __DIR__ . '/..' . '/league/plates/src',
+        ),
+        'Comodojo\\Zip\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/comodojo/zip/src',
+        ),
+        'Comodojo\\Exception\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception',
         ),
         'Carrooi\\DocxExtractor\\' => 
         array (
@@ -126,6 +136,28 @@ class ComposerStaticInit85726f4fb9ea8f61594adc488cdc3511
         'Carrooi\\DocxExtractor\\InvalidArgumentException' => __DIR__ . '/..' . '/carrooi/docx-extractor/src/exceptions.php',
         'Carrooi\\DocxExtractor\\InvalidStateException' => __DIR__ . '/..' . '/carrooi/docx-extractor/src/exceptions.php',
         'Carrooi\\DocxExtractor\\RuntimeException' => __DIR__ . '/..' . '/carrooi/docx-extractor/src/exceptions.php',
+        'Comodojo\\Exception\\AuthenticationException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/AuthenticationException.php',
+        'Comodojo\\Exception\\CacheException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/CacheException.php',
+        'Comodojo\\Exception\\ComposerEventException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/ComposerEventException.php',
+        'Comodojo\\Exception\\ComposerRetryException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/ComposerRetryException.php',
+        'Comodojo\\Exception\\ConfigurationException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/ConfigurationException.php',
+        'Comodojo\\Exception\\CookieException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/CookieException.php',
+        'Comodojo\\Exception\\DatabaseException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/DatabaseException.php',
+        'Comodojo\\Exception\\DispatcherException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/DispatcherException.php',
+        'Comodojo\\Exception\\HttpException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/HttpException.php',
+        'Comodojo\\Exception\\IOException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/IOException.php',
+        'Comodojo\\Exception\\InstallerException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/InstallerException.php',
+        'Comodojo\\Exception\\LdaphException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/LdaphException.php',
+        'Comodojo\\Exception\\MetaWeblogException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/MetaWeblogException.php',
+        'Comodojo\\Exception\\RpcException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/RpcException.php',
+        'Comodojo\\Exception\\ShellException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/ShellException.php',
+        'Comodojo\\Exception\\TaskException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/TaskException.php',
+        'Comodojo\\Exception\\WPException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/WPException.php',
+        'Comodojo\\Exception\\XMLException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/XMLException.php',
+        'Comodojo\\Exception\\XmlrpcException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/XmlrpcException.php',
+        'Comodojo\\Exception\\ZipException' => __DIR__ . '/..' . '/comodojo/exceptions/src/Exception/ZipException.php',
+        'Comodojo\\Zip\\Zip' => __DIR__ . '/..' . '/comodojo/zip/src/Zip.php',
+        'Comodojo\\Zip\\ZipManager' => __DIR__ . '/..' . '/comodojo/zip/src/ZipManager.php',
         'EasyPeasyICS' => __DIR__ . '/..' . '/phpmailer/phpmailer/extras/EasyPeasyICS.php',
         'League\\Plates\\Engine' => __DIR__ . '/..' . '/league/plates/src/Engine.php',
         'League\\Plates\\Extension\\Asset' => __DIR__ . '/..' . '/league/plates/src/Extension/Asset.php',
