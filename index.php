@@ -92,7 +92,6 @@
 
     $router->post("login/", function (){
         $db = getDatabase();
-        $info = getUserInfo($db, $_POST['username']);
 
         if ($_POST['password_forgotten'] == 1) {
             $sanitized_email = filter_var($_POST['username'], FILTER_SANITIZE_EMAIL);
@@ -109,6 +108,7 @@
                 // Retrieve the email template required
                 $message = file_get_contents('/volume1/hofstad/staff/assets/mail/reset.html');
                 // Replace the % with the actual information
+                $info = getUserInfo($db, $_POST['username']);
                 $message = str_replace('%name%', $info['name'], $message);
                 $message = str_replace('%link%', $token, $message);
 
@@ -127,11 +127,19 @@
         } else {
             // Regular login
             if(check_login($db, $_POST['username'], $_POST['password'])){
+                $info = getUserInfo($db, $_POST['username']);
+
                 session_start("staff");
                 $_SESSION['staff_id'] = $info["id"];
+                $_SESSION['type'] = $info["type"];
                 $_SESSION["staff_email"] = $_POST["username"];
                 $_SESSION['staff_name'] = $info["name"];
-                getRedirect("../submissions/");
+                if ($_SESSION['type'] == 0) {
+                    getRedirect("../submissions/");
+                }
+                elseif ($_SESSION['type'] == 1) {
+                    getRedirect("../review/");
+                }
             } else {
                 getRedirect("/staff/login/?failed=true");
             }
@@ -178,7 +186,7 @@
 
         session_start("staff");
         // Generate menu
-        $menu = generateMenu($bp, ["active" => "Mijn account", "align" => "stacked"]);
+        $menu = generateMenu($bp, ["active" => "Mijn account", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Mijn account" => "#"]);
 
         echo getTemplates()->render("login::account", ["title" => "Tekstmijn | Mijn account",
@@ -200,7 +208,7 @@
         $bp = getBootstrap();
         $db = getDatabase();
 
-        $menu = generateMenu($bp, ["active" => "Leerlingen", "align" => "stacked"]);
+        $menu = generateMenu($bp, ["active" => "Leerlingen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Leerlingen" => "#"]);
 
         $classes = getClassesForStaff($db, $_SESSION["staff_id"]);
@@ -221,7 +229,7 @@
         $db = getDatabase();
 
         $name = sprintf("Klas %s", getClassName($db, $class_id));
-        $menu = generateMenu($bp, ["active" => "Leerlingen", "align" => "stacked"]);
+        $menu = generateMenu($bp, ["active" => "Leerlingen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Leerlingen" => "/staff/classes/",
             $name => "#"]);
 
@@ -253,7 +261,7 @@
         $bp = getBootstrap();
         $db = getDatabase();
 
-        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"]);
+        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Inzendingen" => "#"]);
 
         $classes = getSubmissionsForStaff($db, $_SESSION["staff_id"]);
@@ -274,7 +282,7 @@
         $db = getDatabase();
 
         $class = getClassName($db, $class_id);
-        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"]);
+        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/",
             sprintf("Klas %s", $class) => "#"]);
 
@@ -302,7 +310,7 @@
         $title = getAssignmentName($db, $assignment_id);
         $class = getClassName($db, $class_id);
         $tabs = generateTabs($bp, ["Ingeleverd" => "#ingeleverd", "Te laat" => "#telaat", "Niet ingeleverd" => "#nietingeleverd", "Beoordelen" => "#beoordelen"], 'Ingeleverd');
-        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"]);
+        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/", sprintf("Klas %s", $class) => "/staff/submissions/$class_id",
             $title => "#"]);
 
@@ -356,7 +364,7 @@
         $student_name = getStudentName($db, $submission_id);
         $subtitle = sprintf("%s : %s", $assignment_name, $student_name);
         $class = getClassName($db, $class_id);
-        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"]);
+        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/", sprintf("Klas %s", $class) => "/staff/submissions/$class_id", $assignment_name => "/staff/submissions/$class_id/$assignment_id", $title => "#"]);
 
         $submission_info = getSubmissionInfo($db, $submission_id);
@@ -431,7 +439,7 @@
         $bp = getBootstrap();
         $db = getDatabase();
 
-        $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"]);
+        $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/review/"]);
 
         $students =  getAssignmentforBeoordelaar($db, $_SESSION['staff_id']);
@@ -454,7 +462,7 @@
 
         $title = getAssignmentName($db, $assignmentid);
         $tabs = generateTabs($bp, ["Te beoordelen" => "#tebeoordelen", "Beoordelen" => "#beoordelen"], 'Te beoordelen');
-        $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"]);
+        $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/staff/review/", $title => "#"]);
 
         $students_ingeleverd =  getSubmissionsforBeoordelaar($db, $assignmentid, $staff_id);
@@ -513,7 +521,7 @@
         $student_name = getStudentName($db, $submission_id);
         $subtitle = sprintf("%s : %s", $assignment_name, $student_name);
         $class = getClassName($db, $class_id);
-        $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"]);
+        $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/staff/review/", $assignment_name => "/staff/review/$assignment_id", $title => "#"]);
 
         $submission_info = getSubmissionInfo($db, $submission_id);
