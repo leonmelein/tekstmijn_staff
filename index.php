@@ -494,7 +494,8 @@
     $router->get("/download/(\d+)/([a-z0-9_-]+)", function($staffid, $assignmentid){
         $db = getDatabase();
         $files = getFiles($db, $staffid, $assignmentid);
-        $filename = sprintf("download_%s_%s.zip", $staffid, $assignmentid);
+        $filename_vars = getNames($db, $staffid, $assignmentid);
+        $filename = sprintf("download_%s_%s.zip", $filename_vars['fullname'], $filename_vars['assignment_name']);
         $zip = \Comodojo\Zip\Zip::create($filename);
 
         foreach ($files as $file){

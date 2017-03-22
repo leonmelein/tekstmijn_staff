@@ -16,3 +16,13 @@ function getFiles($db, $staffid, $assignmentid){
                 AND submissions.assignment_id = $quoted_assignemntid";
     return $db->query($query)->fetchAll(PDO::FETCH_COLUMN);
 }
+
+function getNames($db, $staffid, $assignmentid){
+    $quoted_staffid = $db->quote($staffid);
+    $quoted_assignemntid = $db->quote($assignmentid);
+    $query = "SELECT CONCAT(firstname,prefix,lastname) as fullname, title as assignment_name
+                FROM staff, assignments
+                WHERE staff.id = $quoted_staffid
+                AND assignments.id = $quoted_assignemntid";
+    return $db->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
+}
