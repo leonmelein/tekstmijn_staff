@@ -461,7 +461,7 @@
         $staff_id = $_SESSION['staff_id'];
 
         $title = getAssignmentName($db, $assignmentid);
-        $tabs = generateTabs($bp, ["Te beoordelen" => "#tebeoordelen", "Beoordelen" => "#beoordelen"], 'Te beoordelen');
+        $tabs = generateTabs($bp, ["Individueel beoordelen" => "#tebeoordelen", "Beoordelen in tabel" => "#beoordelen"], 'Te beoordelen');
         $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/staff/review/", $title => "#"]);
 
