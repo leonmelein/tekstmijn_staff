@@ -208,3 +208,7 @@ input.input-file {
 textarea#text {
     background: #ffffff !important;
 }
+
+.review-label {
+    font-weight: normal !important;
+}

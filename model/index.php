@@ -57,6 +57,14 @@ function generateMenu($bp, $active, $type){
 
         $menu_options = ["Beoordelen" => "/staff/review/", "Mijn account" => "/staff/account/"];
     }
+    elseif ($type == 2) {
+        $menu_panel = '<div class="panel panel-default">
+                           <div class="panel-heading">Menu</div>
+                           <div class="panel-body">%s</div>
+                        </div>';
+
+        $menu_options = ["Beoordelen" => "/staff/review/", "Mijn account" => "/staff/account/"];
+    }
     return sprintf($menu_panel, $bp->pills($menu_options, $active));
 }
 

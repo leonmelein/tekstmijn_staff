@@ -8,6 +8,7 @@
     require("model/students.php");
     require("model/submissions.php");
     require("model/download.php");
+    require("model/review.php");
     use BootPress\Bootstrap\v3\Component as Bootstrap;
 
     function getDatabase(){
@@ -27,6 +28,7 @@
         $templates->addFolder("login", "view/login");
         $templates->addFolder("classes", "view/classes");
         $templates->addFolder("submissions", "view/submissions");
+        $templates->addFolder("review", "view/review");
         return $templates;
     }
 
@@ -138,6 +140,9 @@
                     getRedirect("../submissions/");
                 }
                 elseif ($_SESSION['type'] == 1) {
+                    getRedirect("../review/");
+                }
+                elseif ($_SESSION['type'] == 2) {
                     getRedirect("../review/");
                 }
             } else {
@@ -461,7 +466,7 @@
         $staff_id = $_SESSION['staff_id'];
 
         $title = getAssignmentName($db, $assignmentid);
-        $tabs = generateTabs($bp, ["Individueel beoordelen" => "#tebeoordelen", "Beoordelen in tabel" => "#beoordelen"], 'Te beoordelen');
+        $tabs = generateTabs($bp, ["Individueel beoordelen" => "#tebeoordelen", "Beoordelen in tabel" => "#beoordelen"], 'Individueel beoordelen');
         $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/staff/review/", $title => "#"]);
 
@@ -524,13 +529,18 @@
         $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/staff/review/", $assignment_name => "/staff/review/$assignment_id", $title => "#"]);
 
+        if ($_SESSION['type'] == 1) {$tabs = generateTabs($bp, ["Lezen en beoordelen" => "#beoordelen"], 'Lezen en beoordelen');}
+        elseif ($_SESSION['type'] == 2) {$tabs = generateTabs($bp, ["Lezen en beoordelen" => "#beoordelen", "Beoordelingslijst" => "#beoordelingslijst"], 'Lezen en beoordelen');}
+
         $submission_info = getSubmissionInfo($db, $submission_id);
         $page_js = "/staff/vendor/application/add_field.js";
 
         $staff_id = $_SESSION['staff_id'];
         $current_grades= getGrades($db, $staff_id, $submission_id, ["Score"]);
 
-        echo getTemplates()->render("submissions::grading", ["title" => "Tekstmijn | Beoordelen",
+        //$beoordelingslijst = generate_reviewquestionnaire($db, $assignment_id);
+
+        echo getTemplates()->render("review::grading", ["title" => "Tekstmijn | Beoordelen",
             "page_title" => $title, "page_subtitle" => $subtitle, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "class_id" => $class_id,
             "assignment_id" => $assignment_id,
@@ -542,7 +552,69 @@
             "submission_originalfile" => $submission_info["submission_originalfile"],
             "text" => $submission_info["text"],
             "current_grades" => $current_grades,
+            "tabs" => $tabs,
+            "user_type" => $_SESSION['type'],
+            //"beoordelingslijst" => $beoordelingslijst
         ]);
+    });
+
+    $router->get("review/dev/([a-z0-9_-]+)/(\d+)", function ($assignment_id, $submission_id) {
+        session_start("staff");
+        $bp = getBootstrap();
+        $db = getDatabase();
+
+        $title = "Beoordelen";
+        $assignment_name = getAssignmentName($db, $assignment_id);
+        $student_name = getStudentName($db, $submission_id);
+        $subtitle = sprintf("%s : %s", $assignment_name, $student_name);
+        $class = getClassName($db, $class_id);
+        $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"], $_SESSION['type']);
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/staff/review/", $assignment_name => "/staff/review/$assignment_id", $title => "#"]);
+
+        if ($_SESSION['type'] == 1) {$tabs = generateTabs($bp, ["Lezen en beoordelen" => "#beoordelen"], 'Lezen en beoordelen');}
+        elseif ($_SESSION['type'] == 2) {$tabs = generateTabs($bp, ["Lezen en beoordelen" => "#beoordelen", "Beoordelingslijst" => "#beoordelingslijst"], 'Lezen en beoordelen');}
+
+        $submission_info = getSubmissionInfo($db, $submission_id);
+        $page_js = "/staff/vendor/application/add_field.js";
+
+        $staff_id = $_SESSION['staff_id'];
+        $current_grades= getGrades($db, $staff_id, $submission_id, ["Score"]);
+
+        echo getTemplates()->render("review::gradingdev", ["title" => "Tekstmijn | Beoordelen",
+            "page_title" => $title, "page_subtitle" => $subtitle, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+            "class_id" => $class_id,
+            "assignment_id" => $assignment_id,
+            "submission_id" => $submission_id,
+            "staff_id" => $_SESSION['staff_id'],
+            "page_js" => $page_js,
+            "submission_date" => $submission_info["submission_date"],
+            "submission_file" => $submission_info["submission_file"],
+            "submission_count" => $submission_info["submission_count"],
+            "submission_originalfile" => $submission_info["submission_originalfile"],
+            "text" => $submission_info["text"],
+            "current_grades" => $current_grades,
+            "tabs" => $tabs,
+            "user_type" => $_SESSION['type'],
+            "db" => $db
+        ]);
+    });
+
+    $router->post("review/(.*)/saveques", function () {
+        $db = getDatabase();
+
+        session_start("staff");
+        $staff_id = $_POST['staff_id'];
+        $submission_id = $_POST['submission_id'];
+        $saved_data = $_POST;
+        unset($saved_data['staff_id']);
+        unset($saved_data['submission_id']);
+
+        $result = save_questionnaire($db, $saved_data, $staff_id, $submission_id);
+        if ($result){
+            getRedirect("../?success=true");
+        } else {
+            getRedirect("../?success=false");
+        }
     });
 
     $router->post("/review/(.*)/grade", function () {
