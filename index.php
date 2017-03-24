@@ -605,11 +605,13 @@
         session_start("staff");
         $staff_id = $_POST['staff_id'];
         $submission_id = $_POST['submission_id'];
+        $reviewerlist_id = $_POST['reviewerlist_id'];
         $saved_data = $_POST;
         unset($saved_data['staff_id']);
         unset($saved_data['submission_id']);
+        unset($saved_data['reviewerlist_id']);
 
-        $result = save_questionnaire($db, $saved_data, $staff_id, $submission_id);
+        $result = save_questionnaire($db, $saved_data, $staff_id, $submission_id, $reviewerlist_id);
         if ($result){
             getRedirect("../?success=true");
         } else {
