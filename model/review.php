@@ -57,13 +57,16 @@ function generate_reviewquestionnaire($database, $assignment_id, $staff_id, $sub
                 AND reviewing.submission_id = $submission_id_quoted
                 AND reviewing.question_id = $id_quoted";
             $values_db = $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['value'];
-            if (!empty($values_db)){
-                $options_local['value'] = $values_db;
+            if ($values_db != ""){
+                $attributes_local['value'] = $values_db;
             }
 
             if ($elementtype == 'title'){
                 echo "</br>";
                 echo "<h5>".$label."</h5>";
+            }
+            elseif ( in_array($elementtype, Array('YesNo', 'Number')) ){
+                Form::$elementtype ($label, $id, $attributes_local);
             }
             else{
                 Form::$elementtype ($label, $id, $options_local, $attributes_local);
