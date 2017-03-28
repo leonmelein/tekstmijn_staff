@@ -46,7 +46,7 @@ function generate_reviewquestionnaire($database, $assignment_id, $staff_id, $sub
             $options_local = Array();
             if (!empty($options_db)){
                 foreach ($options_db as $key => $value){
-                    $options_local[$value['option_key']] = $value['option_value'];
+                    $options_local[$value['option_value']] = $value['option_key'];
                 }
             }
 
@@ -57,7 +57,9 @@ function generate_reviewquestionnaire($database, $assignment_id, $staff_id, $sub
                 AND reviewing.submission_id = $submission_id_quoted
                 AND reviewing.question_id = $id_quoted";
             $values_db = $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['value'];
-            $options_local['value'] = $values_db;
+            if (!empty($values_db)){
+                $options_local['value'] = $values_db;
+            }
 
             if ($elementtype == 'title'){
                 echo "</br>";
