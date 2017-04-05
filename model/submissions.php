@@ -208,6 +208,6 @@ function getSubmissionsforBeoordelaar($database, $assignment, $staff){
             AND staff_id = $quoted_staff_id
             AND students.id = submissions.student_id
             AND submissions.assignment_id = $quoted_assignment_id
-            ORDER BY name;";
+            ORDER BY student_id;";
     return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
 }

@@ -29,6 +29,7 @@
         $templates->addFolder("classes", "view/classes");
         $templates->addFolder("submissions", "view/submissions");
         $templates->addFolder("review", "view/review");
+        $templates->addFolder("status", "view/status");
         return $templates;
     }
 
@@ -84,6 +85,14 @@
         }
     });
 
+//    // Prerouting check for initial setup
+//    $router->before('GET', 'review/', function() {
+//        if (!isset($_GET["token"])) {
+//            getRedirect("/staff/login?failed_registration=true");
+//            exit();
+//        }
+//    });
+
     $router->get("/", function(){
             getRedirect("/staff/login");
     });
@@ -136,10 +145,10 @@
                 $_SESSION['type'] = $info["type"];
                 $_SESSION["staff_email"] = $_POST["username"];
                 $_SESSION['staff_name'] = $info["name"];
-                if ($_SESSION['type'] == 0) {
+                if ($info['type'] == 0) {
                     getRedirect("../submissions/");
                 }
-                elseif ($_SESSION['type'] == 1) {
+                elseif ($info['type'] == 1) {
                     getRedirect("../review/");
                 }
                 elseif ($_SESSION['type'] == 2) {
@@ -501,6 +510,7 @@
         $files = getFiles($db, $staffid, $assignmentid);
         $filename_vars = getNames($db, $staffid, $assignmentid);
         $filename = sprintf("download_%s_%s.zip", $filename_vars['fullname'], $filename_vars['assignment_name']);
+
         $zip = \Comodojo\Zip\Zip::create($filename);
 
         foreach ($files as $file){
@@ -635,6 +645,15 @@
         } else {
             getRedirect("../?success=false");
         }
+    });
+
+    $router->get("/status", function (){
+        session_start("staff");
+        $bp = getBootstrap();
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Status" => "#"]);
+        $menu = generateMenu($bp, ["active" => "Status", "align" => "stacked"], $_SESSION['type']);
+        echo getTemplates()->render("status::overview", ["title" => "Tekstmijn | Status",
+            "page_title" => "Status", "page_subtitle" => $_SESSION["staff_name"], "menu" => $menu, "breadcrumbs" => $breadcrumbs]);
     });
 
     $router->run();
