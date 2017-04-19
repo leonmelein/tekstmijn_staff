@@ -9,6 +9,7 @@
     require("model/submissions.php");
     require("model/download.php");
     require("model/review.php");
+    require("model/status.php");
     use BootPress\Bootstrap\v3\Component as Bootstrap;
 
     function getDatabase(){
@@ -605,13 +606,48 @@
         }
     });
 
-    $router->get("/status", function (){
+    $router->get("/status/(.*)", function ($assignment_id){
         session_start("staff");
+        $db = getDatabase();
         $bp = getBootstrap();
+        $title = getAssignmentName($db, $assignment_id);
+
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Status" => "/staff/status/", $title => "#"]);
+        $menu = generateMenu($bp, ["active" => "Status", "align" => "stacked"], $_SESSION['type']);
+        $overview = getAssignmentOverview($db, $assignment_id);
+        $columns = [
+            ["Naam", "StaffName"],
+            ["Toegewezen", "Promised"],
+            ["Ingevoerd", "Fullfilled"]
+        ];
+        $table = generateTable($bp, $columns, $overview);
+        echo getTemplates()->render("status::assignment", ["title" => "Tekstmijn | Status",
+            "page_title" => "Status", "page_subtitle" => $title,
+            "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+            "overview" => $table]);
+    });
+
+    $router->get("/status/", function (){
+        $db = getDatabase();
+        $bp = getBootstrap();
+
+        session_start("staff");
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Status" => "#"]);
         $menu = generateMenu($bp, ["active" => "Status", "align" => "stacked"], $_SESSION['type']);
+
+
+        $data = getTotalOverview($db);
+        $columns = [
+            ["Opdracht", "title"],
+            ["Toegewezen", "promised"],
+            ["Ingevoerd", "fullfilled"]
+        ];
+        $tbl = generateTable($bp, $columns, $data, null, '<a href="%s/">%s</a>');
+
         echo getTemplates()->render("status::overview", ["title" => "Tekstmijn | Status",
-            "page_title" => "Status", "page_subtitle" => $_SESSION["staff_name"], "menu" => $menu, "breadcrumbs" => $breadcrumbs]);
+            "page_title" => "Status",
+            "menu" => $menu, "breadcrumbs" => $breadcrumbs, "overview" => $tbl
+            ]);
     });
 
     $router->run();
