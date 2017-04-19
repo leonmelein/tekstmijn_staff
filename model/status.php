@@ -20,6 +20,7 @@ function getTotalOverview($database){
                                 FROM grading, submissions
                                 WHERE grading.submission_id = submissions.id
                                 AND grading.staff_id NOT IN (1,24)
+                                AND grading.notes = ''
                                 GROUP BY assignment_id
                 ) AS fullfilled_grades
                   WHERE promised_grades.assignment_id = fullfilled_grades.assignment_id
