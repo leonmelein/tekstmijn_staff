@@ -70,7 +70,7 @@
                                         <div class="row">
                                             <div class="col-md-6">
                                                 <input name="grading_name[]" type="hidden" placeholder="Type beoordeling" class="form-control input-md" value="Score">
-                                                <input value="<?php echo $current_grades['Score']; ?>" name="grading_grade[]" type="number" placeholder="50" min="50" max="150" step="1" class="form-control input-md">
+                                                <input value="<?php echo $current_grades['Score']; ?>" name="grading_grade[]" type="number" placeholder="0" min="50" max="150" step="1" class="form-control input-md">
                                             </div>
                                             <div id="notes_button_<?php echo $submission_id; ?>" class="col-md-3 text-center">
                                                 <button id="add_button" type="submit" onclick="addPencil(this.parentNode.parentNode.parentNode, this)" class="btn btn-default"><i class="glyphicon glyphicon-pencil"></i></button>

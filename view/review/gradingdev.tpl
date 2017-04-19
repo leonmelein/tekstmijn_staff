@@ -64,7 +64,7 @@
                                         <input name="grading_name[]" type="hidden" placeholder="Type beoordeling" class="form-control input-md" value="Score">
                                     </div>
                                     <div class="col-md-4">
-                                        <input value="<?php echo $current_grades['Score']; ?>" name="grading_grade[]" type="number" placeholder="50" min="50" max="150" step="1" class="form-control input-md">
+                                        <input value="<?php echo $current_grades['Score']; ?>" name="grading_grade[]" type="number" placeholder="50" min="0" max="150" step="1" class="form-control input-md">
                                     </div>
                                     <!--<div class="col-xs-2">
                                         <button id="add_button" type="button" onclick="addRow()" class="btn btn-default"><i class="glyphicon glyphicon-plus"></i></button>

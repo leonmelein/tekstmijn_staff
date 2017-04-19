@@ -526,48 +526,6 @@
         exit();
     });
 
-//    $router->get("review/([a-z0-9_-]+)/(\d+)", function ($assignment_id, $submission_id) {
-//        session_start("staff");
-//        $bp = getBootstrap();
-//        $db = getDatabase();
-//
-//        $title = "Beoordelen";
-//        $assignment_name = getAssignmentName($db, $assignment_id);
-//        $student_name = getStudentName($db, $submission_id);
-//        $subtitle = sprintf("%s : %s", $assignment_name, $student_name);
-//        $class = getClassName($db, $class_id);
-//        $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"], $_SESSION['type']);
-//        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/staff/review/", $assignment_name => "/staff/review/$assignment_id", $title => "#"]);
-//
-//        if ($_SESSION['type'] == 1) {$tabs = generateTabs($bp, ["Lezen en beoordelen" => "#beoordelen"], 'Lezen en beoordelen');}
-//        elseif ($_SESSION['type'] == 2) {$tabs = generateTabs($bp, ["Lezen en beoordelen" => "#beoordelen", "Beoordelingslijst" => "#beoordelingslijst"], 'Lezen en beoordelen');}
-//
-//        $submission_info = getSubmissionInfo($db, $submission_id);
-//        $page_js = "/staff/vendor/application/add_field.js";
-//
-//        $staff_id = $_SESSION['staff_id'];
-//        $current_grades= getGrades($db, $staff_id, $submission_id, ["Score"]);
-//
-//        //$beoordelingslijst = generate_reviewquestionnaire($db, $assignment_id);
-//
-//        echo getTemplates()->render("review::grading", ["title" => "Tekstmijn | Beoordelen",
-//            "page_title" => $title, "page_subtitle" => $subtitle, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
-//            "class_id" => $class_id,
-//            "assignment_id" => $assignment_id,
-//            "submission_id" => $submission_id,
-//            "page_js" => $page_js,
-//            "submission_date" => $submission_info["submission_date"],
-//            "submission_file" => $submission_info["submission_file"],
-//            "submission_count" => $submission_info["submission_count"],
-//            "submission_originalfile" => $submission_info["submission_originalfile"],
-//            "text" => $submission_info["text"],
-//            "current_grades" => $current_grades,
-//            "tabs" => $tabs,
-//            "user_type" => $_SESSION['type'],
-//            //"beoordelingslijst" => $beoordelingslijst
-//        ]);
-//    });
-
     $router->get("review/([a-z0-9_-]+)/(\d+)", function ($assignment_id, $submission_id) {
         session_start("staff");
         $bp = getBootstrap();
