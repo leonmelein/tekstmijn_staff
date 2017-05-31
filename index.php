@@ -118,6 +118,22 @@
         }
     });
 
+    $router->before('GET|POST', '/review/', function() {
+        session_start("staff");
+        if (!isset($_SESSION['staff_id'])) {
+            getRedirect("/staff/login");
+            exit();
+        }
+    });
+
+    $router->before('GET|POST', '/review/.*', function() {
+        session_start("staff");
+        if (!isset($_SESSION['staff_id'])) {
+            getRedirect("/staff/login");
+            exit();
+        }
+    });
+
     $router->get("/", function(){
             getRedirect("/staff/login");
     });

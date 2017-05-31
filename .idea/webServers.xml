@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<project version="4">
+  <component name="WebServers">
+    <option name="servers">
+      <webServer id="78f2bf24-f064-482d-bdbf-bb44c983e8b2" name="Hofstad Staging" url="http://hofstad.reinardvandalen.nl">
+        <fileTransfer host="hofstad.reinardvandalen.nl" port="21" rootFolder="/hofstad">
+          <advancedOptions>
+            <advancedOptions dataProtectionLevel="Private" />
+          </advancedOptions>
+          <option name="port" value="21" />
+        </fileTransfer>
+      </webServer>
+    </option>
+  </component>
+</project>
