@@ -572,13 +572,12 @@
         $bp = getBootstrap();
         $db = getDatabase();
 
-        $title = "Beoordelen";
         $assignment_name = getAssignmentName($db, $assignment_id);
         $student_name = getStudentName($db, $submission_id);
         $subtitle = sprintf("%s : %s", $assignment_name, $student_name);
-        $class = getClassName($db, $class_id);
+//        $class = getClassName($db, $class_id);
         $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"], $_SESSION['type']);
-        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/staff/review/", $assignment_name => "/staff/review/$assignment_id", $title => "#"]);
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/staff/review/", $assignment_name => "/staff/review/$assignment_id", "Beoordeel inzending" => "#"]);
 
         if ($_SESSION['type'] == 1) {$tabs = generateTabs($bp, ["Lezen en beoordelen" => "#beoordelen"], 'Lezen en beoordelen');}
         elseif ($_SESSION['type'] == 2) {$tabs = generateTabs($bp, ["Lezen en beoordelen" => "#beoordelen", "Beoordelingslijst" => "#beoordelingslijst"], 'Lezen en beoordelen');}

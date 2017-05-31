@@ -6,7 +6,7 @@
         <span class="icon-bar"></span>
     </button>
     <div class="navbar-header">
-        <a class="navbar-brand" href="/staff/classes/">
+        <a class="navbar-brand" href="/staff/review/">
             <img alt="Brand" src="/staff/assets/img/logo.svg"> Tekstmijn
         </a>
     </div>
