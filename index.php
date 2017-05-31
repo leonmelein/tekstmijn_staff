@@ -702,16 +702,16 @@
         $tbl_schools_columns = [
             ["School", "name"],
         ];
-        $tbl_options = [["<a class='btn btn-default pull-right' href='editschool/%s'><i class='glyphicon glyphicon-pencil'></i></a>"]];
-        $tbl_schools = generateTable($bp, $tbl_schools_columns, $tbl_schools_data, $tbl_options, '<a href="%s/">%s</a>');
+        $tbl_options = [["<a class='btn btn-default pull-right' href='institution/%s/edit'><i class='glyphicon glyphicon-pencil'></i></a>"]];
+        $tbl_schools = generateTable($bp, $tbl_schools_columns, $tbl_schools_data, $tbl_options, '<a href="institution/%s/edit">%s</a>');
 
         $tbl_universities_data = getUniversities($db);
         $tbl_universities_columns = [
             ["Universiteit", "name"],
         ];
-        $tbl_universities = generateTable($bp, $tbl_universities_columns, $tbl_universities_data, $tbl_options, '<a href="%s/">%s</a>');
+        $tbl_universities = generateTable($bp, $tbl_universities_columns, $tbl_universities_data, $tbl_options, '<a href="institution/%s/edit/">%s</a>');
 
-        echo getTemplates()->render("administration::schools_universities", [
+        echo getTemplates()->render("administration::institutions", [
             "title" => "Tekstmijn | Administratie",
             "page_title" => "Administratie",
             "menu" => $menu,
@@ -722,33 +722,61 @@
         ]);
     });
 
-    $router->get("/administration/editschool/([0-9a-zA-Z]+)", function($school_id){
+    $router->get("/administration/institution/([0-9a-zA-Z]+)/edit", function($school_id){
         $db = getDatabase();
         $bp = getBootstrap();
         session_start("staff");
         $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
-        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", "School bewerken"]);
-        if ($school_id == "newSchool") {
-            $school_id == "";
-            $school_type = 0;
-        }
-        elseif ($school_id == "newUniversity") {
-            $school_id == "";
-            $school_type = 1;
-        }
-        else {
-            $school_name = getSchoolName($db, $school_id);
-            $school_type = getSchoolType($db, $school_id);
+        $school_name = getSchoolName($db, $school_id);
+        $school_type = getSchoolType($db, $school_id);
+
+        $typestring = "School";
+        if ($school_type == 1) {
+            $typestring = "Universiteit";
         }
 
-        echo getTemplates()->render("administration::editschool", [
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", sprintf("%s: %s", $typestring, $school_name)]);
+
+        echo getTemplates()->render("administration::institutions_edit", [
             "title" => "Tekstmijn | Administratie",
-            "page_title" => "Administratie",
+            "page_title" => sprintf("%s: %s", $typestring, $school_name),
             "menu" => $menu,
             "breadcrumbs" => $breadcrumbs,
             "school_id" => $school_id,
             "school_name" => $school_name,
             "school_type" => $school_type
+        ]);
+    });
+
+    $router->get("/administration/school/new", function(){
+        $db = getDatabase();
+        $bp = getBootstrap();
+        session_start("staff");
+        $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", "School toevoegen"]);
+
+        echo getTemplates()->render("administration::institutions_edit", [
+            "title" => "Tekstmijn | Administratie",
+            "page_title" => "School toevoegen",
+            "menu" => $menu,
+            "breadcrumbs" => $breadcrumbs,
+            "school_type" => 0
+        ]);
+    });
+
+    $router->get("/administration/university/new", function(){
+        $db = getDatabase();
+        $bp = getBootstrap();
+        session_start("staff");
+        $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", "Universiteit toevoegen"]);
+
+        echo getTemplates()->render("administration::institutions_edit", [
+            "title" => "Tekstmijn | Administratie",
+            "page_title" => "Universiteit toevoegen",
+            "menu" => $menu,
+            "breadcrumbs" => $breadcrumbs,
+            "school_type" => 1
         ]);
     });
 

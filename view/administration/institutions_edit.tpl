@@ -42,7 +42,7 @@
 
                 <!-- Button -->
                 <div class="form-group">
-                    <label class="col-md-4 control-label" for="opslaan">Opslaan</label>
+                    <label class="col-md-4 control-label" for="opslaan"></label>
                     <div class="col-md-4">
                         <button id="opslaan" name="opslaan" class="btn btn-primary">Opslaan</button>
                     </div>
