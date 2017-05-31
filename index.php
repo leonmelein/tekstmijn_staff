@@ -54,7 +54,7 @@
 
     //  Authentication check: check if each request has a user ID set in session.
     //  TODO: use tokens?
-    $router->before('GET|POST', 'account/', function() {
+    $router->before('GET|POST', '/account/', function() {
         session_start("staff");
         if (!isset($_SESSION['staff_id'])) {
             getRedirect("/staff/login");
@@ -62,7 +62,15 @@
         }
     });
 
-    $router->before('GET|POST', 'classes/', function() {
+    $router->before('GET|POST', '/classes/', function() {
+    session_start("staff");
+    if (!isset($_SESSION['staff_id'])) {
+        getRedirect("/staff/login");
+        exit();
+    }
+});
+
+    $router->before('GET|POST', '/classes/.*', function() {
         session_start("staff");
         if (!isset($_SESSION['staff_id'])) {
             getRedirect("/staff/login");
@@ -70,7 +78,15 @@
         }
     });
 
-    $router->before('GET|POST', 'submissions/', function() {
+    $router->before('GET|POST', '/submissions/', function() {
+    session_start("staff");
+    if (!isset($_SESSION['staff_id'])) {
+        getRedirect("/staff/login");
+        exit();
+    }
+});
+
+    $router->before('GET|POST', '/submissions/.*', function() {
         session_start("staff");
         if (!isset($_SESSION['staff_id'])) {
             getRedirect("/staff/login");
@@ -79,20 +95,28 @@
     });
 
     // Prerouting check for initial setup
-    $router->before('GET', 'register/', function() {
+    $router->before('GET', '/register/', function() {
         if (!isset($_GET["token"])) {
             getRedirect("/staff/login?failed_registration=true");
             exit();
         }
     });
 
-//    // Prerouting check for initial setup
-//    $router->before('GET', 'review/', function() {
-//        if (!isset($_GET["token"])) {
-//            getRedirect("/staff/login?failed_registration=true");
-//            exit();
-//        }
-//    });
+    $router->before('GET|POST', '/status/', function() {
+        session_start("staff");
+        if (!isset($_SESSION['staff_id'])) {
+            getRedirect("/staff/login");
+            exit();
+        }
+    });
+
+    $router->before('GET|POST', '/status/.*', function() {
+        session_start("staff");
+        if (!isset($_SESSION['staff_id'])) {
+            getRedirect("/staff/login");
+            exit();
+        }
+    });
 
     $router->get("/", function(){
             getRedirect("/staff/login");
