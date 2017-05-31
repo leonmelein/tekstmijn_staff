@@ -641,6 +641,7 @@
      * Administration
      *
      * Routes to administration pages
+     *
      */
     $router->mount('/administration', function() use ($router, $db, $templates, $bp) {
 
@@ -673,66 +674,75 @@
             ]);
         });
 
-        $router->get("/institution/([0-9a-zA-Z]+)/edit", function($school_id) use ($db, $templates, $bp){
-            session_start("staff");
-            $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
-            $school_name = getSchoolName($db, $school_id);
-            $school_type = getSchoolType($db, $school_id);
+        /*
+         * Institutions
+         *
+         * Routes to pages concerning the participating institutions, either supplying the students or the reviewers.
+         *
+         */
+        $router->mount('/institution', function() use ($router, $db, $templates, $bp) {
+            $router->get("/([0-9a-zA-Z]+)/edit", function($school_id) use ($db, $templates, $bp){
+                session_start("staff");
+                $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+                $school_name = getSchoolName($db, $school_id);
+                $school_type = getSchoolType($db, $school_id);
 
-            $typestring = "School";
-            if ($school_type == 1) {
-                $typestring = "Universiteit";
-            }
+                $typestring = "School";
+                if ($school_type == 1) {
+                    $typestring = "Universiteit";
+                }
 
-            $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", sprintf("%s: %s", $typestring, $school_name)]);
+                $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", sprintf("%s: %s", $typestring, $school_name)]);
 
-            echo $templates->render("administration::institutions_edit", [
-                "title" => "Tekstmijn | Administratie",
-                "page_title" => sprintf("%s: %s", $typestring, $school_name),
-                "menu" => $menu,
-                "breadcrumbs" => $breadcrumbs,
-                "school_id" => $school_id,
-                "school_name" => $school_name,
-                "school_type" => $school_type
-            ]);
-        });
+                echo $templates->render("administration::institutions_edit", [
+                    "title" => "Tekstmijn | Administratie",
+                    "page_title" => sprintf("%s: %s", $typestring, $school_name),
+                    "menu" => $menu,
+                    "breadcrumbs" => $breadcrumbs,
+                    "school_id" => $school_id,
+                    "school_name" => $school_name,
+                    "school_type" => $school_type
+                ]);
+            });
 
-        $router->post("/institution/([0-9a-zA-Z]+)/save", function($school_id) use ($db) {
-            session_start("staff");
+            $router->post("/([0-9a-zA-Z]+)/save", function($school_id) use ($db) {
+                session_start("staff");
 
-            if (updateInstitution($db, $school_id, $_POST)) {
-                getRedirect("/staff/administration/?institution_update=true");
-            } else {
-                getRedirect("/staff/administration/?institution_update=false");
-            }
-        });
+                if (updateInstitution($db, $school_id, $_POST)) {
+                    getRedirect("/staff/administration/?institution_update=true");
+                } else {
+                    getRedirect("/staff/administration/?institution_update=false");
+                }
+            });
 
-        $router->get("/school/new", function() use ($db, $templates, $bp) {
-            session_start("staff");
-            $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
-            $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", "School toevoegen"]);
+            $router->get("/new", function() use ($db, $templates, $bp) {
+                session_start("staff");
+                $type = $_GET["type"];
+                if ($type == "school") {
+                    $school_type = 0;
+                } else {
+                    $school_type = 1;
+                }
 
-            echo $templates->render("administration::institutions_edit", [
-                "title" => "Tekstmijn | Administratie",
-                "page_title" => "School toevoegen",
-                "menu" => $menu,
-                "breadcrumbs" => $breadcrumbs,
-                "school_type" => 0
-            ]);
-        });
+                $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+                $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", "Onderwijsinstelling toevoegen"]);
 
-        $router->get("/university/new", function() use ($db, $templates, $bp) {
-            session_start("staff");
-            $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
-            $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", "Universiteit toevoegen"]);
+                echo $templates->render("administration::institutions_add", [
+                    "title" => "Tekstmijn | Administratie",
+                    "page_title" => "Onderwijsinstelling toevoegen",
+                    "menu" => $menu,
+                    "breadcrumbs" => $breadcrumbs,
+                    "school_type" => $school_type
+                ]);
+            });
 
-            echo $templates->render("administration::institutions_edit", [
-                "title" => "Tekstmijn | Administratie",
-                "page_title" => "Universiteit toevoegen",
-                "menu" => $menu,
-                "breadcrumbs" => $breadcrumbs,
-                "school_type" => 1
-            ]);
+            $router->post("/add", function() use ($db){
+                if (addInstitution($db, $_POST)) {
+                    getRedirect("/staff/administration/?institution_update=true");
+                } else {
+                    getRedirect("/staff/administration/?institution_update=false");
+                }
+            });
         });
 
     });

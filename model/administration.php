@@ -79,3 +79,19 @@ function updateInstitution($database, $id, $post){
         ["name" => $post['name'], "type_school" => $post['type']],
         ["id" => $id]);
 }
+
+/*
+ * Adds a new institution with its name and type
+ *
+ * @param Medoo $database A database instance passed as an Medoo object.
+ * @param Array $post The values posted by the update form
+ */
+function addInstitution($database, $post) {
+    return $database->insert(
+        "schools",
+        [
+            "name" => $post['name'],
+            "type_school" => $post['type']
+        ]
+    );
+}

@@ -22,8 +22,8 @@
                 <i class="glyphicon glyphicon-plus"></i> Nieuwe onderwijsinstelling
                 <span class="caret"></span></button>
             <ul class="dropdown-menu">
-                <li><a href="school/new">School</a></li>
-                <li><a href="university/new">Universiteit</a></li>
+                <li><a href="institution/new?type=school">School</a></li>
+                <li><a href="institution/new?type=university">Universiteit</a></li>
             </ul>
         </div>
         <?php echo $tabs; ?>
