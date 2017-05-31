@@ -23,31 +23,59 @@ function getSchools($database) {
  * @return Array, associative
  */
 function getUniversities($database) {
-    $query = "SELECT * FROM schools WHERE type_school = 1";
-    return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+    return $database->select(
+        "schools",
+        "*",
+        [
+            "type_school" => 1
+        ]
+    );
 }
 
 /*
  * Gets the name of a participating school.
  *
  * @param Medoo $database A database instance passed as an Medoo object.
+ *  @param int $school_id The id of the institution
  * @return string
  */
 function getSchoolName($database, $school_id) {
-    $quoted_school_id = $database->quote($school_id);
-    $query = "SELECT name FROM schools WHERE id = $quoted_school_id";
-    return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['name'];
+    return $database->get(
+        "schools",
+        "name",
+        [
+            "id" => $school_id
+        ]
+    );
 }
-
 
 /*
  * Gets the type of a participating school.
  *
  * @param Medoo $database A database instance passed as an Medoo object.
+ * @param int $school_id The id of the institution
  * @return int
  */
 function getSchoolType($database, $school_id) {
-    $quoted_school_id = $database->quote($school_id);
-    $query = "SELECT type_school FROM schools WHERE id = $quoted_school_id";
-    return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['type_school'];
+    return $database->get(
+        "schools",
+        "type_school",
+        [
+            "id" => $school_id
+        ]
+    );
+}
+
+/*
+ * Updates the institution's name and type
+ *
+ * @param Medoo $database A database instance passed as an Medoo object.
+ * @param int $id The ID of the institution
+ * @param Array $post The values posted by the update form
+ */
+function updateInstitution($database, $id, $post){
+    return $database->update(
+        "schools",
+        ["name" => $post['name'], "type_school" => $post['type']],
+        ["id" => $id]);
 }

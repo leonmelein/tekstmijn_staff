@@ -78,3 +78,8 @@ function generateTabs($bp, $tabsarray, $active = 'Info'){
         'toggle' => "tab",
     ));
 }
+
+function getRedirect($url, $statusCode = 303) {
+    header('Location: ' . $url, true, $statusCode);
+    die();
+}

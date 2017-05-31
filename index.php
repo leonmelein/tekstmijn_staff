@@ -13,39 +13,27 @@
     require("model/administration.php");
     use BootPress\Bootstrap\v3\Component as Bootstrap;
 
-    function getDatabase(){
-        $database = new medoo([
-            'database_type' => 'mysql',
-            'database_name' => 'hofstad',
-            'server' => 'srv-01.reinardvandalen.nl',
-            'username' => 'hofstad',
-            'password' => 'LR_hdh4@26', // TODO: Move to config file?
-            'charset' => 'utf8'
-        ]);
-        return $database;
-    }
+    // Database setup
+    $db = new medoo([
+        'database_type' => 'mysql',
+        'database_name' => 'hofstad',
+        'server' => 'srv-01.reinardvandalen.nl',
+        'username' => 'hofstad',
+        'password' => 'LR_hdh4@26', // TODO: Move to config file?
+        'charset' => 'utf8'
+    ]);
 
-    function getTemplates(){
-        $templates = new League\Plates\Engine('view', 'tpl');
-        $templates->addFolder("login", "view/login");
-        $templates->addFolder("classes", "view/classes");
-        $templates->addFolder("submissions", "view/submissions");
-        $templates->addFolder("review", "view/review");
-        $templates->addFolder("status", "view/status");
-        $templates->addFolder("administration", "view/administration");
-        return $templates;
-    }
+    // Template setup
+    $templates = new League\Plates\Engine('view', 'tpl');
+    $templates->addFolder("login", "view/login");
+    $templates->addFolder("classes", "view/classes");
+    $templates->addFolder("submissions", "view/submissions");
+    $templates->addFolder("review", "view/review");
+    $templates->addFolder("status", "view/status");
+    $templates->addFolder("administration", "view/administration");
+    $bp = new Bootstrap;
 
-    function getRedirect($url, $statusCode = 303)
-    {
-        header('Location: ' . $url, true, $statusCode);
-        die();
-    }
-
-    function getBootstrap(){
-        return new Bootstrap;
-    }
-
+    // Initiate router
     $router = new \Bramus\Router\Router();
 
 
@@ -65,12 +53,12 @@
     });
 
     $router->before('GET|POST', '/classes/', function() {
-    session_start("staff");
-    if (!isset($_SESSION['staff_id'])) {
-        getRedirect("/staff/login");
-        exit();
-    }
-});
+        session_start("staff");
+        if (!isset($_SESSION['staff_id'])) {
+            getRedirect("/staff/login");
+            exit();
+        }
+    });
 
     $router->before('GET|POST', '/classes/.*', function() {
         session_start("staff");
@@ -81,12 +69,12 @@
     });
 
     $router->before('GET|POST', '/submissions/', function() {
-    session_start("staff");
-    if (!isset($_SESSION['staff_id'])) {
-        getRedirect("/staff/login");
-        exit();
-    }
-});
+        session_start("staff");
+        if (!isset($_SESSION['staff_id'])) {
+            getRedirect("/staff/login");
+            exit();
+        }
+    });
 
     $router->before('GET|POST', '/submissions/.*', function() {
         session_start("staff");
@@ -140,13 +128,11 @@
             getRedirect("/staff/login");
     });
 
-    $router->get("login/", function (){
-        echo getTemplates()->render("login::login", ["title" => "Tekstmijn | Inloggen"]);
+    $router->get("login/", function () use ($templates){
+        echo $templates->render("login::login", ["title" => "Tekstmijn | Inloggen"]);
     });
 
-    $router->post("login/", function (){
-        $db = getDatabase();
-
+    $router->post("login/", function () use ($db){
         if ($_POST['password_forgotten'] == 1) {
             $sanitized_email = filter_var($_POST['username'], FILTER_SANITIZE_EMAIL);
             if (filter_var($sanitized_email, FILTER_VALIDATE_EMAIL)) {
@@ -210,12 +196,11 @@
             getRedirect("../login/?logged_out=true");
         });
 
-    $router->get("register/", function (){
-        $db = getDatabase();
+    $router->get("register/", function () use ($db, $templates){
         $registration = getRegistrationInfo($db, $_GET["token"]);
 
         if($registration){
-            echo getTemplates()->render("login::register",
+            echo $templates->render("login::register",
                                         ["title" => "Tekstmijn | Registreren",
                                             "name" => $registration["name"],
                                             "email" => $registration["email"],
@@ -229,8 +214,7 @@
 
     });
 
-    $router->post("register/", function(){
-        $db = getDatabase();
+    $router->post("register/", function() use ($db, $templates){
         if(set_initial_password($db, $_POST["username"], $_POST["password"])){
             getRedirect("/staff/login/?registration=true");
         } else {
@@ -238,21 +222,18 @@
         }
     });
 
-    $router->get("account/", function (){
-        $bp = getBootstrap();
-
+    $router->get("account/", function () use ($db, $templates, $bp){
         session_start("staff");
         // Generate menu
         $menu = generateMenu($bp, ["active" => "Mijn account", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Mijn account" => "#"]);
 
-        echo getTemplates()->render("login::account", ["title" => "Tekstmijn | Mijn account",
+        echo $templates->render("login::account", ["title" => "Tekstmijn | Mijn account",
             "page_title" => "Mijn account", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "name" => $_SESSION["staff_name"], "email" => $_SESSION["staff_email"], "page_js" => "../vendor/application/register_validate.js"]);
     });
 
-    $router->post("account/", function(){
-        $db = getDatabase();
+    $router->post("account/", function() use ($db){
         if(change_password($db, $_POST["username"], $_POST["password"])){
             getRedirect("/staff/account/?password_changed=true");
         } else {
@@ -260,11 +241,8 @@
         }
     });
 
-    $router->get("classes/", function (){
+    $router->get("classes/", function () use ($db, $templates, $bp){
         session_start("staff");
-        $bp = getBootstrap();
-        $db = getDatabase();
-
         $menu = generateMenu($bp, ["active" => "Leerlingen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Leerlingen" => "#"]);
 
@@ -275,15 +253,13 @@
             ["Jaar", "year"]
         ];
         $table = generateTable($bp, $columns, $classes, null, '<a href="%s/">%s</a>');
-        echo getTemplates()->render("classes::index", ["title" => "Tekstmijn | Leerlingen",
+        echo $templates->render("classes::index", ["title" => "Tekstmijn | Leerlingen",
             "page_title" => "Leerlingen", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table]);
     });
 
-    $router->get("classes/(\d+)/", function ($class_id){
+    $router->get("classes/(\d+)/", function ($class_id) use ($db, $templates, $bp){
         session_start("staff");
-        $bp = getBootstrap();
-        $db = getDatabase();
 
         $name = sprintf("Klas %s", getClassName($db, $class_id));
         $menu = generateMenu($bp, ["active" => "Leerlingen", "align" => "stacked"], $_SESSION['type']);
@@ -300,23 +276,21 @@
         ];
 
         $table = generateTable($bp, $columns, $students, $options);
-        echo getTemplates()->render("classes::class", ["title" => "Tekstmijn | Leerlingen",
+        echo $templates->render("classes::class", ["title" => "Tekstmijn | Leerlingen",
             "page_title" => $name, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table, "page_js" => "/staff/vendor/application/reset_pwd_students.js"]);
     });
 
-    $router->get("reset/(\d+)/", function($student_id){
-       if(resetStudentPassword(getDatabase(), $student_id)){
+    $router->get("reset/(\d+)/", function($student_id) use ($db){
+       if(resetStudentPassword($db, $student_id)){
            echo '{"status": "success"}';
        } else {
            echo '{"status": "failure"}';
        }
     });
 
-    $router->get("submissions/", function (){
+    $router->get("submissions/", function () use ($db, $templates, $bp){
         session_start("staff");
-        $bp = getBootstrap();
-        $db = getDatabase();
 
         $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Inzendingen" => "#"]);
@@ -328,16 +302,13 @@
             ["Jaar", "year"]
         ];
         $table = generateTable($bp, $columns, $classes, null, '<a href="%s/">%s</a>');
-        echo getTemplates()->render("submissions::index", ["title" => "Tekstmijn | Inzendingen",
+        echo $templates->render("submissions::index", ["title" => "Tekstmijn | Inzendingen",
             "page_title" => "Inzendingen", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table]);
     });
 
-    $router->get("submissions/(\d+)/", function ($class_id){
+    $router->get("submissions/(\d+)/", function ($class_id)  use ($db, $templates, $bp){
         session_start("staff");
-        $bp = getBootstrap();
-        $db = getDatabase();
-
         $class = getClassName($db, $class_id);
         $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/",
@@ -352,15 +323,13 @@
         ];
 
         $table = generateTable($bp, $columns, $students, null, '<a href="%s/">%s</a>');
-        echo getTemplates()->render("submissions::classes", ["title" => "Tekstmijn | Inzendingen",
+        echo $templates->render("submissions::classes", ["title" => "Tekstmijn | Inzendingen",
             "page_title" => "Inzendingen", "page_subtitle" => sprintf("Klas %s", $class),  "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table]);
     });
 
-    $router->get("submissions/(\d+)/([a-z0-9_-]+)/", function ($class_id, $assignment_id){
+    $router->get("submissions/(\d+)/([a-z0-9_-]+)/", function ($class_id, $assignment_id)  use ($db, $templates, $bp){
         session_start("staff");
-        $bp = getBootstrap();
-        $db = getDatabase();
 
         $staff_id = $_SESSION['staff_id'];
 
@@ -393,7 +362,7 @@
 
         $page_js = "/staff/vendor/application/add_pencil.js";
 
-        echo getTemplates()->render("submissions::submissions", [
+        echo $templates->render("submissions::submissions", [
             "title" => "Tekstmijn | Inzendingen",
             "page_title" => "Inzendingen",
             "page_subtitle" => $title,
@@ -411,10 +380,8 @@
             "db" => $db]);
     });
 
-    $router->get("submissions/(\d+)/([a-z0-9_-]+)/(\d+)", function ($class_id, $assignment_id, $submission_id) {
+    $router->get("submissions/(\d+)/([a-z0-9_-]+)/(\d+)", function ($class_id, $assignment_id, $submission_id) use ($db, $templates, $bp) {
         session_start("staff");
-        $bp = getBootstrap();
-        $db = getDatabase();
 
         $title = "Inzending";
         $assignment_name = getAssignmentName($db, $assignment_id);
@@ -430,7 +397,7 @@
         $staff_id = $_SESSION['staff_id'];
         $current_grades= getGrades($db, $staff_id, $submission_id, ["Score"]);
 
-        echo getTemplates()->render("submissions::grading", ["title" => "Tekstmijn | Inzendingen",
+        echo $templates->render("submissions::grading", ["title" => "Tekstmijn | Inzendingen",
             "page_title" => $title, "page_subtitle" => $subtitle, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "class_id" => $class_id,
             "assignment_id" => $assignment_id,
@@ -445,9 +412,7 @@
         ]);
     });
 
-    $router->post("/submissions/(.*)/grade", function () {
-        $db = getDatabase();
-
+    $router->post("/submissions/(.*)/grade", function ()  use ($db){
         session_start("staff");
         $staff_id = $_SESSION['staff_id'];
         $submission_id = $_POST["submission_id"];
@@ -464,12 +429,11 @@
 
     });
 
-    $router->get("/reset_password/", function (){
-        $db = getDatabase();
+    $router->get("/reset_password/", function ()  use ($db, $templates){
         $registration = getResetInfo($db, $_GET["token"]);
 
         if($registration){
-            echo getTemplates()->render("login::reset",
+            echo $templates->render("login::reset",
                 ["title" => "Tekstmijn | Registreren",
                     "name" => $registration["name"],
                     "email" => $registration["email"],
@@ -482,8 +446,7 @@
 
     });
 
-    $router->post("/reset_password/", function(){
-        $db = getDatabase();
+    $router->post("/reset_password/", function() use ($db) {
         if(change_password($db, $_POST["username"], $_POST["password"])){
             getRedirect("/staff/login/?pwd_reset=true");
         } else {
@@ -491,10 +454,8 @@
         }
     });
 
-    $router->get("review/", function (){
+    $router->get("review/", function () use ($db, $templates, $bp){
         session_start("staff");
-        $bp = getBootstrap();
-        $db = getDatabase();
 
         $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/review/"]);
@@ -505,16 +466,13 @@
         ];
 
         $table = generateTable($bp, $columns, $students, null, '<a href="%s/">%s</a>');
-        echo getTemplates()->render("submissions::classes", ["title" => "Tekstmijn | Beoordelen",
+        echo $templates->render("submissions::classes", ["title" => "Tekstmijn | Beoordelen",
             "page_title" => "Beoordelen", "page_subtitle" => $_SESSION["staff_name"],  "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table]);
     });
 
-    $router->get("review/([a-z0-9_-]+)/", function($assignmentid){
+    $router->get("review/([a-z0-9_-]+)/", function($assignmentid)  use ($db, $templates, $bp) {
         session_start("staff");
-        $bp = getBootstrap();
-        $db = getDatabase();
-
         $staff_id = $_SESSION['staff_id'];
 
         $title = getAssignmentName($db, $assignmentid);
@@ -533,7 +491,7 @@
 
         $page_js = "/staff/vendor/application/add_pencil.js";
 
-        echo getTemplates()->render("submissions::review", [
+        echo $templates->render("submissions::review", [
             "title" => "Tekstmijn | Beoordelen",
             "page_title" => "Beoordelen",
             "page_subtitle" => $title,
@@ -548,8 +506,7 @@
             "db" => $db]);
     });
 
-    $router->get("/download/(\d+)/([a-z0-9_-]+)", function($staffid, $assignmentid){
-        $db = getDatabase();
+    $router->get("/download/(\d+)/([a-z0-9_-]+)", function($staffid, $assignmentid) use ($db){
         $files = getFiles($db, $staffid, $assignmentid);
         $filename_vars = getNames($db, $staffid, $assignmentid);
         $filename = sprintf("download_%s_%s.zip", $filename_vars['fullname'], $filename_vars['assignment_name']);
@@ -569,10 +526,8 @@
         exit();
     });
 
-    $router->get("review/([a-z0-9_-]+)/(\d+)", function ($assignment_id, $submission_id) {
+    $router->get("review/([a-z0-9_-]+)/(\d+)", function ($assignment_id, $submission_id) use ($db, $templates, $bp) {
         session_start("staff");
-        $bp = getBootstrap();
-        $db = getDatabase();
 
         $assignment_name = getAssignmentName($db, $assignment_id);
         $student_name = getStudentName($db, $submission_id);
@@ -590,7 +545,7 @@
         $staff_id = $_SESSION['staff_id'];
         $current_grades= getGrades($db, $staff_id, $submission_id, ["Score"]);
 
-        echo getTemplates()->render("review::gradingdev", ["title" => "Tekstmijn | Beoordelen",
+        echo $templates->render("review::gradingdev", ["title" => "Tekstmijn | Beoordelen",
             "page_title" => $title, "page_subtitle" => $subtitle, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "class_id" => $class_id,
             "assignment_id" => $assignment_id,
@@ -609,9 +564,7 @@
         ]);
     });
 
-    $router->post("review/(.*)/saveques", function () {
-        $db = getDatabase();
-
+    $router->post("review/(.*)/saveques", function ()  use ($db) {
         session_start("staff");
         $staff_id = $_POST['staff_id'];
         $submission_id = $_POST['submission_id'];
@@ -629,9 +582,7 @@
         }
     });
 
-    $router->post("/review/(.*)/grade", function () {
-        $db = getDatabase();
-
+    $router->post("/review/(.*)/grade", function ()  use ($db) {
         session_start("staff");
         $staff_id = $_SESSION['staff_id'];
         $submission_id = $_POST["submission_id"];
@@ -647,10 +598,8 @@
         }
     });
 
-    $router->get("/status/(.*)", function ($assignment_id){
+    $router->get("/status/(.*)", function ($assignment_id)  use ($db, $templates, $bp) {
         session_start("staff");
-        $db = getDatabase();
-        $bp = getBootstrap();
         $title = getAssignmentName($db, $assignment_id);
 
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Status" => "/staff/status/", $title => "#"]);
@@ -662,16 +611,13 @@
             ["Ingevoerd", "Fullfilled"]
         ];
         $table = generateTable($bp, $columns, $overview);
-        echo getTemplates()->render("status::assignment", ["title" => "Tekstmijn | Status",
+        echo $templates->render("status::assignment", ["title" => "Tekstmijn | Status",
             "page_title" => "Status", "page_subtitle" => $title,
             "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "overview" => $table]);
     });
 
-    $router->get("/status/", function (){
-        $db = getDatabase();
-        $bp = getBootstrap();
-
+    $router->get("/status/", function () use ($db, $templates, $bp) {
         session_start("staff");
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Status" => "#"]);
         $menu = generateMenu($bp, ["active" => "Status", "align" => "stacked"], $_SESSION['type']);
@@ -685,99 +631,110 @@
         ];
         $tbl = generateTable($bp, $columns, $data, null, '<a href="%s/">%s</a>');
 
-        echo getTemplates()->render("status::overview", ["title" => "Tekstmijn | Status",
+        echo $templates->render("status::overview", ["title" => "Tekstmijn | Status",
             "page_title" => "Status",
             "menu" => $menu, "breadcrumbs" => $breadcrumbs, "overview" => $tbl
             ]);
     });
 
-    $router->get("/administration/", function(){
-        $db = getDatabase();
-        $bp = getBootstrap();
-        session_start("staff");
-        $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
-        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "#"]);
-        $tabs = generateTabs($bp, ["Scholen" => "#schools", "Universiteiten" => "#universities"], 'Scholen');
-        $tbl_schools_data = getSchools($db);
-        $tbl_schools_columns = [
-            ["School", "name"],
-        ];
-        $tbl_options = [["<a class='btn btn-default pull-right' href='institution/%s/edit'><i class='glyphicon glyphicon-pencil'></i></a>"]];
-        $tbl_schools = generateTable($bp, $tbl_schools_columns, $tbl_schools_data, $tbl_options, '<a href="institution/%s/edit">%s</a>');
+    /*
+     * Administration
+     *
+     * Routes to administration pages
+     */
+    $router->mount('/administration', function() use ($router, $db, $templates, $bp) {
 
-        $tbl_universities_data = getUniversities($db);
-        $tbl_universities_columns = [
-            ["Universiteit", "name"],
-        ];
-        $tbl_universities = generateTable($bp, $tbl_universities_columns, $tbl_universities_data, $tbl_options, '<a href="institution/%s/edit/">%s</a>');
+        $router->get("/", function() use ($db, $templates, $bp){
+            session_start("staff");
+            $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+            $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "#"]);
+            $tabs = generateTabs($bp, ["Scholen" => "#schools", "Universiteiten" => "#universities"], 'Scholen');
+            $tbl_schools_data = getSchools($db);
+            $tbl_schools_columns = [
+                ["School", "name"],
+            ];
+            $tbl_options = [["<a class='btn btn-default pull-right' href='institution/%s/edit'><i class='glyphicon glyphicon-pencil'></i></a>"]];
+            $tbl_schools = generateTable($bp, $tbl_schools_columns, $tbl_schools_data, $tbl_options, '<a href="institution/%s/edit">%s</a>');
 
-        echo getTemplates()->render("administration::institutions", [
-            "title" => "Tekstmijn | Administratie",
-            "page_title" => "Administratie",
-            "menu" => $menu,
-            "breadcrumbs" => $breadcrumbs,
-            "tbl_schools" => $tbl_schools,
-            "tbl_universities" => $tbl_universities,
-            "tabs" => $tabs
-        ]);
-    });
+            $tbl_universities_data = getUniversities($db);
+            $tbl_universities_columns = [
+                ["Universiteit", "name"],
+            ];
+            $tbl_universities = generateTable($bp, $tbl_universities_columns, $tbl_universities_data, $tbl_options, '<a href="institution/%s/edit/">%s</a>');
 
-    $router->get("/administration/institution/([0-9a-zA-Z]+)/edit", function($school_id){
-        $db = getDatabase();
-        $bp = getBootstrap();
-        session_start("staff");
-        $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
-        $school_name = getSchoolName($db, $school_id);
-        $school_type = getSchoolType($db, $school_id);
+            echo $templates->render("administration::institutions", [
+                "title" => "Tekstmijn | Administratie",
+                "page_title" => "Administratie",
+                "menu" => $menu,
+                "breadcrumbs" => $breadcrumbs,
+                "tbl_schools" => $tbl_schools,
+                "tbl_universities" => $tbl_universities,
+                "tabs" => $tabs
+            ]);
+        });
 
-        $typestring = "School";
-        if ($school_type == 1) {
-            $typestring = "Universiteit";
-        }
+        $router->get("/institution/([0-9a-zA-Z]+)/edit", function($school_id) use ($db, $templates, $bp){
+            session_start("staff");
+            $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+            $school_name = getSchoolName($db, $school_id);
+            $school_type = getSchoolType($db, $school_id);
 
-        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", sprintf("%s: %s", $typestring, $school_name)]);
+            $typestring = "School";
+            if ($school_type == 1) {
+                $typestring = "Universiteit";
+            }
 
-        echo getTemplates()->render("administration::institutions_edit", [
-            "title" => "Tekstmijn | Administratie",
-            "page_title" => sprintf("%s: %s", $typestring, $school_name),
-            "menu" => $menu,
-            "breadcrumbs" => $breadcrumbs,
-            "school_id" => $school_id,
-            "school_name" => $school_name,
-            "school_type" => $school_type
-        ]);
-    });
+            $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", sprintf("%s: %s", $typestring, $school_name)]);
 
-    $router->get("/administration/school/new", function(){
-        $db = getDatabase();
-        $bp = getBootstrap();
-        session_start("staff");
-        $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
-        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", "School toevoegen"]);
+            echo $templates->render("administration::institutions_edit", [
+                "title" => "Tekstmijn | Administratie",
+                "page_title" => sprintf("%s: %s", $typestring, $school_name),
+                "menu" => $menu,
+                "breadcrumbs" => $breadcrumbs,
+                "school_id" => $school_id,
+                "school_name" => $school_name,
+                "school_type" => $school_type
+            ]);
+        });
 
-        echo getTemplates()->render("administration::institutions_edit", [
-            "title" => "Tekstmijn | Administratie",
-            "page_title" => "School toevoegen",
-            "menu" => $menu,
-            "breadcrumbs" => $breadcrumbs,
-            "school_type" => 0
-        ]);
-    });
+        $router->post("/institution/([0-9a-zA-Z]+)/save", function($school_id) use ($db) {
+            session_start("staff");
 
-    $router->get("/administration/university/new", function(){
-        $db = getDatabase();
-        $bp = getBootstrap();
-        session_start("staff");
-        $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
-        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", "Universiteit toevoegen"]);
+            if (updateInstitution($db, $school_id, $_POST)) {
+                getRedirect("/staff/administration/?institution_update=true");
+            } else {
+                getRedirect("/staff/administration/?institution_update=false");
+            }
+        });
 
-        echo getTemplates()->render("administration::institutions_edit", [
-            "title" => "Tekstmijn | Administratie",
-            "page_title" => "Universiteit toevoegen",
-            "menu" => $menu,
-            "breadcrumbs" => $breadcrumbs,
-            "school_type" => 1
-        ]);
+        $router->get("/school/new", function() use ($db, $templates, $bp) {
+            session_start("staff");
+            $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+            $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", "School toevoegen"]);
+
+            echo $templates->render("administration::institutions_edit", [
+                "title" => "Tekstmijn | Administratie",
+                "page_title" => "School toevoegen",
+                "menu" => $menu,
+                "breadcrumbs" => $breadcrumbs,
+                "school_type" => 0
+            ]);
+        });
+
+        $router->get("/university/new", function() use ($db, $templates, $bp) {
+            session_start("staff");
+            $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+            $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", "Universiteit toevoegen"]);
+
+            echo $templates->render("administration::institutions_edit", [
+                "title" => "Tekstmijn | Administratie",
+                "page_title" => "Universiteit toevoegen",
+                "menu" => $menu,
+                "breadcrumbs" => $breadcrumbs,
+                "school_type" => 1
+            ]);
+        });
+
     });
 
     $router->run();
