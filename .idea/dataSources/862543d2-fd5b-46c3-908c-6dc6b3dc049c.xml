@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <dataSource name="Hofstad Staging">
-  <database-model serializer="dbm" rdbms="MYSQL" format-version="4.1">
+  <database-model serializer="dbm" rdbms="MYSQL" format-version="4.2">
     <root id="1"/>
     <schema id="2" parent="1" name="hofstad">
       <Current>1</Current>
@@ -29,43 +29,35 @@
     <table id="11" parent="2" name="level">
       <Comment>Onderwijsniveaus (HAVO/VWO; profielen en richtingen)</Comment>
     </table>
-    <table id="12" parent="2" name="question_options">
-      <Comment>Mogelijke antwoorden per vraag vragenlijst</Comment>
-    </table>
-    <table id="13" parent="2" name="questionnaire_question"/>
-    <table id="14" parent="2" name="questionnaires">
-      <Comment>Vragenlijsten</Comment>
-    </table>
-    <table id="15" parent="2" name="questionnaires_classes">
-      <Comment>Wijst vragenlijsten aan klassen toe</Comment>
-    </table>
-    <table id="16" parent="2" name="questions">
-      <Comment>Vragen voor vragenlijst</Comment>
-    </table>
-    <table id="17" parent="2" name="reactions">
-      <Comment>Antwoorden op vragenlijst</Comment>
-    </table>
-    <table id="18" parent="2" name="reviewerlists"/>
-    <table id="19" parent="2" name="reviewerlistsquestions"/>
-    <table id="20" parent="2" name="reviewerlistsquestions_attributes"/>
-    <table id="21" parent="2" name="reviewerlistsquestions_options"/>
-    <table id="22" parent="2" name="reviewing"/>
-    <table id="23" parent="2" name="schools">
+    <table id="12" parent="2" name="questioning"/>
+    <table id="13" parent="2" name="questionnaire_question_attributes"/>
+    <table id="14" parent="2" name="questionnaire_question_options"/>
+    <table id="15" parent="2" name="questionnaires"/>
+    <table id="16" parent="2" name="questionnaires_questions"/>
+    <table id="17" parent="2" name="reviewerlists"/>
+    <table id="18" parent="2" name="reviewerlistsquestions"/>
+    <table id="19" parent="2" name="reviewerlistsquestions_attributes"/>
+    <table id="20" parent="2" name="reviewerlistsquestions_options"/>
+    <table id="21" parent="2" name="reviewing"/>
+    <table id="22" parent="2" name="schools">
       <Comment>Schoolgegevens</Comment>
     </table>
-    <table id="24" parent="2" name="staff"/>
-    <table id="25" parent="2" name="students">
+    <table id="23" parent="2" name="staff"/>
+    <table id="24" parent="2" name="students">
       <Comment>Leerlinggegevens</Comment>
     </table>
-    <table id="26" parent="2" name="submissions">
+    <table id="25" parent="2" name="submissions">
       <Comment>Uitwerkingen leerlingen</Comment>
     </table>
-    <table id="27" parent="2" name="submissions_staff">
+    <table id="26" parent="2" name="submissions_staff">
       <Comment>Toewijzing uitwerkingen aan staflid</Comment>
     </table>
-    <view id="28" parent="2" name="grade_total">
+    <view id="27" parent="2" name="grade_total">
       <Comment>VIEW</Comment>
     </view>
+    <routine id="28" parent="2" name="wordcount">
+      <RoutineKind>function</RoutineKind>
+    </routine>
     <column id="29" parent="5" name="id">
       <Position>1</Position>
       <Comment>ID beheerder</Comment>
@@ -271,476 +263,525 @@ type</ColNames>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="66" parent="12" name="question_id">
+    <column id="66" parent="12" name="student_id">
       <Position>1</Position>
-      <Comment>ID vraag</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="67" parent="12" name="type">
+    <column id="67" parent="12" name="questionnaire_id">
       <Position>2</Position>
-      <Comment>Het type antwoord behorende bij de vraag</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="68" parent="12" name="answer">
+    <column id="68" parent="12" name="question_id">
       <Position>3</Position>
-      <Comment>Optie vraag</Comment>
-      <DataType>varchar(255)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="69" parent="13" name="questionnaire_id">
-      <Position>1</Position>
-      <Comment>ID vragenlijst</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="70" parent="13" name="question_id">
-      <Position>2</Position>
-      <Comment>ID vraag</Comment>
-      <DataType>int(11)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="71" parent="14" name="id">
-      <Position>1</Position>
-      <Comment>ID vragenlijst</Comment>
-      <DataType>int(11)|0</DataType>
-      <NotNull>1</NotNull>
-      <SequenceIdentity>1</SequenceIdentity>
-    </column>
-    <column id="72" parent="14" name="name">
-      <Position>2</Position>
-      <Comment>Naam vragenlijst</Comment>
-      <DataType>varchar(255)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <key id="73" parent="14" name="PRIMARY">
-      <NameSurrogate>1</NameSurrogate>
-      <ColNames>id</ColNames>
-      <Primary>1</Primary>
-    </key>
-    <column id="74" parent="15" name="questionnaire_id">
-      <Position>1</Position>
-      <DataType>int(11)|0</DataType>
-    </column>
-    <column id="75" parent="15" name="class_id">
-      <Position>2</Position>
-      <DataType>int(11)|0</DataType>
-    </column>
-    <column id="76" parent="16" name="id">
-      <Position>1</Position>
-      <Comment>ID vraag</Comment>
-      <DataType>int(11)|0</DataType>
-      <NotNull>1</NotNull>
-      <SequenceIdentity>1</SequenceIdentity>
-    </column>
-    <column id="77" parent="16" name="question">
-      <Position>2</Position>
-      <Comment>Tekst vraag</Comment>
-      <DataType>varchar(255)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <key id="78" parent="16" name="PRIMARY">
-      <NameSurrogate>1</NameSurrogate>
-      <ColNames>id</ColNames>
-      <Primary>1</Primary>
-    </key>
-    <column id="79" parent="17" name="id">
-      <Position>1</Position>
-      <Comment>ID vragenlijst</Comment>
-      <DataType>int(11)|0</DataType>
-      <NotNull>1</NotNull>
-      <SequenceIdentity>1</SequenceIdentity>
-    </column>
-    <column id="80" parent="17" name="student_id">
-      <Position>2</Position>
-      <Comment>ID student</Comment>
-      <DataType>int(11)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="81" parent="17" name="questionnaire_id">
-      <Position>3</Position>
-      <Comment>ID vragenlijst</Comment>
-      <DataType>int(11)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="82" parent="17" name="answer">
-      <Position>4</Position>
-      <Comment>Antwoord student</Comment>
-      <DataType>int(1)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <key id="83" parent="17" name="PRIMARY">
-      <NameSurrogate>1</NameSurrogate>
-      <ColNames>id</ColNames>
-      <Primary>1</Primary>
-    </key>
-    <column id="84" parent="18" name="id">
-      <Position>1</Position>
-      <Comment>ID van de beoordelaarslijst</Comment>
-      <DataType>int(11)|0</DataType>
-      <NotNull>1</NotNull>
-      <SequenceIdentity>1</SequenceIdentity>
-    </column>
-    <column id="85" parent="18" name="assignment_id">
-      <Position>2</Position>
-      <DataType>varchar(36)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="86" parent="18" name="name">
-      <Position>3</Position>
-      <Comment>Naam van de beoordelaarslijst</Comment>
-      <DataType>varchar(255)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="87" parent="18" name="action">
+    <column id="69" parent="12" name="value">
       <Position>4</Position>
       <DataType>varchar(255)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="88" parent="18" name="method">
-      <Position>5</Position>
-      <DataType>varchar(255)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <key id="89" parent="18" name="PRIMARY">
-      <NameSurrogate>1</NameSurrogate>
-      <ColNames>id</ColNames>
-      <Primary>1</Primary>
-    </key>
-    <column id="90" parent="19" name="id">
-      <Position>1</Position>
-      <Comment>ID van de vraag</Comment>
-      <DataType>int(11)|0</DataType>
-      <NotNull>1</NotNull>
-      <SequenceIdentity>1</SequenceIdentity>
-    </column>
-    <column id="91" parent="19" name="elementtype">
-      <Position>3</Position>
-      <Comment>Type element van de vraag</Comment>
-      <DataType>varchar(255)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="92" parent="19" name="label">
-      <Position>4</Position>
-      <Comment>Label van de vraag</Comment>
-      <DataType>varchar(255)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="93" parent="19" name="reviewerlists_id">
-      <Position>2</Position>
-      <DataType>int(11)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <key id="94" parent="19" name="PRIMARY">
-      <NameSurrogate>1</NameSurrogate>
-      <ColNames>id</ColNames>
-      <Primary>1</Primary>
-    </key>
-    <column id="95" parent="20" name="id">
+    <column id="70" parent="13" name="id">
       <Position>1</Position>
       <Comment>ID van het attribute</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>1</SequenceIdentity>
     </column>
-    <column id="96" parent="20" name="reviewerlistsquestions_id">
+    <column id="71" parent="13" name="questionnairesquestions_id">
       <Position>2</Position>
-      <Comment>ID van de reviewlistquestion vraag</Comment>
+      <Comment>ID van de questionnairequestion vraag</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="97" parent="20" name="attribute_key">
+    <column id="72" parent="13" name="attribute_key">
       <Position>3</Position>
-      <Comment>Attribute voor de vraag uit de beoordelaarslijst</Comment>
+      <Comment>Attribute voor de vraag uit de questionnaire</Comment>
       <DataType>varchar(255)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="98" parent="20" name="attribute_value">
+    <column id="73" parent="13" name="attribute_value">
       <Position>4</Position>
       <DataType>varchar(255)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <key id="99" parent="20" name="PRIMARY">
+    <key id="74" parent="13" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="100" parent="21" name="id">
+    <column id="75" parent="14" name="id">
       <Position>1</Position>
       <Comment>ID van de option</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>1</SequenceIdentity>
     </column>
-    <column id="101" parent="21" name="reviewerlistsquestions_id">
+    <column id="76" parent="14" name="questionnairesquestions_id">
+      <Position>2</Position>
+      <Comment>ID van de questionnaire question vraag</Comment>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="77" parent="14" name="option_key">
+      <Position>3</Position>
+      <Comment>Option voor de vraag uit de questionnaire</Comment>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="78" parent="14" name="option_value">
+      <Position>4</Position>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <key id="79" parent="14" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="80" parent="15" name="id">
+      <Position>1</Position>
+      <Comment>ID van de questionnaire</Comment>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="81" parent="15" name="school_id">
+      <Position>2</Position>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="82" parent="15" name="name">
+      <Position>3</Position>
+      <Comment>Naam van de questionnaire</Comment>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="83" parent="15" name="action">
+      <Position>4</Position>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="84" parent="15" name="method">
+      <Position>5</Position>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <key id="85" parent="15" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="86" parent="16" name="id">
+      <Position>1</Position>
+      <Comment>ID van de vraag</Comment>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="87" parent="16" name="questionnaire_id">
+      <Position>2</Position>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="88" parent="16" name="elementtype">
+      <Position>3</Position>
+      <Comment>Type element van de vraag</Comment>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="89" parent="16" name="label">
+      <Position>4</Position>
+      <Comment>Label van de vraag</Comment>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <key id="90" parent="16" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="91" parent="17" name="id">
+      <Position>1</Position>
+      <Comment>ID van de beoordelaarslijst</Comment>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="92" parent="17" name="assignment_id">
+      <Position>2</Position>
+      <DataType>varchar(36)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="93" parent="17" name="name">
+      <Position>3</Position>
+      <Comment>Naam van de beoordelaarslijst</Comment>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="94" parent="17" name="action">
+      <Position>4</Position>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="95" parent="17" name="method">
+      <Position>5</Position>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <key id="96" parent="17" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="97" parent="18" name="id">
+      <Position>1</Position>
+      <Comment>ID van de vraag</Comment>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="98" parent="18" name="reviewerlists_id">
+      <Position>2</Position>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="99" parent="18" name="elementtype">
+      <Position>3</Position>
+      <Comment>Type element van de vraag</Comment>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="100" parent="18" name="label">
+      <Position>4</Position>
+      <Comment>Label van de vraag</Comment>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <key id="101" parent="18" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="102" parent="19" name="id">
+      <Position>1</Position>
+      <Comment>ID van het attribute</Comment>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="103" parent="19" name="reviewerlistsquestions_id">
       <Position>2</Position>
       <Comment>ID van de reviewlistquestion vraag</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="102" parent="21" name="option_key">
+    <column id="104" parent="19" name="attribute_key">
+      <Position>3</Position>
+      <Comment>Attribute voor de vraag uit de beoordelaarslijst</Comment>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="105" parent="19" name="attribute_value">
+      <Position>4</Position>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <key id="106" parent="19" name="PRIMARY">
+      <NameSurrogate>1</NameSurrogate>
+      <ColNames>id</ColNames>
+      <Primary>1</Primary>
+    </key>
+    <column id="107" parent="20" name="id">
+      <Position>1</Position>
+      <Comment>ID van de option</Comment>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+      <SequenceIdentity>1</SequenceIdentity>
+    </column>
+    <column id="108" parent="20" name="reviewerlistsquestions_id">
+      <Position>2</Position>
+      <Comment>ID van de reviewlistquestion vraag</Comment>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="109" parent="20" name="option_key">
       <Position>3</Position>
       <Comment>Option voor de vraag uit de beoordelaarslijst</Comment>
       <DataType>varchar(255)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="103" parent="21" name="option_value">
+    <column id="110" parent="20" name="option_value">
       <Position>4</Position>
       <DataType>varchar(255)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <key id="104" parent="21" name="PRIMARY">
+    <key id="111" parent="20" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="105" parent="22" name="staff_id">
+    <column id="112" parent="21" name="staff_id">
       <Position>1</Position>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="106" parent="22" name="submission_id">
+    <column id="113" parent="21" name="submission_id">
       <Position>2</Position>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="107" parent="22" name="question_id">
-      <Position>4</Position>
-      <DataType>int(11)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="108" parent="22" name="value">
-      <Position>5</Position>
-      <DataType>varchar(255)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="109" parent="22" name="reviewerlist_id">
+    <column id="114" parent="21" name="reviewerlist_id">
       <Position>3</Position>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="110" parent="23" name="id">
+    <column id="115" parent="21" name="question_id">
+      <Position>4</Position>
+      <DataType>int(11)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="116" parent="21" name="value">
+      <Position>5</Position>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="117" parent="22" name="id">
       <Position>1</Position>
       <Comment>ID school</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>1</SequenceIdentity>
     </column>
-    <column id="111" parent="23" name="name">
+    <column id="118" parent="22" name="name">
       <Position>2</Position>
       <Comment>Naam school</Comment>
       <DataType>varchar(255)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <key id="112" parent="23" name="PRIMARY">
+    <column id="119" parent="22" name="type_school">
+      <Position>3</Position>
+      <Comment>0=School; 1=Universiteit</Comment>
+      <DataType>int(1)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <key id="120" parent="22" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="113" parent="24" name="id">
+    <column id="121" parent="23" name="id">
       <Position>1</Position>
       <Comment>ID staflid</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>1</SequenceIdentity>
     </column>
-    <column id="114" parent="24" name="school_id">
-      <Position>3</Position>
-      <Comment>School staflid</Comment>
-      <DataType>int(11)|0</DataType>
-    </column>
-    <column id="115" parent="24" name="firstname">
-      <Position>4</Position>
-      <Comment>Voornaam staflid</Comment>
-      <DataType>varchar(255)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="116" parent="24" name="prefix">
-      <Position>5</Position>
-      <Comment>Tussenvoegsel staflid</Comment>
-      <DataType>varchar(255)|0</DataType>
-    </column>
-    <column id="117" parent="24" name="lastname">
-      <Position>6</Position>
-      <Comment>Achternaam staflid</Comment>
-      <DataType>varchar(255)|0</DataType>
-      <NotNull>1</NotNull>
-    </column>
-    <column id="118" parent="24" name="email">
-      <Position>7</Position>
-      <DataType>varchar(190)|0</DataType>
-    </column>
-    <column id="119" parent="24" name="password">
-      <Position>8</Position>
-      <Comment>Wachtwoord staflid</Comment>
-      <DataType>varchar(255)|0</DataType>
-    </column>
-    <column id="120" parent="24" name="setuptoken">
-      <Position>9</Position>
-      <DataType>varchar(190)|0</DataType>
-    </column>
-    <column id="121" parent="24" name="type">
+    <column id="122" parent="23" name="type">
       <Position>2</Position>
       <Comment>Type beoordelaar (docent=0; extern=1; onderzoek=2)</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <index id="122" parent="24" name="staff_email_uindex">
+    <column id="123" parent="23" name="school_id">
+      <Position>3</Position>
+      <Comment>School staflid</Comment>
+      <DataType>int(11)|0</DataType>
+    </column>
+    <column id="124" parent="23" name="firstname">
+      <Position>4</Position>
+      <Comment>Voornaam staflid</Comment>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="125" parent="23" name="prefix">
+      <Position>5</Position>
+      <Comment>Tussenvoegsel staflid</Comment>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="126" parent="23" name="lastname">
+      <Position>6</Position>
+      <Comment>Achternaam staflid</Comment>
+      <DataType>varchar(255)|0</DataType>
+      <NotNull>1</NotNull>
+    </column>
+    <column id="127" parent="23" name="email">
+      <Position>7</Position>
+      <DataType>varchar(190)|0</DataType>
+    </column>
+    <column id="128" parent="23" name="password">
+      <Position>8</Position>
+      <Comment>Wachtwoord staflid</Comment>
+      <DataType>varchar(255)|0</DataType>
+    </column>
+    <column id="129" parent="23" name="setuptoken">
+      <Position>9</Position>
+      <DataType>varchar(190)|0</DataType>
+    </column>
+    <index id="130" parent="23" name="staff_email_uindex">
       <ColNames>email</ColNames>
       <Unique>1</Unique>
     </index>
-    <index id="123" parent="24" name="staff_setuptoken_uindex">
+    <index id="131" parent="23" name="staff_setuptoken_uindex">
       <ColNames>setuptoken</ColNames>
       <Unique>1</Unique>
     </index>
-    <key id="124" parent="24" name="PRIMARY">
+    <key id="132" parent="23" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <key id="125" parent="24" name="staff_email_uindex">
+    <key id="133" parent="23" name="staff_email_uindex">
       <ColNames>email</ColNames>
       <UnderlyingIndexName>staff_email_uindex</UnderlyingIndexName>
     </key>
-    <key id="126" parent="24" name="staff_setuptoken_uindex">
+    <key id="134" parent="23" name="staff_setuptoken_uindex">
       <ColNames>setuptoken</ColNames>
       <UnderlyingIndexName>staff_setuptoken_uindex</UnderlyingIndexName>
     </key>
-    <trigger id="127" parent="24" name="before_staff_insert">
+    <trigger id="135" parent="23" name="before_staff_insert">
       <Turn>before-row</Turn>
       <Events>I</Events>
     </trigger>
-    <column id="128" parent="25" name="id">
+    <column id="136" parent="24" name="id">
       <Position>1</Position>
       <Comment>Stamnummer leerling</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="129" parent="25" name="school_id">
+    <column id="137" parent="24" name="school_id">
       <Position>2</Position>
       <Comment>School leerling</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="130" parent="25" name="class_id">
+    <column id="138" parent="24" name="class_id">
       <Position>3</Position>
       <Comment>Klas leerling</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="131" parent="25" name="firstname">
+    <column id="139" parent="24" name="firstname">
       <Position>4</Position>
       <Comment>Voornaam leerling</Comment>
       <DataType>varchar(255)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="132" parent="25" name="prefix">
+    <column id="140" parent="24" name="prefix">
       <Position>5</Position>
       <Comment>Tussenvoegsel leerling</Comment>
       <DataType>varchar(255)|0</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>&apos;&apos;</DefaultExpression>
     </column>
-    <column id="133" parent="25" name="lastname">
+    <column id="141" parent="24" name="lastname">
       <Position>6</Position>
       <Comment>Achternaam leerling</Comment>
       <DataType>varchar(255)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="134" parent="25" name="birthday">
+    <column id="142" parent="24" name="birthday">
       <Position>7</Position>
       <Comment>Geboortedatum leerling</Comment>
       <DataType>date|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="135" parent="25" name="password">
+    <column id="143" parent="24" name="password">
       <Position>8</Position>
       <Comment>Wachtwoord leerling</Comment>
       <DataType>varchar(255)|0</DataType>
     </column>
-    <key id="136" parent="25" name="PRIMARY">
+    <key id="144" parent="24" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="137" parent="26" name="id">
+    <column id="145" parent="25" name="id">
       <Position>1</Position>
       <Comment>ID uitwerking</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
       <SequenceIdentity>1</SequenceIdentity>
     </column>
-    <column id="138" parent="26" name="time">
+    <column id="146" parent="25" name="time">
       <Position>2</Position>
       <Comment>Datum inleveren uitwerking</Comment>
       <DataType>timestamp|0</DataType>
       <NotNull>1</NotNull>
       <DefaultExpression>CURRENT_TIMESTAMP</DefaultExpression>
     </column>
-    <column id="139" parent="26" name="student_id">
+    <column id="147" parent="25" name="student_id">
       <Position>3</Position>
       <Comment>Leerling uitwerking</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="140" parent="26" name="assignment_id">
+    <column id="148" parent="25" name="assignment_id">
       <Position>4</Position>
       <Comment>Opdracht uitwerking</Comment>
       <DataType>varchar(36)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="141" parent="26" name="file">
+    <column id="149" parent="25" name="file">
       <Position>5</Position>
       <Comment>Bestandsnaam uitwerking</Comment>
       <DataType>varchar(255)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="142" parent="26" name="original_file">
+    <column id="150" parent="25" name="original_file">
       <Position>6</Position>
       <DataType>varchar(255)|0</DataType>
     </column>
-    <column id="143" parent="26" name="text">
+    <column id="151" parent="25" name="text">
       <Position>7</Position>
       <Comment>Ruwe tekst uitwerking</Comment>
       <DataType>longtext|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="144" parent="26" name="submission_count">
+    <column id="152" parent="25" name="submission_count">
       <Position>8</Position>
       <DataType>int(11)|0</DataType>
       <DefaultExpression>&apos;1&apos;</DefaultExpression>
     </column>
-    <key id="145" parent="26" name="PRIMARY">
+    <key id="153" parent="25" name="PRIMARY">
       <NameSurrogate>1</NameSurrogate>
       <ColNames>id</ColNames>
       <Primary>1</Primary>
     </key>
-    <column id="146" parent="27" name="submission_id">
+    <column id="154" parent="26" name="submission_id">
       <Position>1</Position>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="147" parent="27" name="staff_id">
+    <column id="155" parent="26" name="staff_id">
       <Position>2</Position>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="148" parent="28" name="staff_id">
+    <column id="156" parent="27" name="staff_id">
       <Position>1</Position>
       <Comment>ID beoordelaar</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="149" parent="28" name="submission_id">
+    <column id="157" parent="27" name="submission_id">
       <Position>2</Position>
       <Comment>ID uitwerking</Comment>
       <DataType>int(11)|0</DataType>
       <NotNull>1</NotNull>
     </column>
-    <column id="150" parent="28" name="final_grade">
+    <column id="158" parent="27" name="final_grade">
       <Position>3</Position>
       <DataType>decimal(13,2)|0</DataType>
     </column>
+    <argument id="159" parent="28">
+      <ArgumentDirection>R</ArgumentDirection>
+      <DataType>int(11)|0</DataType>
+    </argument>
+    <argument id="160" parent="28" name="str">
+      <DataType>text|0</DataType>
+    </argument>
   </database-model>
 </dataSource>

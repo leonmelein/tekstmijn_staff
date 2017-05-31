@@ -63,7 +63,7 @@ function generateMenu($bp, $active, $type){
                            <div class="panel-body">%s</div>
                         </div>';
 
-        $menu_options = ["Beoordelen" => "/staff/review/", "Status" => "/staff/status/", "Mijn account" => "/staff/account/"];
+        $menu_options = ["Beoordelen" => "/staff/review/", "Status" => "/staff/status/", "Mijn account" => "/staff/account/", "Administratie" => "/staff/administration/"];
     }
     return sprintf($menu_panel, $bp->pills($menu_options, $active));
 }
