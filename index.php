@@ -658,7 +658,7 @@
                 ["<a class='btn btn-link pull-right' href='institution/%s/edit'><i class='glyphicon glyphicon-pencil'></i> Bewerken</a>"],
                 ["<a class='btn btn-link pull-right' href='institution/%s/classes'><i class='glyphicon glyphicon-menu-hamburger'></i> Klassen</a>"],
                 ["<a class='btn btn-link pull-right' href='institution/%s/students'><i class='glyphicon glyphicon-education'></i> Leerlingen</a>"],
-                ["<a class='btn btn-link pull-right' href='institution/%s/personel'><i class='glyphicon glyphicon-user'></i> Personeel</a>"]
+                ["<a class='btn btn-link pull-right' href='institution/%s/personnel'><i class='glyphicon glyphicon-user'></i> Personeel</a>"]
             ];
             $tbl_schools = generateTable($bp, $tbl_schools_columns, $tbl_schools_data, $tbl_schools_options, '<a href="institution/%s/edit">%s</a>');
 
@@ -751,6 +751,86 @@
                 } else {
                     getRedirect("/staff/administration/?institution_update=false");
                 }
+            });
+
+            $router->get("/([0-9a-zA-Z]+)/classes", function($school_id) use ($db, $templates, $bp) {
+                session_start("staff");
+                $institution = getInstitution($db, $school_id);
+                $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+                $breadcrumbs = generateBreadcrumbs($bp,
+                    [
+                        $_SESSION["staff_name"] => "/staff/account/",
+                        "Administratie" => "/staff/administration/",
+                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/%s/edit", $school_id),
+                        "Klassen" => "#"
+                    ]
+                );
+
+                echo $templates->render("administration::institution_classes", [
+                    "title" => "Tekstmijn | Administratie",
+                    "menu" => $menu,
+                    "breadcrumbs" => $breadcrumbs
+                ]);
+            });
+
+            $router->get("/([0-9a-zA-Z]+)/students", function($school_id) use ($db, $templates, $bp) {
+                session_start("staff");
+                $institution = getInstitution($db, $school_id);
+                $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+                $breadcrumbs = generateBreadcrumbs($bp,
+                    [
+                        $_SESSION["staff_name"] => "/staff/account/",
+                        "Administratie" => "/staff/administration/",
+                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/%s/edit", $school_id),
+                        "Leerlingen" => "#"
+                    ]
+                );
+
+                echo $templates->render("administration::institution_students", [
+                    "title" => "Tekstmijn | Administratie",
+                    "menu" => $menu,
+                    "breadcrumbs" => $breadcrumbs
+                ]);
+            });
+
+            $router->get("/([0-9a-zA-Z]+)/personnel", function($school_id) use ($db, $templates, $bp)  {
+                session_start("staff");
+                $institution = getInstitution($db, $school_id);
+                $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+                $breadcrumbs = generateBreadcrumbs($bp,
+                    [
+                        $_SESSION["staff_name"] => "/staff/account/",
+                        "Administratie" => "/staff/administration/",
+                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/%s/edit", $school_id),
+                        "Personeel" => "#"
+                    ]
+                );
+
+                echo $templates->render("administration::institution_personnel", [
+                    "title" => "Tekstmijn | Administratie",
+                    "menu" => $menu,
+                    "breadcrumbs" => $breadcrumbs
+                ]);
+            });
+
+            $router->get("/([0-9a-zA-Z]+)/reviewers", function($school_id) use ($db, $templates, $bp)  {
+                session_start("staff");
+                $institution = getInstitution($db, $school_id);
+                $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+                $breadcrumbs = generateBreadcrumbs($bp,
+                    [
+                        $_SESSION["staff_name"] => "/staff/account/",
+                        "Administratie" => "/staff/administration/",
+                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/%s/edit", $school_id),
+                        "Klassen" => "#"
+                    ]
+                );
+
+                echo $templates->render("administration::institution_reviewers", [
+                    "title" => "Tekstmijn | Administratie",
+                    "menu" => $menu,
+                    "breadcrumbs" => $breadcrumbs
+                ]);
             });
         });
 

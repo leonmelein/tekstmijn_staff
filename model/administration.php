@@ -66,6 +66,26 @@ function getSchoolType($database, $school_id) {
     );
 }
 
+function getInstitution($database, $school_id){
+    $data = $database->get(
+        "schools",
+        [
+            "name",
+            "type_school"
+        ],
+        [
+            "id" => $school_id
+        ]
+    );
+
+    $typestring = "School";
+    if ($data['type_school'] == 1) {
+        $typestring = "Universiteit";
+    }
+
+    return ["name" => $data['name'], "type" => $typestring];
+}
+
 /*
  * Updates the institution's name and type
  *
