@@ -654,14 +654,23 @@
             $tbl_schools_columns = [
                 ["School", "name"],
             ];
-            $tbl_options = [["<a class='btn btn-default pull-right' href='institution/%s/edit'><i class='glyphicon glyphicon-pencil'></i></a>"]];
-            $tbl_schools = generateTable($bp, $tbl_schools_columns, $tbl_schools_data, $tbl_options, '<a href="institution/%s/edit">%s</a>');
+            $tbl_schools_options = [
+                ["<a class='btn btn-link pull-right' href='institution/%s/edit'><i class='glyphicon glyphicon-pencil'></i> Bewerken</a>"],
+                ["<a class='btn btn-link pull-right' href='institution/%s/classes'><i class='glyphicon glyphicon-menu-hamburger'></i> Klassen</a>"],
+                ["<a class='btn btn-link pull-right' href='institution/%s/students'><i class='glyphicon glyphicon-education'></i> Leerlingen</a>"],
+                ["<a class='btn btn-link pull-right' href='institution/%s/personel'><i class='glyphicon glyphicon-user'></i> Personeel</a>"]
+            ];
+            $tbl_schools = generateTable($bp, $tbl_schools_columns, $tbl_schools_data, $tbl_schools_options, '<a href="institution/%s/edit">%s</a>');
 
             $tbl_universities_data = getUniversities($db);
             $tbl_universities_columns = [
                 ["Universiteit", "name"],
             ];
-            $tbl_universities = generateTable($bp, $tbl_universities_columns, $tbl_universities_data, $tbl_options, '<a href="institution/%s/edit/">%s</a>');
+            $tbl_universities_options = [
+                ["<a class='btn btn-link pull-right' href='institution/%s/edit'><i class='glyphicon glyphicon-pencil'></i> Bewerken</a>"],
+                ["<a class='btn btn-link pull-right' href='institution/%s/reviewers'><i class='glyphicon glyphicon-user'></i> Beoordelaars</a>"]
+            ];
+            $tbl_universities = generateTable($bp, $tbl_universities_columns, $tbl_universities_data, $tbl_universities_options, '<a href="institution/%s/edit">%s</a>');
 
             echo $templates->render("administration::institutions", [
                 "title" => "Tekstmijn | Administratie",
