@@ -212,3 +212,10 @@ textarea#text {
 .review-label {
     font-weight: normal !important;
 }
+
+.menu-heading {
+    padding-top: 5px;
+    padding-left: 15px;
+    padding-bottom: 0px;
+    padding-right: 15px;
+}

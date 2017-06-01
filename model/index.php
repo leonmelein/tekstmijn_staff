@@ -43,7 +43,9 @@ function generateTable($bp, $columns, $data, $options = null, $format = "", $cla
 function generateMenu($bp, $active, $type){
     if ($type == 0) {
         $menu_panel = '<div class="panel panel-default">
-                           <div class="panel-heading">Menu</div>
+                           <div class="panel-heading menu-heading">
+                                <h4>Menu</h4>
+                           </div>
                            <div class="panel-body">%s</div>
                         </div>';
 
@@ -51,7 +53,9 @@ function generateMenu($bp, $active, $type){
     }
     elseif ($type == 1) {
         $menu_panel = '<div class="panel panel-default">
-                           <div class="panel-heading">Menu</div>
+                           <div class="panel-heading menu-heading">
+                                <h4>Menu</h4>
+                           </div>
                            <div class="panel-body">%s</div>
                         </div>';
 
@@ -59,11 +63,18 @@ function generateMenu($bp, $active, $type){
     }
     elseif ($type == 2) {
         $menu_panel = '<div class="panel panel-default">
-                           <div class="panel-heading">Menu</div>
+                           <div class="panel-heading menu-heading">
+                                <h4>Menu</h4>
+                           </div>
                            <div class="panel-body">%s</div>
                         </div>';
 
-        $menu_options = ["Beoordelen" => "/staff/review/", "Status" => "/staff/status/", "Mijn account" => "/staff/account/", "Administratie" => "/staff/administration/"];
+        $menu_options = [
+            "<i class='glyphicon glyphicon-pencil' aria-hidden=true'></i>&nbsp;&nbsp;Beoordelen" => "/staff/review/",
+            "<i class='glyphicon glyphicon-stats' aria-hidden=true'></i>&nbsp;&nbsp;Status" => "/staff/status/",
+            "<i class='glyphicon glyphicon-cog' aria-hidden=true'></i>&nbsp;&nbsp;Administratie" => "/staff/administration/",
+            "<i class='glyphicon glyphicon-user' aria-hidden=true'></i>&nbsp;&nbsp;Mijn account" => "/staff/account/",
+        ];
     }
     return sprintf($menu_panel, $bp->pills($menu_options, $active));
 }
