@@ -41,6 +41,15 @@ function generateTable($bp, $columns, $data, $options = null, $format = "", $cla
 }
 
 function generateMenu($bp, $active, $type){
+    $item = [
+        "Inzendingen" => "<i class='glyphicon glyphicon-pencil' aria-hidden='true'></i>&nbsp;&nbsp;Inzendingen",
+        "Leerlingen" => "<i class='glyphicon glyphicon-th-list' aria-hidden='true'></i>&nbsp;&nbsp;Leerlingen",
+        "Beoordelen" => "<i class='glyphicon glyphicon-pencil' aria-hidden='true'></i>&nbsp;&nbsp;Beoordelen",
+        "Status" => "<i class='glyphicon glyphicon-stats' aria-hidden=true'></i>&nbsp;&nbsp;Status",
+        "Administratie" => "<i class='glyphicon glyphicon-cog' aria-hidden='true'></i>&nbsp;&nbsp;Administratie",
+        "Mijn account" => "<i class='glyphicon glyphicon-user' aria-hidden='true'></i>&nbsp;&nbsp;Mijn account",
+    ];
+
     if ($type == 0) {
         $menu_panel = '<div class="panel panel-default">
                            <div class="panel-heading menu-heading">
@@ -49,7 +58,7 @@ function generateMenu($bp, $active, $type){
                            <div class="panel-body">%s</div>
                         </div>';
 
-        $menu_options = ["Inzendingen" => "/staff/submissions/", "Leerlingen" => "/staff/classes/", "Mijn account" => "/staff/account/"];
+        $menu_options = [$item["Inzendingen"] => "/staff/submissions/", $item["Leerlingen"] => "/staff/classes/", $item["Mijn account"] => "/staff/account/"];
     }
     elseif ($type == 1) {
         $menu_panel = '<div class="panel panel-default">
@@ -59,7 +68,7 @@ function generateMenu($bp, $active, $type){
                            <div class="panel-body">%s</div>
                         </div>';
 
-        $menu_options = ["Beoordelen" => "/staff/review/", "Mijn account" => "/staff/account/"];
+        $menu_options = [$item["Beoordelen"] => "/staff/review/", $item["Mijn account"] => "/staff/account/"];
     }
     elseif ($type == 2) {
         $menu_panel = '<div class="panel panel-default">
@@ -70,10 +79,10 @@ function generateMenu($bp, $active, $type){
                         </div>';
 
         $menu_options = [
-            "<i class='glyphicon glyphicon-pencil' aria-hidden=true'></i>&nbsp;&nbsp;Beoordelen" => "/staff/review/",
-            "<i class='glyphicon glyphicon-stats' aria-hidden=true'></i>&nbsp;&nbsp;Status" => "/staff/status/",
-            "<i class='glyphicon glyphicon-cog' aria-hidden=true'></i>&nbsp;&nbsp;Administratie" => "/staff/administration/",
-            "<i class='glyphicon glyphicon-user' aria-hidden=true'></i>&nbsp;&nbsp;Mijn account" => "/staff/account/",
+            $item["Beoordelen"] => "/staff/review/",
+            $item["Status"] => "/staff/status/",
+            $item["Administratie"] => "/staff/administration/",
+            $item["Mijn account"] => "/staff/account/",
         ];
     }
     return sprintf($menu_panel, $bp->pills($menu_options, $active));

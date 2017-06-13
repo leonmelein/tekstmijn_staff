@@ -13,7 +13,6 @@
     require("model/administration.php");
     use BootPress\Bootstrap\v3\Component as Bootstrap;
 
-
     // Reroute HTTP traffic to HTTPS
     if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
         if(!headers_sent()) {
@@ -240,7 +239,7 @@
     $router->get("account/", function () use ($db, $templates, $bp){
         session_start("staff");
         // Generate menu
-        $menu = generateMenu($bp, ["active" => "Mijn account", "align" => "stacked"], $_SESSION['type']);
+        $menu = generateMenu($bp, ["active" => "/staff/account/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Mijn account" => "#"]);
 
         echo $templates->render("login::account", ["title" => "Tekstmijn | Mijn account",
@@ -258,7 +257,7 @@
 
     $router->get("classes/", function () use ($db, $templates, $bp){
         session_start("staff");
-        $menu = generateMenu($bp, ["active" => "Leerlingen", "align" => "stacked"], $_SESSION['type']);
+        $menu = generateMenu($bp, ["active" => "/staff/classes/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Leerlingen" => "#"]);
 
         $classes = getClassesForStaff($db, $_SESSION["staff_id"]);
@@ -277,7 +276,7 @@
         session_start("staff");
 
         $name = sprintf("Klas %s", getClassName($db, $class_id));
-        $menu = generateMenu($bp, ["active" => "Leerlingen", "align" => "stacked"], $_SESSION['type']);
+        $menu = generateMenu($bp, ["active" => "/staff/classes/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Leerlingen" => "/staff/classes/",
             $name => "#"]);
 
@@ -307,7 +306,7 @@
     $router->get("submissions/", function () use ($db, $templates, $bp){
         session_start("staff");
 
-        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"], $_SESSION['type']);
+        $menu = generateMenu($bp, ["active" => "/staff/submissions/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Inzendingen" => "#"]);
 
         $classes = getSubmissionsForStaff($db, $_SESSION["staff_id"]);
@@ -325,7 +324,7 @@
     $router->get("submissions/(\d+)/", function ($class_id)  use ($db, $templates, $bp){
         session_start("staff");
         $class = getClassName($db, $class_id);
-        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"], $_SESSION['type']);
+        $menu = generateMenu($bp, ["active" => "/staff/submissions/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/",
             sprintf("Klas %s", $class) => "#"]);
 
@@ -351,7 +350,7 @@
         $title = getAssignmentName($db, $assignment_id);
         $class = getClassName($db, $class_id);
         $tabs = generateTabs($bp, ["Ingeleverd" => "#ingeleverd", "Te laat" => "#telaat", "Niet ingeleverd" => "#nietingeleverd", "Beoordelen" => "#beoordelen"], 'Ingeleverd');
-        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"], $_SESSION['type']);
+        $menu = generateMenu($bp, ["active" => "/staff/submissions/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/", sprintf("Klas %s", $class) => "/staff/submissions/$class_id",
             $title => "#"]);
 
@@ -403,7 +402,7 @@
         $student_name = getStudentName($db, $submission_id);
         $subtitle = sprintf("%s : %s", $assignment_name, $student_name);
         $class = getClassName($db, $class_id);
-        $menu = generateMenu($bp, ["active" => "Inzendingen", "align" => "stacked"], $_SESSION['type']);
+        $menu = generateMenu($bp, ["active" => "/staff/submissions/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/", sprintf("Klas %s", $class) => "/staff/submissions/$class_id", $assignment_name => "/staff/submissions/$class_id/$assignment_id", $title => "#"]);
 
         $submission_info = getSubmissionInfo($db, $submission_id);
@@ -472,7 +471,7 @@
     $router->get("review/", function () use ($db, $templates, $bp){
         session_start("staff");
 
-        $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"], $_SESSION['type']);
+        $menu = generateMenu($bp, ["active" => "/staff/review/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/review/"]);
 
         $students =  getAssignmentforBeoordelaar($db, $_SESSION['staff_id']);
@@ -492,7 +491,7 @@
 
         $title = getAssignmentName($db, $assignmentid);
         $tabs = generateTabs($bp, ["Individueel beoordelen" => "#tebeoordelen", "Beoordelen in tabel" => "#beoordelen"], 'Individueel beoordelen');
-        $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"], $_SESSION['type']);
+        $menu = generateMenu($bp, ["active" => "/staff/review/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/staff/review/", $title => "#"]);
 
         $students_ingeleverd =  getSubmissionsforBeoordelaar($db, $assignmentid, $staff_id);
@@ -548,7 +547,7 @@
         $student_name = getStudentName($db, $submission_id);
         $subtitle = sprintf("%s : %s", $assignment_name, $student_name);
 //        $class = getClassName($db, $class_id);
-        $menu = generateMenu($bp, ["active" => "Beoordelen", "align" => "stacked"], $_SESSION['type']);
+        $menu = generateMenu($bp, ["active" => "/staff/review/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/staff/review/", $assignment_name => "/staff/review/$assignment_id", "Beoordeel inzending" => "#"]);
 
         if ($_SESSION['type'] == 1) {$tabs = generateTabs($bp, ["Lezen en beoordelen" => "#beoordelen"], 'Lezen en beoordelen');}
@@ -618,7 +617,7 @@
         $title = getAssignmentName($db, $assignment_id);
 
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Status" => "/staff/status/", $title => "#"]);
-        $menu = generateMenu($bp, ["active" => "Status", "align" => "stacked"], $_SESSION['type']);
+        $menu = generateMenu($bp, ["active" => "/staff/status/", "align" => "stacked"], $_SESSION['type']);
         $overview = getAssignmentOverview($db, $assignment_id);
         $columns = [
             ["Naam", "StaffName"],
@@ -635,7 +634,7 @@
     $router->get("/status/", function () use ($db, $templates, $bp) {
         session_start("staff");
         $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Status" => "#"]);
-        $menu = generateMenu($bp, ["active" => "Status", "align" => "stacked"], $_SESSION['type']);
+        $menu = generateMenu($bp, ["active" => "/staff/status/", "align" => "stacked"], $_SESSION['type']);
 
 
         $data = getTotalOverview($db);
@@ -662,7 +661,7 @@
 
         $router->get("/", function() use ($db, $templates, $bp){
             session_start("staff");
-            $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+            $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
             $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "#"]);
             $tabs = generateTabs($bp, ["Scholen" => "#schools", "Universiteiten" => "#universities"], 'Scholen');
             $tbl_schools_data = getSchools($db);
@@ -707,7 +706,7 @@
         $router->mount('/institution', function() use ($router, $db, $templates, $bp) {
             $router->get("/([0-9a-zA-Z]+)/edit", function($school_id) use ($db, $templates, $bp){
                 session_start("staff");
-                $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+                $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
                 $school_name = getSchoolName($db, $school_id);
                 $school_type = getSchoolType($db, $school_id);
 
@@ -748,7 +747,7 @@
                     $school_type = 1;
                 }
 
-                $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+                $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
                 $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", "Onderwijsinstelling toevoegen"]);
 
                 echo $templates->render("administration::institutions_add", [
@@ -771,12 +770,12 @@
             $router->get("/([0-9a-zA-Z]+)/classes", function($school_id) use ($db, $templates, $bp) {
                 session_start("staff");
                 $institution = getInstitution($db, $school_id);
-                $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+                $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
                 $breadcrumbs = generateBreadcrumbs($bp,
                     [
                         $_SESSION["staff_name"] => "/staff/account/",
                         "Administratie" => "/staff/administration/",
-                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/%s/edit", $school_id),
+                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
                         "Klassen" => "#"
                     ]
                 );
@@ -796,7 +795,7 @@
                     [
                         $_SESSION["staff_name"] => "/staff/account/",
                         "Administratie" => "/staff/administration/",
-                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/%s/edit", $school_id),
+                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
                         "Leerlingen" => "#"
                     ]
                 );
@@ -811,12 +810,12 @@
             $router->get("/([0-9a-zA-Z]+)/personnel", function($school_id) use ($db, $templates, $bp)  {
                 session_start("staff");
                 $institution = getInstitution($db, $school_id);
-                $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+                $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
                 $breadcrumbs = generateBreadcrumbs($bp,
                     [
                         $_SESSION["staff_name"] => "/staff/account/",
                         "Administratie" => "/staff/administration/",
-                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/%s/edit", $school_id),
+                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
                         "Personeel" => "#"
                     ]
                 );
@@ -831,12 +830,12 @@
             $router->get("/([0-9a-zA-Z]+)/reviewers", function($school_id) use ($db, $templates, $bp)  {
                 session_start("staff");
                 $institution = getInstitution($db, $school_id);
-                $menu = generateMenu($bp, ["active" => "Administratie", "align" => "stacked"], $_SESSION['type']);
+                $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
                 $breadcrumbs = generateBreadcrumbs($bp,
                     [
                         $_SESSION["staff_name"] => "/staff/account/",
                         "Administratie" => "/staff/administration/",
-                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/%s/edit", $school_id),
+                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
                         "Klassen" => "#"
                     ]
                 );
