@@ -13,13 +13,28 @@
     require("model/administration.php");
     use BootPress\Bootstrap\v3\Component as Bootstrap;
 
+
+    // Reroute HTTP traffic to HTTPS
+    if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
+        if(!headers_sent()) {
+            header("Status: 301 Moved Permanently");
+            header(sprintf(
+                'Location: https://%s%s',
+                $_SERVER['HTTP_HOST'],
+                $_SERVER['REQUEST_URI']
+            ));
+            exit();
+        }
+    }
+
     // Database setup
+    $db_settings = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini");
     $db = new medoo([
         'database_type' => 'mysql',
-        'database_name' => 'hofstad',
-        'server' => 'srv-01.reinardvandalen.nl',
-        'username' => 'hofstad',
-        'password' => 'LR_hdh4@26', // TODO: Move to config file?
+        'database_name' => $db_settings['database_name'],
+        'server' => $db_settings['server'],
+        'username' => $db_settings['username'],
+        'password' => $db_settings['password'],
         'charset' => 'utf8'
     ]);
 
@@ -655,10 +670,10 @@
                 ["School", "name"],
             ];
             $tbl_schools_options = [
-                ["<a class='btn btn-link pull-right' href='institution/%s/edit'><i class='glyphicon glyphicon-pencil'></i> Bewerken</a>"],
-                ["<a class='btn btn-link pull-right' href='institution/%s/classes'><i class='glyphicon glyphicon-menu-hamburger'></i> Klassen</a>"],
-                ["<a class='btn btn-link pull-right' href='institution/%s/students'><i class='glyphicon glyphicon-education'></i> Leerlingen</a>"],
-                ["<a class='btn btn-link pull-right' href='institution/%s/personnel'><i class='glyphicon glyphicon-user'></i> Personeel</a>"]
+                ["<a class='pull-right' href='institution/%s/edit'><i class='glyphicon glyphicon-pencil'></i> Bewerken</a>"],
+                ["<a class='pull-right' href='institution/%s/classes'><i class='glyphicon glyphicon-menu-hamburger'></i> Klassen</a>"],
+                ["<a class='pull-right' href='institution/%s/students'><i class='glyphicon glyphicon-education'></i> Leerlingen</a>"],
+                ["<a class='pull-right' href='institution/%s/personnel'><i class='glyphicon glyphicon-user'></i> Personeel</a>"]
             ];
             $tbl_schools = generateTable($bp, $tbl_schools_columns, $tbl_schools_data, $tbl_schools_options, '<a href="institution/%s/edit">%s</a>');
 
