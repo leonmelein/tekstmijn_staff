@@ -154,13 +154,13 @@
 
                 // Password forgotten
                 $mail = new PHPMailer;
-                $mail->setFrom('hofstad@thesociallions.nl', 'Project Tekstmijn');
+                $mail->setFrom('info@tekstmijn.nl', 'Project Tekstmijn');
                 $mail->addAddress($sanitized_email);
                 $mail->isHTML(true);                                  // Set email format to HTML
                 $mail->Subject = 'Project Tekstmijn - Wachtwoord wijzigen';
                 $token = get_setup_token($db, $sanitized_email);
                 // Retrieve the email template required
-                $message = file_get_contents('/volume1/hofstad/staff/assets/mail/reset.html');
+                $message = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/assets/mail/reset.html');
                 // Replace the % with the actual information
                 $info = getUserInfo($db, $_POST['username']);
                 $message = str_replace('%name%', $info['name'], $message);
@@ -528,7 +528,7 @@
         $zip = \Comodojo\Zip\Zip::create($filename);
 
         foreach ($files as $file){
-            $filepath = sprintf('/volume1/hofstad/assets/submissions/%s', $file);
+            $filepath = sprintf($_SERVER['DOCUMENT_ROOT'] . '/assets/submissions/%s', $file);
             $zip->add($filepath);
         }
         $zip->close();
