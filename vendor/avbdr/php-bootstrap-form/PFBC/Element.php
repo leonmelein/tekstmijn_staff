@@ -1,5 +1,5 @@
 <?php
-abstract class Element extends Base {
+abstract class Element extends model {
     protected $_errors = array();
     protected $_attributes = array();
     protected $_form;

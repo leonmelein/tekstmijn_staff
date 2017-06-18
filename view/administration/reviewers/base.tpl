@@ -10,8 +10,6 @@
         <?php echo $menu; ?>
     </div>
     <div class="col-md-9">
-        <h1 class="page_title"><i class="glyphicon glyphicon-education"></i> Leerlingen</h1>
-        <a class="btn btn-primary pull-right" href="new/"><i class="glyphicon glyphicon-plus"></i> Nieuwe leerling</a>
-        <? echo $table; ?>
+        <h1 class="page_title"><?php echo $page_title; ?></h1>
     </div>
 </div>

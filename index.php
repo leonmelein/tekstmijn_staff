@@ -3,15 +3,18 @@
      * CONTROLLER
      */
     require("vendor/autoload.php");
+    require("model/model.php");
     require("model/index.php");
     require("model/login.php");
     require("model/students.php");
     require("model/submissions.php");
     require("model/download.php");
     require("model/review.php");
-    require("model/status.php");
     require("model/administration.php");
     require("model/debug.php");
+    require("model/newstatus.php");
+    require("model/classroom.php");
+    require("model/auth.php");
     use BootPress\Bootstrap\v3\Component as Bootstrap;
 
     // Reroute HTTP traffic to HTTPS
@@ -52,6 +55,7 @@
     $templates->addFolder("admin_classes", "view/administration/classes");
     $templates->addFolder("admin_students", "view/administration/students");
     $templates->addFolder("admin_personnel", "view/administration/personnel");
+    $templates->addFolder("admin_reviewers", "view/administration/reviewers");
     $bp = new Bootstrap;
 
     // Initiate router
@@ -64,186 +68,74 @@
 
     //  Authentication check: check if each request has a user ID set in session.
     //  TODO: use tokens?
-    $router->before('GET|POST', '/account/', function() {
-        session_start("staff");
-        if (!isset($_SESSION['staff_id'])) {
-            getRedirect("/staff/login");
-            exit();
-        }
-    });
-
-    $router->before('GET|POST', '/classes/', function() {
-        session_start("staff");
-        if (!isset($_SESSION['staff_id'])) {
-            getRedirect("/staff/login");
-            exit();
-        }
-    });
-
-    $router->before('GET|POST', '/classes/.*', function() {
-        session_start("staff");
-        if (!isset($_SESSION['staff_id'])) {
-            getRedirect("/staff/login");
-            exit();
-        }
-    });
-
-    $router->before('GET|POST', '/submissions/', function() {
-        session_start("staff");
-        if (!isset($_SESSION['staff_id'])) {
-            getRedirect("/staff/login");
-            exit();
-        }
-    });
-
-    $router->before('GET|POST', '/submissions/.*', function() {
-        session_start("staff");
-        if (!isset($_SESSION['staff_id'])) {
-            getRedirect("/staff/login");
-            exit();
-        }
-    });
-
-    // Prerouting check for initial setup
-    $router->before('GET', '/register/', function() {
-        if (!isset($_GET["token"])) {
-            getRedirect("/staff/login?failed_registration=true");
-            exit();
-        }
-    });
-
-    $router->before('GET|POST', '/status/', function() {
-        session_start("staff");
-        if (!isset($_SESSION['staff_id'])) {
-            getRedirect("/staff/login");
-            exit();
-        }
-    });
-
-    $router->before('GET|POST', '/status/.*', function() {
-        session_start("staff");
-        if (!isset($_SESSION['staff_id'])) {
-            getRedirect("/staff/login");
-            exit();
-        }
-    });
-
-    $router->before('GET|POST', '/review/', function() {
-        session_start("staff");
-        if (!isset($_SESSION['staff_id'])) {
-            getRedirect("/staff/login");
-            exit();
-        }
-    });
-
-    $router->before('GET|POST', '/review/.*', function() {
-        session_start("staff");
-        if (!isset($_SESSION['staff_id'])) {
-            getRedirect("/staff/login");
-            exit();
-        }
-    });
+    $router->before('GET|POST', '/account/', 'auth@checkLogin');
+    $router->before('GET|POST', '/classes/', 'auth@checkLogin');
+    $router->before('GET|POST', '/classes/.*', 'auth@checkLogin');
+    $router->before('GET|POST', '/submissions/', 'auth@checkLogin');
+    $router->before('GET|POST', '/submissions/.*', 'auth@checkLogin');
+    $router->before('GET|POST', '/status/', 'auth@checkLogin');
+    $router->before('GET|POST', '/status/.*', 'auth@checkLogin');
+    $router->before('GET|POST', '/review/','auth@checkLogin');
+    $router->before('GET|POST', '/review/.*', 'auth@checkLogin');
+    $router->before('GET|POST', '/administration/', 'auth@checkLogin');
+    $router->before('GET|POST', '/administration/.*', 'auth@checkLogin');
+    $router->before('GET', '/register/', 'auth@checkToken');
 
     /*
      * Page routers
      * - Provides routes to the individual parts of the system
      */
 
-    $router->get("/", function(){
-            getRedirect("/staff/login");
-    });
+    $router->get("/", function(){getRedirect("/staff/login");});
 
-    $router->get("login/", function () use ($templates){
-        echo $templates->render("login::login", ["title" => "Tekstmijn | Inloggen"]);
-    });
-
-    $router->post("login/", function () use ($db){
-        if ($_POST['password_forgotten'] == 1) {
-            $sanitized_email = filter_var($_POST['username'], FILTER_SANITIZE_EMAIL);
-            if (filter_var($sanitized_email, FILTER_VALIDATE_EMAIL)) {
-                set_setup_token($db, $sanitized_email);
-
-                // Password forgotten
-                $mail = new PHPMailer;
-                $mail->setFrom('info@tekstmijn.nl', 'Project Tekstmijn');
-                $mail->addAddress($sanitized_email);
-                $mail->isHTML(true);                                  // Set email format to HTML
-                $mail->Subject = 'Project Tekstmijn - Wachtwoord wijzigen';
-                $token = get_setup_token($db, $sanitized_email);
-                // Retrieve the email template required
-                $message = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/assets/mail/reset.html');
-                // Replace the % with the actual information
-                $info = getUserInfo($db, $_POST['username']);
-                $message = str_replace('%name%', $info['name'], $message);
-                $message = str_replace('%link%', $token, $message);
-
-
-                $mail->Body    = $message;
-                $mail->AltBody = 'Zet HTML aan in uw e-mailclient.';
-
-                if(!$mail->send()) {
-                    getRedirect("/staff/login/?reset=false");
-                } else {
-                    echo $mail->ErrorInfo;
-                    getRedirect("/staff/login/?reset=true");
-                }
-            }
-
-        } else {
-            // Regular login
-            if(check_login($db, $_POST['username'], $_POST['password'])){
-                $info = getUserInfo($db, $_POST['username']);
-
-                session_start("staff");
-                $_SESSION['staff_id'] = $info["id"];
-                $_SESSION['type'] = $info["type"];
-                $_SESSION["staff_email"] = $_POST["username"];
-                $_SESSION['staff_name'] = $info["name"];
-                if ($info['type'] == 0) {
-                    getRedirect("../submissions/");
-                }
-                elseif ($info['type'] == 1) {
-                    getRedirect("../review/");
-                }
-                elseif ($_SESSION['type'] == 2) {
-                    getRedirect("../review/");
-                }
-            } else {
-                getRedirect("/staff/login/?failed=true");
-            }
-        }
-
-    });
-
-    $router->get('logout/', function (){
-            session_start("staff");
-            session_destroy();
-            getRedirect("../login/?logged_out=true");
+    $router->mount('/login', function() use ($router, $templates){
+        $router->get("/", function () use ($templates){
+            echo $templates->render("login::login", ["title" => "Tekstmijn | Inloggen"]);
         });
 
-    $router->get("register/", function () use ($db, $templates){
-        $registration = getRegistrationInfo($db, $_GET["token"]);
+        $router->post("/", 'auth@login');
+    });
+
+    $router->get('/logout', "auth@logout");
+
+    /*
+    * Account
+    */
+
+    $router->get("/register", "auth@startRegistration");
+
+    $router->post("/register", "auth@completeRegistration");
+
+    $router->get("/reset_password/", function ()  use ($db, $templates){
+        $registration = getResetInfo($db, $_GET["token"]);
 
         if($registration){
-            echo $templates->render("login::register",
-                                        ["title" => "Tekstmijn | Registreren",
-                                            "name" => $registration["name"],
-                                            "email" => $registration["email"],
-                                            "page_js" => "../vendor/application/register_validate.js"
-                                        ]
+            echo $templates->render("login::reset",
+                ["title" => "Tekstmijn | Registreren",
+                    "name" => $registration["name"],
+                    "email" => $registration["email"],
+                    "page_js" => "../vendor/application/register_validate.js"
+                ]
             );
         } else {
-            getRedirect("/staff/login/?failed_registration=true");
+            getRedirect("/staff/login/?pwd_reset=false");
         }
-
 
     });
 
-    $router->post("register/", function() use ($db, $templates){
-        if(set_initial_password($db, $_POST["username"], $_POST["password"])){
-            getRedirect("/staff/login/?registration=true");
+    $router->post("/reset_password/", function() use ($db) {
+        if(change_password($db, $_POST["username"], $_POST["password"])){
+            getRedirect("/staff/login/?pwd_reset=true");
         } else {
-            getRedirect("/staff/register/?failed=true");
+            getRedirect("/staff/reset_password/?failed=true");
+        }
+    });
+
+    $router->get("reset/(\d+)/", function($student_id) use ($db){
+        if(resetStudentPassword($db, $student_id)){
+            echo '{"status": "success"}';
+        } else {
+            echo '{"status": "failure"}';
         }
     });
 
@@ -266,53 +158,17 @@
         }
     });
 
-    $router->get("classes/", function () use ($db, $templates, $bp){
-        session_start("staff");
-        $menu = generateMenu($bp, ["active" => "/staff/classes/", "align" => "stacked"], $_SESSION['type']);
-        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "../account/", "Leerlingen" => "#"]);
+    /*
+     * Classes
+     */
 
-        $classes = getClassesForStaff($db, $_SESSION["staff_id"]);
-        $columns = [
-            ["Naam", "name"],
-            ["Niveau", "level"],
-            ["Jaar", "year"]
-        ];
-        $table = generateTable($bp, $columns, $classes, null, '<a href="%s/">%s</a>');
-        echo $templates->render("classes::index", ["title" => "Tekstmijn | Leerlingen",
-            "page_title" => "Leerlingen", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
-            "table" => $table]);
-    });
+    $router->get("classes/", "classroom@generateTeacherOverview");
 
-    $router->get("classes/(\d+)/", function ($class_id) use ($db, $templates, $bp){
-        session_start("staff");
+    $router->get("classes/(\d+)/", "classroom@generateDetailOverview");
 
-        $name = sprintf("Klas %s", getClassName($db, $class_id));
-        $menu = generateMenu($bp, ["active" => "/staff/classes/", "align" => "stacked"], $_SESSION['type']);
-        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Leerlingen" => "/staff/classes/",
-            $name => "#"]);
-
-        $students =  getClassStudents($db, $class_id);
-        $columns = [
-            ["#", "id"],
-            ["Naam", "name"]
-        ];
-        $options = [
-            ["<a class='btn btn-primary pull-right' id='%s' onclick='reset_student_pwd(%s, self.document)'>Wachtwoord resetten</a>", "id", ""]
-        ];
-
-        $table = generateTable($bp, $columns, $students, $options);
-        echo $templates->render("classes::class", ["title" => "Tekstmijn | Leerlingen",
-            "page_title" => $name, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
-            "table" => $table, "page_js" => "/staff/vendor/application/reset_pwd_students.js"]);
-    });
-
-    $router->get("reset/(\d+)/", function($student_id) use ($db){
-       if(resetStudentPassword($db, $student_id)){
-           echo '{"status": "success"}';
-       } else {
-           echo '{"status": "failure"}';
-       }
-    });
+    /*
+     * Submissions
+     */
 
     $router->get("submissions/", function () use ($db, $templates, $bp){
         session_start("staff");
@@ -454,30 +310,33 @@
 
     });
 
-    $router->get("/reset_password/", function ()  use ($db, $templates){
-        $registration = getResetInfo($db, $_GET["token"]);
+   /*
+    * Downloads
+    */
 
-        if($registration){
-            echo $templates->render("login::reset",
-                ["title" => "Tekstmijn | Registreren",
-                    "name" => $registration["name"],
-                    "email" => $registration["email"],
-                    "page_js" => "../vendor/application/register_validate.js"
-                ]
-            );
-        } else {
-            getRedirect("/staff/login/?pwd_reset=false");
+    $router->get("/download/(\d+)/([a-z0-9_-]+)", function($staffid, $assignmentid) use ($db){
+        $files = getFiles($db, $staffid, $assignmentid);
+        $filename_vars = getNames($db, $staffid, $assignmentid);
+        $filename = sprintf("download_%s_%s.zip", $filename_vars['fullname'], $filename_vars['assignment_name']);
+
+        $zip = \Comodojo\Zip\Zip::create($filename);
+
+        foreach ($files as $file){
+            $filepath = sprintf($_SERVER['DOCUMENT_ROOT'] . '/assets/submissions/%s', $file);
+            $zip->add($filepath);
         }
+        $zip->close();
 
+        header("Content-Description: File Transfer");
+        header("Content-Type: application/octet-stream");
+        header("Content-Disposition: attachment; filename=$filename");
+        readfile($filename);
+        exit();
     });
 
-    $router->post("/reset_password/", function() use ($db) {
-        if(change_password($db, $_POST["username"], $_POST["password"])){
-            getRedirect("/staff/login/?pwd_reset=true");
-        } else {
-            getRedirect("/staff/reset_password/?failed=true");
-        }
-    });
+    /*
+     * Review
+     */
 
     $router->get("review/", function () use ($db, $templates, $bp){
         session_start("staff");
@@ -529,26 +388,6 @@
             "assignment_id" => $assignmentid,
             "staff_id" => $staff_id,
             "db" => $db]);
-    });
-
-    $router->get("/download/(\d+)/([a-z0-9_-]+)", function($staffid, $assignmentid) use ($db){
-        $files = getFiles($db, $staffid, $assignmentid);
-        $filename_vars = getNames($db, $staffid, $assignmentid);
-        $filename = sprintf("download_%s_%s.zip", $filename_vars['fullname'], $filename_vars['assignment_name']);
-
-        $zip = \Comodojo\Zip\Zip::create($filename);
-
-        foreach ($files as $file){
-            $filepath = sprintf($_SERVER['DOCUMENT_ROOT'] . '/assets/submissions/%s', $file);
-            $zip->add($filepath);
-        }
-        $zip->close();
-
-        header("Content-Description: File Transfer");
-        header("Content-Type: application/octet-stream");
-        header("Content-Disposition: attachment; filename=$filename");
-        readfile($filename);
-        exit();
     });
 
     $router->get("review/([a-z0-9_-]+)/(\d+)", function ($assignment_id, $submission_id) use ($db, $templates, $bp) {
@@ -623,44 +462,12 @@
         }
     });
 
-    $router->get("/status/(.*)", function ($assignment_id)  use ($db, $templates, $bp) {
-        session_start("staff");
-        $title = getAssignmentName($db, $assignment_id);
+    /*
+     * Status
+     */
 
-        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Status" => "/staff/status/", $title => "#"]);
-        $menu = generateMenu($bp, ["active" => "/staff/status/", "align" => "stacked"], $_SESSION['type']);
-        $overview = getAssignmentOverview($db, $assignment_id);
-        $columns = [
-            ["Naam", "StaffName"],
-            ["Toegewezen", "Promised"],
-            ["Ingevoerd", "Fullfilled"]
-        ];
-        $table = generateTable($bp, $columns, $overview);
-        echo $templates->render("status::assignment", ["title" => "Tekstmijn | Status",
-            "page_title" => "Status", "page_subtitle" => $title,
-            "menu" => $menu, "breadcrumbs" => $breadcrumbs,
-            "overview" => $table]);
-    });
-
-    $router->get("/status/", function () use ($db, $templates, $bp) {
-        session_start("staff");
-        $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Status" => "#"]);
-        $menu = generateMenu($bp, ["active" => "/staff/status/", "align" => "stacked"], $_SESSION['type']);
-
-
-        $data = getTotalOverview($db);
-        $columns = [
-            ["Opdracht", "title"],
-            ["Toegewezen", "promised"],
-            ["Ingevoerd", "fullfilled"]
-        ];
-        $tbl = generateTable($bp, $columns, $data, null, '<a href="%s/">%s</a>');
-
-        echo $templates->render("status::overview", ["title" => "Tekstmijn | Status",
-            "page_title" => "Status",
-            "menu" => $menu, "breadcrumbs" => $breadcrumbs, "overview" => $tbl
-            ]);
-    });
+    $router->get("/status/", 'status@generateOverall');
+    $router->get("/status/(.*)", 'status@generateDetail');
 
     /*
      * Administration
@@ -670,6 +477,9 @@
      */
     $router->mount('/administration', function() use ($router, $db, $templates, $bp) {
 
+        /*
+         * Show all institutions
+         */
         $router->get("/", function() use ($db, $templates, $bp){
             session_start("staff");
             $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
@@ -709,56 +519,16 @@
         });
 
         /*
-         * Institutions
-         *
-         * Routes to pages concerning the participating institutions, either supplying the students or the reviewers.
-         *
+         * Manage institutions
          */
         $router->mount('/institution', function() use ($router, $db, $templates, $bp) {
-            $router->get("/([0-9a-zA-Z]+)/edit", function($school_id) use ($db, $templates, $bp){
-                session_start("staff");
-                $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
-                $school_name = getSchoolName($db, $school_id);
-                $school_type = getSchoolType($db, $school_id);
+            session_start("staff");
+            $breadcrumbs_base = [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/"];
 
-                $typestring = "School";
-                if ($school_type == 1) {
-                    $typestring = "Universiteit";
-                }
-
-                $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", sprintf("%s: %s", $typestring, $school_name)]);
-
-                echo $templates->render("administration::institutions_edit", [
-                    "title" => "Tekstmijn | Administratie",
-                    "page_title" => sprintf("%s: %s", $typestring, $school_name),
-                    "menu" => $menu,
-                    "breadcrumbs" => $breadcrumbs,
-                    "school_id" => $school_id,
-                    "school_name" => $school_name,
-                    "school_type" => $school_type
-                ]);
-            });
-
-            $router->post("/([0-9a-zA-Z]+)/save", function($school_id) use ($db) {
-                session_start("staff");
-
-                if (updateInstitution($db, $school_id, $_POST)) {
-                    getRedirect("/staff/administration/?institution_update=true");
-                } else {
-                    getRedirect("/staff/administration/?institution_update=false");
-                }
-            });
-
-            $router->get("/([0-9a-zA-Z]+)/delete", function($school_id) use ($db) {
-                if (deleteInstitution($db, $school_id)) {
-                    getRedirect("/staff/administration/?institution_update=true");
-                } else {
-                    getRedirect("/staff/administration/?institution_update=false");
-                }
-            });
-
-            $router->get("/new", function() use ($db, $templates, $bp) {
-                session_start("staff");
+            /*
+             * Creating new institutions
+             */
+            $router->get("/new", function() use ($db, $templates, $bp, $breadcrumbs_base) {
                 $type = $_GET["type"];
                 if ($type == "school") {
                     $school_type = 0;
@@ -767,7 +537,7 @@
                 }
 
                 $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
-                $breadcrumbs = generateBreadcrumbs($bp, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", "Onderwijsinstelling toevoegen"]);
+                $breadcrumbs = generateBreadcrumbs($bp, array_merge($breadcrumbs_base, ["Onderwijsinstelling toevoegen" => "#"]));
 
                 echo $templates->render("administration::institutions_add", [
                     "title" => "Tekstmijn | Administratie",
@@ -786,372 +556,589 @@
                 }
             });
 
-            $router->get("/([0-9a-zA-Z]+)/classes", function($school_id) use ($db, $templates, $bp) {
-                session_start("staff");
-                $institution = getInstitution($db, $school_id);
-                $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
-                $breadcrumbs = generateBreadcrumbs($bp,
-                    [
-                        $_SESSION["staff_name"] => "/staff/account/",
-                        "Administratie" => "/staff/administration/",
-                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
-                        "Klassen" => "#"
-                    ]
-                );
+            /*
+             * Managing settings and data of existing institutions
+             */
 
-                $tbl_schools_data = getClasses($db, $school_id);
-                $tbl_schools_columns = [
-                    ["Klas", "name"],
-                    ["Jaar", "year"],
-                    ["Niveau", "level"],
-                ];
-                $tbl_schools_options = [
-                    ["<a class='pull-right' href='%s/edit'><i class='glyphicon glyphicon-pencil'></i> Bewerken</a>"],
-                    ["<a class='pull-right' href='%s/students'><i class='glyphicon glyphicon-education'></i> Leerlingen</a>"]
-                ];
-                $tbl_schools = generateTable($bp, $tbl_schools_columns, $tbl_schools_data, $tbl_schools_options, '<a href="%s/edit">%s</a>');
-
-                echo $templates->render("admin_classes::classes", [
-                    "title" => "Tekstmijn | Administratie",
-                    "page_title" => "Klassen",
-                    "menu" => $menu,
-                    "breadcrumbs" => $breadcrumbs,
-                    "tbl_class" => $tbl_schools
-                ]);
-            });
-
-            $router->get("/([0-9a-zA-Z]+)/classes/new", function($school_id) use ($db, $templates, $bp) {
-                session_start("staff");
-                $institution = getInstitution($db, $school_id);
-                $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
-                $breadcrumbs = generateBreadcrumbs($bp,
-                    [
-                        $_SESSION["staff_name"] => "/staff/account/",
-                        "Administratie" => "/staff/administration/",
-                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
-                        "Klassen" => sprintf("/staff/administration/institution/%s/classes/", $school_id),
-                        "Klas toevoegen" => "#",
-                    ]
-                );
-
-                echo $templates->render("admin_classes::add", [
-                    "title" => "Tekstmijn | Administratie",
-                    "page_title" => "Klas toevoegen",
-                    "menu" => $menu,
-                    "breadcrumbs" => $breadcrumbs,
-                ]);
-            });
-
-            $router->post("/([0-9a-zA-Z]+)/classes/add", function($school_id) use ($db) {
-                if (addClass($db, $school_id, $_POST)) {
-                    getRedirect("../?institution_update=true");
-                } else {
-                    getRedirect("../?institution_update=false");
-                }
-            });
-
-            $router->get("/([0-9a-zA-Z]+)/classes/([0-9a-zA-Z]+)/edit", function($school_id, $class_id) use ($db, $templates, $bp) {
-                session_start("staff");
-                $institution = getInstitution($db, $school_id);
-                $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
-                $breadcrumbs = generateBreadcrumbs($bp,
-                    [
-                        $_SESSION["staff_name"] => "/staff/account/",
-                        "Administratie" => "/staff/administration/",
-                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
-                        "Klassen" => sprintf("/staff/administration/institution/%s/classes/", $school_id),
-                        "Klas bewerken" => "#",
-                    ]
-                );
-                $class = getClass($db, $class_id);
-
-                echo $templates->render("admin_classes::edit", [
-                    "title" => "Tekstmijn | Administratie",
-                    "page_title" => "Klas bewerken",
-                    "menu" => $menu,
-                    "breadcrumbs" => $breadcrumbs,
-                    "name" => $class["name"],
-                    "levelid" => $class["levelid"],
-                    "levelname" => $class["level"],
-                    "year" => $class["year"]
-                ]);
-            });
-
-            $router->get("/([0-9a-zA-Z]+)/classes/([0-9a-zA-Z]+)/delete", function($school_id, $class_id) use ($db, $templates, $bp) {
-                if (deleteClass($db, $class_id)) {
-                    getRedirect("../../?institution_update=true");
-                } else {
-                    getRedirect("../../?institution_update=false");
-                }
-            });
-
-            $router->post("/([0-9a-zA-Z]+)/classes/([0-9a-zA-Z]+)/save", function($school_id, $class_id) use ($db, $templates, $bp) {
-                if (updateClass($db, $class_id, $_POST)) {
-                    getRedirect("../../?institution_update=true");
-                } else {
-                    getRedirect("../../?institution_update=false");
-                }
-            });
-
-            $router->get("/([0-9a-zA-Z]+)/students", function($school_id) use ($db, $templates, $bp) {
+            $router->mount('/([0-9a-zA-Z]+)', function() use ($router, $db, $templates, $bp, $breadcrumbs_base) {
                 session_start("staff");
 
-                $institution = getInstitution($db, $school_id);
-                $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
-                $breadcrumbs = generateBreadcrumbs($bp,
-                    [
-                        $_SESSION["staff_name"] => "/staff/account/",
-                        "Administratie" => "/staff/administration/",
-                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
-                        "Leerlingen" => "#"
-                    ]
-                );
-
-                $students =  getInstitutionStudents($db, $school_id);
-                $columns = [
-                    ["#", "id"],
-                    ["Naam", "name"]
-                ];
-                $options = [
-                    ["<a class='pull-right' href='%s/edit'><i class='glyphicon glyphicon-pencil'></i> Bewerken</a>"],
-                    ["<a class='pull-right' id='%s' onclick='reset_student_pwd(%s, self.document)'><i class='glyphicon glyphicon-repeat'></i> Wachtwoord resetten</a>", "id", '']
-                ];
-
-                $table = generateTable($bp, $columns, $students, $options, '<a href="%s/edit">%s</a>');
-                echo $templates->render("admin_students::students", ["title" => "Tekstmijn | Administratie",
-                    "page_title" => "Leerlingen", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
-                    "table" => $table, "page_js" => "/staff/vendor/application/reset_pwd_students.js"]);
-
-            });
-
-            $router->get("/([0-9a-zA-Z]+)/students/([0-9a-zA-Z]+)/edit", function($school_id, $student_id) use ($db, $templates, $bp) {
-                session_start("staff");
-
-                $institution = getInstitution($db, $school_id);
-                $classes = getClassList($db, $school_id);
-                $student = getStudent($db, $student_id, $institution["id"]);
-
-                if ($student) {
+                /*
+                 * Manage institution
+                 */
+                $router->get("/edit", function($school_id) use ($db, $templates, $bp, $breadcrumbs_base){
+                    session_start("staff");
                     $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
-                    $breadcrumbs = generateBreadcrumbs($bp,
-                        [
-                            $_SESSION["staff_name"] => "/staff/account/",
-                            "Administratie" => "/staff/administration/",
-                            sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
-                            "Leerlingen" => sprintf("/staff/administration/institution/%s/students/", $school_id),
-                            sprintf("Bewerk leerling #%d: %s %s %s", $student['id'], $student['firstname'], $student['prefix'], $student['lastname']) => "#"
-                        ]
-                    );
+                    $school_name = getSchoolName($db, $school_id);
+                    $school_type = getSchoolType($db, $school_id);
 
-                    echo $templates->render("admin_students::edit",
-                        [
-                            "title" => "Tekstmijn | Administratie",
-                            "page_title" => sprintf("Leerling #%d: %s %s %s", $student['id'], $student['firstname'], $student['prefix'], $student['lastname']),
-                            "menu" => $menu,
-                            "breadcrumbs" => $breadcrumbs,
-                            "student" => $student,
-                            "classes" => generateOptions($classes),
-                            "page_js" => "/staff/vendor/application/load_date_picker.js"
-                        ]
-                    );
-                } else {
-                    echo "U heeft geen toegang tot deze gegevens."; // TODO: better error message?
-                }
+                    $typestring = "School";
+                    if ($school_type == 1) {
+                        $typestring = "Universiteit";
+                    }
 
-            });
+                    $breadcrumbs = generateBreadcrumbs($bp, array_merge($breadcrumbs_base, [sprintf("%s: %s", $typestring, $school_name) => "#"]));
 
-            $router->get("/([0-9a-zA-Z]+)/students/([0-9a-zA-Z]+)/delete", function($school_id, $student_id) use ($db, $templates, $bp) {
-                if (deleteStudent($db, $student_id)) {
-                    getRedirect("../../?student_deletec=true");
-                } else {
-                    getRedirect("../../?student_deletec=false");
-                }
-            });
-
-            $router->post("/([0-9a-zA-Z]+)/students/([0-9a-zA-Z]+)/save", function($school_id, $student_id) use ($db) {
-                if (updateStudent($db, $student_id, $_POST)) {
-                    getRedirect("../../?student_update=true");
-                } else {
-                    getRedirect("../../?student_update=false");
-                }
-            });
-
-            $router->get("/([0-9a-zA-Z]+)/students/new", function($school_id) use ($db, $templates, $bp) {
-                session_start("staff");
-                $classes = getClassList($db, $school_id);
-
-                $institution = getInstitution($db, $school_id);
-
-                $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
-                $breadcrumbs = generateBreadcrumbs($bp,
-                    [
-                        $_SESSION["staff_name"] => "/staff/account/",
-                        "Administratie" => "/staff/administration/",
-                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
-                        "Leerlingen" => sprintf("/staff/administration/institution/%s/students/", $school_id),
-                        "Nieuwe leerling" => "#"
-                    ]
-                );
-
-                echo $templates->render("admin_students::add",
-                    [
+                    echo $templates->render("administration::institutions_edit", [
                         "title" => "Tekstmijn | Administratie",
-                        "page_title" => "Nieuwe leerling",
+                        "page_title" => sprintf("%s: %s", $typestring, $school_name),
                         "menu" => $menu,
                         "breadcrumbs" => $breadcrumbs,
-                        "classes" => generateOptions($classes),
-                        "page_js" => "/staff/vendor/application/load_date_picker.js"
-                    ]
-                );
-            });
+                        "school_id" => $school_id,
+                        "school_name" => $school_name,
+                        "school_type" => $school_type
+                    ]);
+                });
 
-            $router->post("/([0-9a-zA-Z]+)/students/add", function($school_id) use ($db) {
-                if (addStudent($db, $_POST, $school_id)) {
-                    getRedirect("../?student_added=true");
-                } else {
-                    getRedirect("../?student_added=false");
-                }
-            });
+                $router->post("/save", function($school_id) use ($db) {
+                    session_start("staff");
 
-            $router->get("/([0-9a-zA-Z]+)/personnel", function($school_id) use ($db, $templates, $bp)  {
-                session_start("staff");
-                $institution = getInstitution($db, $school_id);
-                $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
-                $breadcrumbs = generateBreadcrumbs($bp,
-                    [
-                        $_SESSION["staff_name"] => "/staff/account/",
-                        "Administratie" => "/staff/administration/",
-                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
-                        "Personeel" => "#"
-                    ]
-                );
+                    if (updateInstitution($db, $school_id, $_POST)) {
+                        getRedirect("/staff/administration/?institution_update=true");
+                    } else {
+                        getRedirect("/staff/administration/?institution_update=false");
+                    }
+                });
 
-                $personnel =  getPersonnel($db, $school_id);
-                $columns = [
-                    ["Naam", "fullname"],
-                    ["Emailadres", "email"]
-                ];
-                $options = [
-                    ["<a class='pull-right' href='%s/edit'><i class='glyphicon glyphicon-pencil'></i> Bewerken</a>"],
+                $router->get("/delete", function($school_id) use ($db) {
+                    if (deleteInstitution($db, $school_id)) {
+                        getRedirect("/staff/administration/?institution_update=true");
+                    } else {
+                        getRedirect("/staff/administration/?institution_update=false");
+                    }
+                });
+
+
+                /*
+                 * Manage classes
+                 */
+                $router->mount('/classes', function() use($router, $db, $templates, $bp){
+                    session_start("staff");
+
+                    $router->get("/", function($school_id) use ($db, $templates, $bp) {
+                        session_start("staff");
+                        $institution = getInstitution($db, $school_id);
+                        $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+                        $breadcrumbs = generateBreadcrumbs($bp,
+                            [
+                                $_SESSION["staff_name"] => "/staff/account/",
+                                "Administratie" => "/staff/administration/",
+                                sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
+                                "Klassen" => "#"
+                            ]
+                        );
+
+                        $tbl_schools_data = getClasses($db, $school_id);
+                        $tbl_schools_columns = [
+                            ["Klas", "name"],
+                            ["Jaar", "year"],
+                            ["Niveau", "level"],
+                        ];
+                        $tbl_schools_options = [
+                            ["<a class='pull-right' href='%s/edit'><i class='glyphicon glyphicon-pencil'></i> Bewerken</a>"],
+                            ["<a class='pull-right' href='%s/'><i class='glyphicon glyphicon-education'></i> Leerlingen</a>"]
+                        ];
+                        $tbl_schools = generateTable($bp, $tbl_schools_columns, $tbl_schools_data, $tbl_schools_options, '<a href="%s/edit">%s</a>');
+
+                        echo $templates->render("admin_classes::classes", [
+                            "title" => "Tekstmijn | Administratie",
+                            "page_title" => "Klassen",
+                            "menu" => $menu,
+                            "breadcrumbs" => $breadcrumbs,
+                            "tbl_class" => $tbl_schools
+                        ]);
+                    });
+
+                    $router->get("/([0-9a-zA-Z]+)", function($school_id, $class_id) use ($db, $templates, $bp){
+                        session_start("staff");
+                        $institution = getInstitution($db, $school_id);
+                        $name = sprintf("Klas %s", getClassName($db, $class_id));
+                        $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+                        $breadcrumbs = generateBreadcrumbs($bp,
+                            [
+                                $_SESSION["staff_name"] => "/staff/account/",
+                                "Administratie" => "/staff/administration/",
+                                sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
+                                "Klassen" => "../",
+                                $name => "#"
+                            ]
+                        );
+
+                        $students =  getClassStudents($db, $class_id);
+                        $columns = [
+                            ["#", "id"],
+                            ["Naam", "name"]
+                        ];
+                        $options = [
+                            ["<a class='pull-right' href='../../students/%s/edit'><i class='glyphicon glyphicon-pencil'></i> Bewerken</a>"],
+                            ["<a class='pull-right' id='%s' onclick='reset_student_pwd(%s, self.document)'><i class='glyphicon glyphicon-repeat'></i> Wachtwoord resetten</a>", "id", '']
+                        ];
+
+                        $table = generateTable($bp, $columns, $students, $options, '<a href="../../students/%s/edit">%s</a>');
+                        echo $templates->render("classes::class", ["title" => "Tekstmijn | Administratie",
+                            "page_title" => $name, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+                            "table" => $table, "page_js" => "/staff/vendor/application/reset_pwd_students.js"]);
+                    });
+
+
+
+                    $router->get("/new", function($school_id) use ($db, $templates, $bp) {
+                        session_start("staff");
+                        $institution = getInstitution($db, $school_id);
+                        $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+                        $breadcrumbs = generateBreadcrumbs($bp,
+                            [
+                                $_SESSION["staff_name"] => "/staff/account/",
+                                "Administratie" => "/staff/administration/",
+                                sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
+                                "Klassen" => sprintf("/staff/administration/institution/%s/classes/", $school_id),
+                                "Klas toevoegen" => "#",
+                            ]
+                        );
+
+                        echo $templates->render("admin_classes::add", [
+                            "title" => "Tekstmijn | Administratie",
+                            "page_title" => "Klas toevoegen",
+                            "menu" => $menu,
+                            "breadcrumbs" => $breadcrumbs,
+                        ]);
+                    });
+
+                    $router->post("/add", function($school_id) use ($db) {
+                        if (addClass($db, $school_id, $_POST)) {
+                            getRedirect("../?institution_update=true");
+                        } else {
+                            getRedirect("../?institution_update=false");
+                        }
+                    });
+
+                    $router->get("/([0-9a-zA-Z]+)/edit", function($school_id, $class_id) use ($db, $templates, $bp) {
+                        session_start("staff");
+                        $institution = getInstitution($db, $school_id);
+                        $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+                        $breadcrumbs = generateBreadcrumbs($bp,
+                            [
+                                $_SESSION["staff_name"] => "/staff/account/",
+                                "Administratie" => "/staff/administration/",
+                                sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
+                                "Klassen" => sprintf("/staff/administration/institution/%s/classes/", $school_id),
+                                "Klas bewerken" => "#",
+                            ]
+                        );
+                        $class = getClass($db, $class_id);
+
+                        echo $templates->render("admin_classes::edit", [
+                            "title" => "Tekstmijn | Administratie",
+                            "page_title" => "Klas bewerken",
+                            "menu" => $menu,
+                            "breadcrumbs" => $breadcrumbs,
+                            "name" => $class["name"],
+                            "levelid" => $class["levelid"],
+                            "levelname" => $class["level"],
+                            "year" => $class["year"]
+                        ]);
+                    });
+
+                    $router->get("/([0-9a-zA-Z]+)/delete", function($school_id, $class_id) use ($db, $templates, $bp) {
+                        if (deleteClass($db, $class_id)) {
+                            getRedirect("../../?institution_update=true");
+                        } else {
+                            getRedirect("../../?institution_update=false");
+                        }
+                    });
+
+                    $router->post("/([0-9a-zA-Z]+)/save", function($school_id, $class_id) use ($db, $templates, $bp) {
+                        if (updateClass($db, $class_id, $_POST)) {
+                            getRedirect("../../?institution_update=true");
+                        } else {
+                            getRedirect("../../?institution_update=false");
+                        }
+                    });
+                });
+
+                /*
+                 * Manage students
+                 */
+                $router->mount('/students', function() use ($router, $db, $templates, $bp){
+                    $router->get("/", function($school_id) use ($db, $templates, $bp) {
+                        session_start("staff");
+
+                        $institution = getInstitution($db, $school_id);
+                        $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+                        $breadcrumbs = generateBreadcrumbs($bp,
+                            [
+                                $_SESSION["staff_name"] => "/staff/account/",
+                                "Administratie" => "/staff/administration/",
+                                sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
+                                "Leerlingen" => "#"
+                            ]
+                        );
+
+                        $students =  getInstitutionStudents($db, $school_id);
+                        $columns = [
+                            ["#", "id"],
+                            ["Naam", "name"]
+                        ];
+                        $options = [
+                            ["<a class='pull-right' href='%s/edit'><i class='glyphicon glyphicon-pencil'></i> Bewerken</a>"],
+                            ["<a class='pull-right' id='%s' onclick='reset_student_pwd(%s, self.document)'><i class='glyphicon glyphicon-repeat'></i> Wachtwoord resetten</a>", "id", '']
+                        ];
+
+                        $table = generateTable($bp, $columns, $students, $options, '<a href="%s/edit">%s</a>');
+                        echo $templates->render("admin_students::students", ["title" => "Tekstmijn | Administratie",
+                            "page_title" => "Leerlingen", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+                            "table" => $table, "page_js" => "/staff/vendor/application/reset_pwd_students.js"]);
+
+                    });
+
+                    $router->get("/new", function($school_id) use ($db, $templates, $bp) {
+                        session_start("staff");
+                        $classes = getClassList($db, $school_id);
+
+                        $institution = getInstitution($db, $school_id);
+
+                        $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+                        $breadcrumbs = generateBreadcrumbs($bp,
+                            [
+                                $_SESSION["staff_name"] => "/staff/account/",
+                                "Administratie" => "/staff/administration/",
+                                sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
+                                "Leerlingen" => sprintf("/staff/administration/institution/%s/students/", $school_id),
+                                "Nieuwe leerling" => "#"
+                            ]
+                        );
+
+                        echo $templates->render("admin_students::add",
+                            [
+                                "title" => "Tekstmijn | Administratie",
+                                "page_title" => "Nieuwe leerling",
+                                "menu" => $menu,
+                                "breadcrumbs" => $breadcrumbs,
+                                "classes" => generateOptions($classes),
+                                "page_js" => "/staff/vendor/application/load_date_picker.js"
+                            ]
+                        );
+                    });
+
+                    $router->post("/add", function($school_id) use ($db) {
+                        if (addStudent($db, $_POST, $school_id)) {
+                            getRedirect("../?student_added=true");
+                        } else {
+                            getRedirect("../?student_added=false");
+                        }
+                    });
+
+                    $router->get("/([0-9a-zA-Z]+)/edit", function($school_id, $student_id) use ($db, $templates, $bp) {
+                        session_start("staff");
+
+                        $institution = getInstitution($db, $school_id);
+                        $classes = getClassList($db, $school_id);
+                        $student = getStudent($db, $student_id, $institution["id"]);
+
+                        if ($student) {
+                            $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+                            $breadcrumbs = generateBreadcrumbs($bp,
+                                [
+                                    $_SESSION["staff_name"] => "/staff/account/",
+                                    "Administratie" => "/staff/administration/",
+                                    sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
+                                    "Leerlingen" => sprintf("/staff/administration/institution/%s/students/", $school_id),
+                                    sprintf("Bewerk leerling #%d: %s %s %s", $student['id'], $student['firstname'], $student['prefix'], $student['lastname']) => "#"
+                                ]
+                            );
+
+                            echo $templates->render("admin_students::edit",
+                                [
+                                    "title" => "Tekstmijn | Administratie",
+                                    "page_title" => sprintf("Leerling #%d: %s %s %s", $student['id'], $student['firstname'], $student['prefix'], $student['lastname']),
+                                    "menu" => $menu,
+                                    "breadcrumbs" => $breadcrumbs,
+                                    "student" => $student,
+                                    "classes" => generateOptions($classes),
+                                    "page_js" => "/staff/vendor/application/load_date_picker.js"
+                                ]
+                            );
+                        } else {
+                            echo "U heeft geen toegang tot deze gegevens."; // TODO: better error message?
+                        }
+
+                    });
+
+                    $router->get("/([0-9a-zA-Z]+)/delete", function($school_id, $student_id) use ($db, $templates, $bp) {
+                        if (deleteStudent($db, $student_id)) {
+                            getRedirect("../../?student_deletec=true");
+                        } else {
+                            getRedirect("../../?student_deletec=false");
+                        }
+                    });
+
+                    $router->post("/([0-9a-zA-Z]+)/save", function($school_id, $student_id) use ($db) {
+                        if (updateStudent($db, $student_id, $_POST)) {
+                            getRedirect("../../?student_update=true");
+                        } else {
+                            getRedirect("../../?student_update=false");
+                        }
+                    });
+
+
+                });
+
+
+                /*
+                 * Manage personnel
+                 */
+                $router->mount('/personnel', function() use ($router, $db, $templates, $bp) {
+                    $router->get("/", function($school_id) use ($db, $templates, $bp)  {
+                        session_start("staff");
+                        $institution = getInstitution($db, $school_id);
+                        $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+                        $breadcrumbs = generateBreadcrumbs($bp,
+                            [
+                                $_SESSION["staff_name"] => "/staff/account/",
+                                "Administratie" => "/staff/administration/",
+                                sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
+                                "Personeel" => "#"
+                            ]
+                        );
+
+                        $personnel =  getPersonnel($db, $school_id);
+                        $columns = [
+                            ["Naam", "fullname"],
+                            ["Emailadres", "email"]
+                        ];
+                        $options = [
+                            ["<a class='pull-right' href='%s/edit'><i class='glyphicon glyphicon-pencil'></i> Bewerken</a>"],
 //                    ["<a class='pull-right' id='%s' onclick='reset_student_pwd(%s, self.document)'><i class='glyphicon glyphicon-repeat'></i> Wachtwoord resetten</a>", "id", '']
-                ];
-                $table = generateTable($bp, $columns, $personnel, $options, '<a href="%s/edit">%s</a>');
+                        ];
+                        $table = generateTable($bp, $columns, $personnel, $options, '<a href="%s/edit">%s</a>');
 
-                echo $templates->render("admin_personnel::personnel", [
-                    "title" => "Tekstmijn | Administratie",
-                    "menu" => $menu,
-                    "page_title" => "Personeel",
-                    "breadcrumbs" => $breadcrumbs,
-                    "tbl" => $table,
-                ]);
-            });
-
-            $router->get("/([0-9a-zA-Z]+)/personnel/([0-9a-zA-Z]+)/edit", function($school_id, $personnel_id) use ($db, $templates, $bp) {
-                session_start("staff");
-
-                $institution = getInstitution($db, $school_id);
-                $classes = getClassList($db, $school_id);
-                $personnelMember = getPersonnelMember($db, $personnel_id, $institution["id"]);
-
-                if ($personnelMember) {
-                    $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
-                    $breadcrumbs = generateBreadcrumbs($bp,
-                        [
-                            $_SESSION["staff_name"] => "/staff/account/",
-                            "Administratie" => "/staff/administration/",
-                            sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
-                            "Personeel" => sprintf("/staff/administration/institution/%s/personnel/", $school_id),
-                            sprintf("Bewerk personeelslid: %s %s %s", $personnelMember['firstname'], $personnelMember['prefix'], $personnelMember['lastname']) => "#"
-                        ]
-                    );
-
-                    echo $templates->render("admin_personnel::edit",
-                        [
+                        echo $templates->render("admin_personnel::personnel", [
                             "title" => "Tekstmijn | Administratie",
-                            "page_title" => sprintf("Personeelslid: %s %s %s", $personnelMember['firstname'], $personnelMember['prefix'], $personnelMember['lastname']),
+                            "menu" => $menu,
+                            "page_title" => "Personeel",
+                            "breadcrumbs" => $breadcrumbs,
+                            "tbl" => $table,
+                        ]);
+                    });
+
+                    $router->get("/([0-9a-zA-Z]+)/edit", function($school_id, $personnel_id) use ($db, $templates, $bp) {
+                        session_start("staff");
+
+                        $institution = getInstitution($db, $school_id);
+                        $classes = getClassList($db, $school_id);
+                        $personnelMember = getPersonnelMember($db, $personnel_id, $institution["id"]);
+
+                        if ($personnelMember) {
+                            $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+                            $breadcrumbs = generateBreadcrumbs($bp,
+                                [
+                                    $_SESSION["staff_name"] => "/staff/account/",
+                                    "Administratie" => "/staff/administration/",
+                                    sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
+                                    "Personeel" => sprintf("/staff/administration/institution/%s/personnel/", $school_id),
+                                    sprintf("Bewerk personeelslid: %s %s %s", $personnelMember['firstname'], $personnelMember['prefix'], $personnelMember['lastname']) => "#"
+                                ]
+                            );
+
+                            echo $templates->render("admin_personnel::edit",
+                                [
+                                    "title" => "Tekstmijn | Administratie",
+                                    "page_title" => sprintf("Personeelslid: %s %s %s", $personnelMember['firstname'], $personnelMember['prefix'], $personnelMember['lastname']),
+                                    "menu" => $menu,
+                                    "breadcrumbs" => $breadcrumbs,
+                                    "personnelmember" => $personnelMember,
+                                    "classes" => generateOptions($classes),
+                                    "page_js" => "/staff/vendor/application/load_date_picker.js"
+                                ]
+                            );
+                        } else {
+                            echo "U heeft geen toegang tot deze gegevens."; // TODO: better error message?
+                        }
+
+                    });
+
+                    $router->post("/([0-9a-zA-Z]+)/save", function($school_id, $personnel_id) use ($db, $templates, $bp) {
+                        if (updatePersonnelMember($db, $personnel_id, $_POST)) {
+                            getRedirect("../../?personnel_update=true");
+                        } else {
+                            getRedirect("../../?personnel_update=false");
+                        }
+                    });
+
+                    $router->get("/([0-9a-zA-Z]+)/delete", function($school_id, $personnel_id) use ($db, $templates, $bp) {
+                        if (deletePersonnelMember($db, $personnel_id)) {
+                            getRedirect("../../?personnel_deleted=true");
+                        } else {
+                            getRedirect("../../?personnel_deleted=false");
+                        }
+                    });
+
+                    $router->get("/new", function($school_id) use ($db, $templates, $bp) {
+                        session_start("staff");
+                        $institution = getInstitution($db, $school_id);
+
+                        $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+                        $breadcrumbs = generateBreadcrumbs($bp,
+                            [
+                                $_SESSION["staff_name"] => "/staff/account/",
+                                "Administratie" => "/staff/administration/",
+                                sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
+                                "Personeel" => sprintf("/staff/administration/institution/%s/personnel/", $school_id),
+                                "Nieuw personeelslid" => "#"
+                            ]
+                        );
+
+                        echo $templates->render("admin_personnel::add",
+                            [
+                                "title" => "Tekstmijn | Administratie",
+                                "page_title" => "Nieuwe personeelslid",
+                                "menu" => $menu,
+                                "breadcrumbs" => $breadcrumbs,
+                                "page_js" => "/staff/vendor/application/load_date_picker.js"
+                            ]
+                        );
+                    });
+
+                    $router->post("/add", function($school_id) use ($db) {
+                        if (addPersonnelMember($db, $_POST, $school_id)) {
+                            getRedirect("../?personnel_added=true");
+                        } else {
+                            getRedirect("../?personnel_added=false");
+                        }
+                    });
+
+                });
+
+
+                /*
+                 * Manage reviewers
+                 */
+                $router->mount('/reviewers', function() use ($router, $db, $templates, $bp) {
+                    $router->get('/', function($school_id) use ($router, $db, $templates, $bp) {
+                        session_start("staff");
+                        $institution = getInstitution($db, $school_id);
+                        $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+                        $breadcrumbs = generateBreadcrumbs($bp,
+                            [
+                                $_SESSION["staff_name"] => "/staff/account/",
+                                "Administratie" => "/staff/administration/",
+                                sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
+                                "Beoordelaars" => "#"
+                            ]
+                        );
+
+                        $personnel =  getPersonnel($db, $school_id);
+                        $columns = [
+                            ["Naam", "fullname"],
+                            ["Emailadres", "email"]
+                        ];
+                        $options = [
+                            ["<a class='pull-right' href='%s/edit'><i class='glyphicon glyphicon-pencil'></i> Bewerken</a>"],
+//                    ["<a class='pull-right' id='%s' onclick='reset_student_pwd(%s, self.document)'><i class='glyphicon glyphicon-repeat'></i> Wachtwoord resetten</a>", "id", '']
+                        ];
+                        $table = generateTable($bp, $columns, $personnel, $options, '<a href="%s/edit">%s</a>');
+
+                        echo $templates->render("admin_reviewers::reviewers", [
+                            "title" => "Tekstmijn | Administratie",
                             "menu" => $menu,
                             "breadcrumbs" => $breadcrumbs,
-                            "personnelmember" => $personnelMember,
-                            "classes" => generateOptions($classes),
-                            "page_js" => "/staff/vendor/application/load_date_picker.js"
-                        ]
-                    );
-                } else {
-                    echo "U heeft geen toegang tot deze gegevens."; // TODO: better error message?
-                }
+                            "tbl" => $table,
+                        ]);
+                    });
+
+                    $router->get("/([0-9a-zA-Z]+)/edit", function($school_id, $personnel_id) use ($db, $templates, $bp) {
+                        session_start("staff");
+
+                        $institution = getInstitution($db, $school_id);
+                        $personnelMember = getPersonnelMember($db, $personnel_id, $institution["id"]);
+
+                        if ($personnelMember) {
+                            $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+                            $breadcrumbs = generateBreadcrumbs($bp,
+                                [
+                                    $_SESSION["staff_name"] => "/staff/account/",
+                                    "Administratie" => "/staff/administration/",
+                                    sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
+                                    "Beoordelaars" => sprintf("/staff/administration/institution/%s/reviewers/", $school_id),
+                                    sprintf("Bewerk beoordelaar: %s %s %s", $personnelMember['firstname'], $personnelMember['prefix'], $personnelMember['lastname']) => "#"
+                                ]
+                            );
+
+                            echo $templates->render("admin_reviewers::edit",
+                                [
+                                    "title" => "Tekstmijn | Administratie",
+                                    "page_title" => sprintf("Beoordelaar: %s %s %s", $personnelMember['firstname'], $personnelMember['prefix'], $personnelMember['lastname']),
+                                    "menu" => $menu,
+                                    "breadcrumbs" => $breadcrumbs,
+                                    "personnelmember" => $personnelMember,
+                                    "page_js" => "/staff/vendor/application/load_date_picker.js"
+                                ]
+                            );
+                        } else {
+                            echo "U heeft geen toegang tot deze gegevens."; // TODO: better error message?
+                        }
+
+                    });
+
+                    $router->post("/([0-9a-zA-Z]+)/save", function($school_id, $personnel_id) use ($db, $templates, $bp) {
+                        if (updatePersonnelMember($db, $personnel_id, $_POST)) {
+                            getRedirect("../../?reviewer_update=true");
+                        } else {
+                            getRedirect("../../?reviewer_update=false");
+                        }
+                    });
+
+                    $router->get("/([0-9a-zA-Z]+)/delete", function($school_id, $personnel_id) use ($db, $templates, $bp) {
+                        if (deletePersonnelMember($db, $personnel_id)) {
+                            getRedirect("../../?reviewer_deleted=true");
+                        } else {
+                            getRedirect("../../?reviewer_deleted=false");
+                        }
+                    });
+
+                    $router->get("/new", function($school_id) use ($db, $templates, $bp) {
+                        session_start("staff");
+                        $institution = getInstitution($db, $school_id);
+
+                        $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+                        $breadcrumbs = generateBreadcrumbs($bp,
+                            [
+                                $_SESSION["staff_name"] => "/staff/account/",
+                                "Administratie" => "/staff/administration/",
+                                sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
+                                "Beoordelaars" => sprintf("/staff/administration/institution/%s/personnel/", $school_id),
+                                "Nieuwe beoordelaar" => "#"
+                            ]
+                        );
+
+                        echo $templates->render("admin_reviewers::add",
+                            [
+                                "title" => "Tekstmijn | Administratie",
+                                "page_title" => "Nieuwe beoordelaar",
+                                "menu" => $menu,
+                                "breadcrumbs" => $breadcrumbs,
+                                "page_js" => "/staff/vendor/application/load_date_picker.js"
+                            ]
+                        );
+                    });
+
+                    $router->post("/add", function($school_id) use ($db) {
+                        if (addPersonnelMember($db, $_POST, $school_id)) {
+                            getRedirect("../?reviewer_added=true");
+                        } else {
+                            getRedirect("../?reviewer_added=false");
+                        }
+                    });
+                });
+
+
 
             });
 
-            $router->post("/([0-9a-zA-Z]+)/personnel/([0-9a-zA-Z]+)/save", function($school_id, $personnel_id) use ($db, $templates, $bp) {
-                if (updatePersonnelMember($db, $personnel_id, $_POST)) {
-                    getRedirect("../../?personnel_update=true");
-                } else {
-                    getRedirect("../../?personnel_update=false");
-                }
-            });
 
-            $router->get("/([0-9a-zA-Z]+)/personnel/([0-9a-zA-Z]+)/delete", function($school_id, $personnel_id) use ($db, $templates, $bp) {
-                if (deletePersonnelMember($db, $personnel_id)) {
-                    getRedirect("../../?personnel_deleted=true");
-                } else {
-                    getRedirect("../../?personnel_deleted=false");
-                }
-            });
-
-            $router->get("/([0-9a-zA-Z]+)/personnel/new", function($school_id) use ($db, $templates, $bp) {
-                session_start("staff");
-                $institution = getInstitution($db, $school_id);
-
-                $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
-                $breadcrumbs = generateBreadcrumbs($bp,
-                    [
-                        $_SESSION["staff_name"] => "/staff/account/",
-                        "Administratie" => "/staff/administration/",
-                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
-                        "Personeel" => sprintf("/staff/administration/institution/%s/personnel/", $school_id),
-                        "Nieuw personeelslid" => "#"
-                    ]
-                );
-
-                echo $templates->render("admin_personnel::add",
-                    [
-                        "title" => "Tekstmijn | Administratie",
-                        "page_title" => "Nieuwe personeelslid",
-                        "menu" => $menu,
-                        "breadcrumbs" => $breadcrumbs,
-                        "page_js" => "/staff/vendor/application/load_date_picker.js"
-                    ]
-                );
-            });
-
-            $router->post("/([0-9a-zA-Z]+)/personnel/add", function($school_id) use ($db) {
-                if (addPersonnelMember($db, $_POST, $school_id)) {
-                    getRedirect("../?personnel_added=true");
-                } else {
-                    getRedirect("../?personnel_added=false");
-                }
-            });
-
-            $router->get("/([0-9a-zA-Z]+)/reviewers", function($school_id) use ($db, $templates, $bp)  {
-                session_start("staff");
-                $institution = getInstitution($db, $school_id);
-                $menu = generateMenu($bp, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
-                $breadcrumbs = generateBreadcrumbs($bp,
-                    [
-                        $_SESSION["staff_name"] => "/staff/account/",
-                        "Administratie" => "/staff/administration/",
-                        sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
-                        "Klassen" => "#"
-                    ]
-                );
-
-                echo $templates->render("administration::institution_reviewers", [
-                    "title" => "Tekstmijn | Administratie",
-                    "menu" => $menu,
-                    "breadcrumbs" => $breadcrumbs
-                ]);
-            });
         });
+
+
 
     });
 

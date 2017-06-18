@@ -24,7 +24,7 @@ class Navbar extends Common
         if (is_array($brand)) {
             list($brand, $link) = (count($brand) > 1) ? $brand : each($brand);
         } else {
-            $link = $this->page->url['base'];
+            $link = $this->page->url['model'];
         }
         $id = $this->page->id('navbar');
         $class = 'navbar';

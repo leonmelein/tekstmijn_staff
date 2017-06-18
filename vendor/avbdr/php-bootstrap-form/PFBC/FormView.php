@@ -1,5 +1,5 @@
 <?php
-abstract class FormView extends Base {
+abstract class FormView extends model {
     public $noLabel = false;
     protected $_form;
     protected $class = null;

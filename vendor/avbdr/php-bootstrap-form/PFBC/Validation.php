@@ -1,5 +1,5 @@
 <?php
-abstract class Validation extends Base {
+abstract class Validation extends model {
     protected $message = "%element% is invalid.";
 
     public function __construct($message = "") {

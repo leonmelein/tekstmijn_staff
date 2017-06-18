@@ -1,5 +1,5 @@
 <?php
-abstract class ErrorView extends Base {
+abstract class ErrorView extends model {
     protected $_form;
 
     public function __construct(array $properties = null) {

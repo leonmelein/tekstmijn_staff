@@ -107,7 +107,7 @@ class Component
     {
         if ($overthrow || null === static::$instance) {
             $page = static::isolated($url, $request);
-            if ($page->url['format'] == 'html' && isset($url['base']) && is_string($url['base'])) {
+            if ($page->url['format'] == 'html' && isset($url['model']) && is_string($url['model'])) {
                 if (($path = $page->redirect()) || strcmp($page->url['full'], $page->request->getUri()) !== 0) {
                     $page->filter('response', function ($page, $response) {
                         $cookie = new Cookie('referer', $page->request->headers->get('referer'), time() + 60);
@@ -139,7 +139,7 @@ class Component
     {
         extract(array_merge(array(
             'dir' => null,
-            'base' => null,
+            'model' => null,
             'suffix' => null,
             'chars' => 'a-z0-9~%.:_-',
         ), $url), EXTR_SKIP);
@@ -164,12 +164,12 @@ class Component
             }
             $folder = implode(DIRECTORY_SEPARATOR, $folders);
         }
-        $page->dir('set', 'base', $folder);
+        $page->dir('set', 'model', $folder);
         $page->dir('set', 'page', $folder);
         $page->url['full'] = '';
-        $page->url['base'] = (!empty($base)) ? trim($base, '/').'/' : $page->request->getUriForPath('/');
-        if (parse_url($page->url['base'], PHP_URL_SCHEME) === null) {
-            $page->url['base'] = 'http://'.$page->url['base'];
+        $page->url['model'] = (!empty($base)) ? trim($base, '/').'/' : $page->request->getUriForPath('/');
+        if (parse_url($page->url['model'], PHP_URL_SCHEME) === null) {
+            $page->url['model'] = 'http://'.$page->url['model'];
         }
         $page->url['path'] = trim($page->request->getPathInfo(), '/'); // excludes leading and trailing slashes
         if ($page->url['suffix'] = pathinfo($page->url['path'], PATHINFO_EXTENSION)) {
@@ -177,7 +177,7 @@ class Component
             $page->url['path'] = substr($page->url['path'], 0, -strlen($page->url['suffix'])); // remove suffix from path
         }
         $page->url['query'] = (null !== $qs = $page->request->getQueryString()) ? '?'.$qs : '';
-        $page->url['preg'] = preg_quote($page->url['base'], '/');
+        $page->url['preg'] = preg_quote($page->url['model'], '/');
         $page->url['chars'] = 'a-z0-9'.preg_quote(str_replace(array('a-z', '0-9', '.', '/', '\\', '?', '#'), '', $chars), '/');
         $page->url['html'] = array('', '/', '.htm', '.html', '.shtml', '.phtml', '.php', '.asp', '.jsp', '.cgi', '.cfm', '.pl');
         if (empty($page->url['suffix']) || in_array($page->url['suffix'], $page->url['html'])) {
@@ -188,11 +188,11 @@ class Component
         }
         $page->url['method'] = $page->request->getMethod(); // eg. GET|POST
         $page->url['route'] = '/'.$page->url['path']; // includes leading slash and unfiltered path (below)
-        $page->url('set', 'base', $page->url['base']);
-        $page->url('set', 'dir', $page->url['base'].'page/');
+        $page->url('set', 'model', $page->url['model']);
+        $page->url('set', 'dir', $page->url['model'].'page/');
         $page->url['path'] = preg_replace('/[^'.$page->url['chars'].'.\/]/i', '', $page->url['path']);
         $page->url['suffix'] = (!empty($suffix) && in_array($suffix, $page->url['html'])) ? $suffix : '';
-        $page->url['full'] = $page->formatLocalPath($page->url['base'].$page->url['path'].$page->url['query']);
+        $page->url['full'] = $page->formatLocalPath($page->url['model'].$page->url['path'].$page->url['query']);
         $page->set(array(), 'reset');
 
         return $page;
@@ -315,7 +315,7 @@ class Component
      */
     public function eject($url = '', $http_response_code = 302)
     {
-        $url = (!empty($url)) ? $this->formatLocalPath($url) : $this->url['base'];
+        $url = (!empty($url)) ? $this->formatLocalPath($url) : $this->url['model'];
 
         return $this->send(RedirectResponse::create(htmlspecialchars_decode($url), $http_response_code));
     }
@@ -343,11 +343,11 @@ class Component
         }
         if (!in_array($suffix, $this->url['html'])) { // images, css files, etc.
             if ($path.$suffix != $this->url['path']) {
-                return $this->eject($this->url['base'].$path.$suffix, $redirect);
+                return $this->eject($this->url['model'].$path.$suffix, $redirect);
             }
         } elseif ($path.$suffix != $compare) {
-            if (strpos($url, $this->url['base']) === 0) {
-                return $this->eject($this->url['base'].$path.$suffix.$this->url['query'], $redirect);
+            if (strpos($url, $this->url['model']) === 0) {
+                return $this->eject($this->url['model'].$path.$suffix.$this->url['query'], $redirect);
             }
         }
     }
@@ -409,18 +409,18 @@ class Component
         if ($folder == 'set') {
             list($folder, $name, $dir) = $folders;
             $this->dir[$name] = rtrim(str_replace('\\', '/', $dir), '/').'/';
-            if (strpos($this->dir[$name], $this->dir['base']) !== 0) {
-                $this->dir['base'] = $this->commonDir(array($this->dir[$name], $this->dir['base']));
+            if (strpos($this->dir[$name], $this->dir['model']) !== 0) {
+                $this->dir['model'] = $this->commonDir(array($this->dir[$name], $this->dir['model']));
             }
 
             return $this->dir[$name]; // all nicely formatted
         }
         $dir = $this->dir['page'];
-        if ($folder == 'base') {
+        if ($folder == 'model') {
             array_shift($folders);
         } elseif (isset($this->dir[$folder])) {
             $dir = $this->dir[array_shift($folders)];
-        } elseif (strpos($folder, $this->dir['base']) === 0) {
+        } elseif (strpos($folder, $this->dir['model']) === 0) {
             $dir = rtrim(array_shift($folders), '/').'/';
         }
         if (empty($folders)) {
@@ -474,12 +474,12 @@ class Component
     public function path($url = null)
     {
         $paths = func_get_args();
-        $base_url = $this->url['base'];
-        if ($url == 'base') {
+        $base_url = $this->url['model'];
+        if ($url == 'model') {
             array_shift($paths);
         } elseif (isset($this->url['set'][$url])) {
             $base_url = $this->url['set'][array_shift($paths)];
-        } elseif (strpos($url, $this->url['base']) === 0) {
+        } elseif (strpos($url, $this->url['model']) === 0) {
             $base_url = rtrim(array_shift($paths), '/').'/';
         }
         if (empty($paths)) {
@@ -588,7 +588,7 @@ class Component
             if (isset($this->url['set'][$base_url])) {
                 $base_url = $this->url['set'][$base_url];
             } elseif (isset($this->dir[$base_url])) {
-                $base_url = $this->url['base'].$base_url.'/';
+                $base_url = $this->url['model'].$base_url.'/';
             }
             // get an array of all url $segments after the $base_url
             $segments = array_filter(array_slice(func_get_args(), 1));
@@ -1028,8 +1028,8 @@ class Component
                     return array(
                         'file' => $this->file($folder, $route, $file),
                         'dir' => $this->dir($folder, $route),
-                        'assets' => $this->url['base'].'page/'.$folder.$route,
-                        'url' => $this->url['base'].$folder.$route,
+                        'assets' => $this->url['model'].'page/'.$folder.$route,
+                        'url' => $this->url['model'].$folder.$route,
                         'folder' => substr($path, 1, strlen($route)), // remove leading slash
                         'route' => substr($path, strlen($route)), // remove trailing slash
                     );
@@ -1040,8 +1040,8 @@ class Component
                 return array(
                     'file' => $this->file($folder, $file),
                     'dir' => $this->dir($folder),
-                    'assets' => $this->url['base'].'page/'.$folder,
-                    'url' => $this->url['base'].$folder,
+                    'assets' => $this->url['model'].'page/'.$folder,
+                    'url' => $this->url['model'].$folder,
                     'folder' => '',
                     'route' => $path,
                 );
@@ -1466,7 +1466,7 @@ EOT;
             return ($array) ? array($url, '', '', '') : $url;
         }
         list($full, $url, $not, $applicable, $path, $suffix, $query) = $matches;
-        $url = $this->url['base'];
+        $url = $this->url['model'];
         $path = trim($path, '/');
         if ($path == 'index') {
             $path = '';
