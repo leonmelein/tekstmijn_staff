@@ -9,7 +9,7 @@ function reset_student_pwd(id,document) {
     $.getJSON( "/staff/reset/" + id, function( data ) {
         console.log(data);
         var btn = document.getElementById(id);
-        btn.innerText  = "Wachtwoord gereset.";
+        btn.innerHTML  = "<span class='green'><i class='glyphicon glyphicon-ok'></i> Wachtwoord gereset.</span>";
         console.log("Reset!");
     });
 }

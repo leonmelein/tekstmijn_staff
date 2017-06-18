@@ -17,6 +17,7 @@
     <link href="/staff/vendor/bootstrap/dist/css/bootstrap-theme.min.css" rel="stylesheet">
     <link href="/staff/vendor/application/application.css" rel="stylesheet">
     <link href="https://fonts.googleapis.com/css?family=Montserrat|Roboto" rel="stylesheet">
+    <link rel="stylesheet" href="/staff/vendor/eonasdan-bootstrap-datetimepicker/build/css/bootstrap-datetimepicker.min.css" />
 
     <!-- HTML5 shim and Respond.js for IE8 support of HTML5 elements and media queries -->
     <!--[if lt IE 9]>
@@ -45,6 +46,8 @@
 <script src="/vendor/jquery-validation/dist/jquery.validate.min.js"></script>
 <script src="/staff/vendor/jquery_form/jquery.form.js"></script>
 <script src="/staff/vendor/jquery-color/jquery.color-2.1.2.min.js"></script>
+<script type="text/javascript" src="/staff/vendor/moment/min/moment.min.js"></script>
+<script type="text/javascript" src="/staff/vendor/eonasdan-bootstrap-datetimepicker/build/js/bootstrap-datetimepicker.min.js"></script>
 <script src="<?php echo $pageJS; ?>"></script>
 </body>
 </html>

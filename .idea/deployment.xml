@@ -2,10 +2,17 @@
 <project version="4">
   <component name="PublishConfigData" serverName="Hofstad Staging">
     <serverData>
+      <paths name="Hofstad Production">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/" local="$PROJECT_DIR$" web="/staff" />
+          </mappings>
+        </serverdata>
+      </paths>
       <paths name="Hofstad Staging">
         <serverdata>
           <mappings>
-            <mapping deploy="/staff" local="$PROJECT_DIR$" web="/staff" />
+            <mapping deploy="/" local="$PROJECT_DIR$" web="/staff" />
           </mappings>
         </serverdata>
       </paths>

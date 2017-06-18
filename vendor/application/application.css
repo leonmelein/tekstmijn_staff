@@ -219,3 +219,12 @@ textarea#text {
     padding-bottom: 0px;
     padding-right: 15px;
 }
+
+.green {
+    color: green !important;
+}
+
+div#datetimepicker2 {
+    padding-left: 15px;
+    padding-right: 15px;
+}

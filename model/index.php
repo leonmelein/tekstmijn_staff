@@ -103,3 +103,14 @@ function getRedirect($url, $statusCode = 303) {
     header('Location: ' . $url, true, $statusCode);
     die();
 }
+
+function generateOptions($array){
+    $option = "<option value='%s'>%s</option>";
+    $options = "";
+
+    foreach ($array as $key => $value) {
+        $options .= sprintf($option, $value["id"], $value["name"]) . "\n";
+    }
+
+    return $options;
+}
