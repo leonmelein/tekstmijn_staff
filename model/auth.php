@@ -6,9 +6,7 @@
  * Date: 19-06-17
  * Time: 00:05
  */
-class auth extends model
-{
-
+class auth extends model {
 
     /*
      * Routing functions
@@ -31,27 +29,26 @@ class auth extends model
             if($this->check_login($_POST['username'], $_POST['password'])){
                 $info = $this->getUserInfo($_POST['username']);
 
-                session_start("staff");
+                $this->get_session();
                 $_SESSION['staff_id'] = $info["id"];
                 $_SESSION['type'] = $info["type"];
                 $_SESSION["staff_email"] = $_POST["username"];
                 $_SESSION['staff_name'] = $info["name"];
-                $this->getRedirect($type_redir[$info['type']]);
+                $this->redirect($type_redir[$info['type']]);
 
             } else {
-                getRedirect("/staff/login/?failed=true");
+                $this->redirect("/staff/login/?failed=true");
             }
         }
     }
-
 
     /**
      * Handles user logout requests
      */
     public function logout(){
-        session_start("staff");
+        $this->get_session();
         session_destroy();
-        getRedirect("/staff/login/?logged_out=true");
+        $this->redirect("/staff/login/?logged_out=true");
     }
 
     /**
@@ -69,7 +66,7 @@ class auth extends model
                 ]
             );
         } else {
-            getRedirect("/staff/login/?failed_registration=true");
+            $this->redirect("/staff/login/?failed_registration=true");
         }
     }
 
@@ -78,9 +75,39 @@ class auth extends model
      */
     public function completeRegistration(){
         if($this->set_initial_password($_POST["username"], $_POST["password"])){
-            getRedirect("/staff/login/?registration=true");
+            $this->redirect("/staff/login/?registration=true");
         } else {
-            getRedirect("/staff/register/?failed=true");
+            $this->redirect("/staff/register/?failed=true");
+        }
+    }
+
+    /**
+     * Loads the users info on password reset
+     */
+    public function startPasswordReset(){
+        $registration = $this->getResetInfo($_GET["token"]);
+
+        if($registration){
+            echo $this->templates->render("login::reset",
+                ["title" => "Tekstmijn | Registreren",
+                    "name" => $registration["name"],
+                    "email" => $registration["email"],
+                    "page_js" => "../vendor/application/register_validate.js"
+                ]
+            );
+        } else {
+            $this->redirect("/staff/login/?pwd_reset=false");
+        }
+    }
+
+    /**
+     * Resets the users password on reset
+     */
+    public function completePasswordReset(){
+        if($this->change_password($_POST["username"], $_POST["password"])){
+            $this->redirect("/staff/login/?pwd_reset=true");
+        } else {
+            $this->redirect("/staff/reset_password/?failed=true");
         }
     }
 
@@ -88,9 +115,9 @@ class auth extends model
      * Checks if a user is (still) logged in
      */
     public function checkLogin(){
-        session_start("staff");
+        $this->get_session();
         if (!isset($_SESSION['staff_id'])) {
-            getRedirect("/staff/login");
+            $this->redirect("/staff/login");
             exit();
         }
     }
@@ -100,7 +127,7 @@ class auth extends model
      */
     public function checkToken(){
         if (!isset($_GET["token"])) {
-            getRedirect("/staff/login?failed_registration=true");
+            $this->redirect("/staff/login?failed_registration=true");
             exit();
         }
     }
@@ -151,16 +178,16 @@ class auth extends model
     }
 
     /**
-     * @param $database
+     *
      * @param $token
      * @return mixed
      */
-    function getResetInfo($database, $token){
-        $quoted_token = $database->quote($token);
+    function getResetInfo($token){
+        $quoted_token = $this->database->quote($token);
         $query = "SELECT CONCAT_WS(' ', firstname, prefix, lastname) as name, email 
               FROM staff
               WHERE setuptoken = $quoted_token";
-        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
     }
 
     /**
@@ -197,16 +224,15 @@ class auth extends model
     }
 
     /**
-     * @param $database
      * @param $username
      * @param $password
      * @return int
      */
-    function change_password($database, $username, $password){
+    function change_password($username, $password){
         $rows_affected = 0;
 
         if (strlen($password) > 0){
-            $rows_affected = $database->update("staff",
+            $rows_affected = $this->database->update("staff",
                 ["password" => $this->hash_password($password),
                     "setuptoken" => null],
                 ["email" => $username]
@@ -255,6 +281,9 @@ class auth extends model
         return $rows_affected;
     }
 
+    /**
+     *
+     */
     function send_reset_link(){
         $sanitized_email = filter_var($_POST['username'], FILTER_SANITIZE_EMAIL);
         if (filter_var($sanitized_email, FILTER_VALIDATE_EMAIL)) {
@@ -279,10 +308,10 @@ class auth extends model
             $mail->AltBody = 'Zet HTML aan in uw e-mailclient.';
 
             if(!$mail->send()) {
-                getRedirect("/staff/login/?reset=false");
+                $this->redirect("/staff/login/?reset=false");
             } else {
                 echo $mail->ErrorInfo;
-                getRedirect("/staff/login/?reset=true");
+                $this->redirect("/staff/login/?reset=true");
             }
         }
     }

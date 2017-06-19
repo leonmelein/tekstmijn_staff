@@ -42,7 +42,7 @@ class model
         $this->templates = $templates;
     }
 
-    public function generateTable($bp, $columns, $data, $options = null, $format = "", $classes = "class=responsive hover"){
+    public function table($bp, $columns, $data, $options = null, $format = "", $classes = "class=responsive hover"){
         $table = $bp->table->open($classes);
         $table .= $bp->table->head();
         foreach ($columns as $column){
@@ -82,7 +82,7 @@ class model
         return $table;
     }
 
-    public function generateMenu($bp, $active, $type){
+    public function menu($bp, $active, $type){
         $item = [
             "Inzendingen" => "<i class='glyphicon glyphicon-pencil' aria-hidden='true'></i>&nbsp;&nbsp;Inzendingen",
             "Leerlingen" => "<i class='glyphicon glyphicon-th-list' aria-hidden='true'></i>&nbsp;&nbsp;Leerlingen",
@@ -130,23 +130,23 @@ class model
         return sprintf($menu_panel, $bp->pills($menu_options, $active));
     }
 
-    public function generateBreadcrumbs($bp, $path){
+    public function breadcrumbs($bp, $path){
         return $bp->breadcrumbs($path);
     }
 
-    public function generateTabs($bp, $tabsarray, $active = 'Info'){
+    public function tabs($bp, $tabsarray, $active = 'Info'){
         return $bp->tabs($tabsarray, array(
             'active' => $active,
             'toggle' => "tab",
         ));
     }
 
-    public function getRedirect($url, $statusCode = 303) {
+    public function redirect($url, $statusCode = 303) {
         header('Location: ' . $url, true, $statusCode);
         die();
     }
 
-    public function generateOptions($array){
+    public function options($array){
         $option = "<option value='%s'>%s</option>";
         $options = "";
 
@@ -155,6 +155,10 @@ class model
         }
 
         return $options;
+    }
+
+    public function get_session(){
+        session_start("staff");
     }
 
 }

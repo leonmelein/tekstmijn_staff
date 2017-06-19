@@ -9,10 +9,10 @@
 class classroom extends model
 {
 
-    public function generateTeacherOverview(){
+    public function teacherOverview(){
         session_start("staff");
-        $menu = $this->generateMenu($this->bootstrap, ["active" => "/staff/classes/", "align" => "stacked"], $_SESSION['type']);
-        $breadcrumbs = $this->generateBreadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "../account/", "Leerlingen" => "#"]);
+        $menu = $this->menu($this->bootstrap, ["active" => "/staff/classes/", "align" => "stacked"], $_SESSION['type']);
+        $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "../account/", "Leerlingen" => "#"]);
 
         $classes = $this->getClassesForStaff($_SESSION["staff_id"]);
         $columns = [
@@ -26,12 +26,12 @@ class classroom extends model
             "table" => $table]);
     }
 
-    public function generateDetailOverview($class_id){
+    public function individualClass($class_id){
         session_start("staff");
 
         $name = sprintf("Klas %s", $this->getClassName($class_id));
-        $menu = $this->generateMenu($this->bootstrap, ["active" => "/staff/classes/", "align" => "stacked"], $_SESSION['type']);
-        $breadcrumbs = $this->generateBreadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Leerlingen" => "/staff/classes/",
+        $menu = $this->menu($this->bootstrap, ["active" => "/staff/classes/", "align" => "stacked"], $_SESSION['type']);
+        $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Leerlingen" => "/staff/classes/",
             $name => "#"]);
 
         $students = $this->getClassStudents($class_id);
@@ -43,7 +43,7 @@ class classroom extends model
             ["<a class='pull-right' id='%s' onclick='reset_student_pwd(%s, self.document)'><i class='glyphicon glyphicon-repeat'></i> Wachtwoord resetten</a>", "id", '']
         ];
 
-        $table = $this->generateTable($this->bootstrap, $columns, $students, $options);
+        $table = $this->table($this->bootstrap, $columns, $students, $options);
         echo $this->templates->render("classes::class", ["title" => "Tekstmijn | Leerlingen",
             "page_title" => $name, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table, "page_js" => "/staff/vendor/application/reset_pwd_students.js"]);

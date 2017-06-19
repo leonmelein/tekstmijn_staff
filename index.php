@@ -2,19 +2,27 @@
     /**
      * CONTROLLER
      */
+
+    // Third party libraries
     require("vendor/autoload.php");
+
+    // Debugging functions
+    require("model/debug.php");
+
+    // Old type Models
     require("model/model.php");
     require("model/index.php");
-    require("model/login.php");
     require("model/students.php");
     require("model/submissions.php");
     require("model/download.php");
     require("model/review.php");
     require("model/administration.php");
-    require("model/debug.php");
-    require("model/newstatus.php");
+
+    // New type Models
+    require("model/status.php");
     require("model/classroom.php");
     require("model/auth.php");
+    require("model/analysis.php");
     use BootPress\Bootstrap\v3\Component as Bootstrap;
 
     // Reroute HTTP traffic to HTTPS
@@ -106,30 +114,9 @@
 
     $router->post("/register", "auth@completeRegistration");
 
-    $router->get("/reset_password/", function ()  use ($db, $templates){
-        $registration = getResetInfo($db, $_GET["token"]);
+    $router->get("/reset_password/", "auth@startPasswordReset");
 
-        if($registration){
-            echo $templates->render("login::reset",
-                ["title" => "Tekstmijn | Registreren",
-                    "name" => $registration["name"],
-                    "email" => $registration["email"],
-                    "page_js" => "../vendor/application/register_validate.js"
-                ]
-            );
-        } else {
-            getRedirect("/staff/login/?pwd_reset=false");
-        }
-
-    });
-
-    $router->post("/reset_password/", function() use ($db) {
-        if(change_password($db, $_POST["username"], $_POST["password"])){
-            getRedirect("/staff/login/?pwd_reset=true");
-        } else {
-            getRedirect("/staff/reset_password/?failed=true");
-        }
-    });
+    $router->post("/reset_password/", "auth@completePasswordReset");
 
     $router->get("reset/(\d+)/", function($student_id) use ($db){
         if(resetStudentPassword($db, $student_id)){
@@ -162,9 +149,9 @@
      * Classes
      */
 
-    $router->get("classes/", "classroom@generateTeacherOverview");
+    $router->get("classes/", "classroom@teacherOverview");
 
-    $router->get("classes/(\d+)/", "classroom@generateDetailOverview");
+    $router->get("classes/(\d+)/", "classroom@individualClass");
 
     /*
      * Submissions
@@ -468,6 +455,14 @@
 
     $router->get("/status/", 'status@generateOverall');
     $router->get("/status/(.*)", 'status@generateDetail');
+
+    /*
+     * Analysis
+     */
+
+    $router->mount("/analysis/", function() use ($router){
+        $router->get("/", 'analysis@overview');
+    });
 
     /*
      * Administration

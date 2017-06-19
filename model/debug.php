@@ -6,9 +6,16 @@
  * Time: 11:33
  */
 
-function pprint($array){
+function pparray($array){
     echo "<pre>";
     print_r($array);
+    echo "</pre>";
+    exit();
+}
+
+function ppstring($string){
+    echo "<pre>";
+    echo $string;
     echo "</pre>";
     exit();
 }
