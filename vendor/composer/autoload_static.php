@@ -21,6 +21,7 @@ class ComposerStaticInit85726f4fb9ea8f61594adc488cdc3511
         'L' => 
         array (
             'League\\Plates\\' => 14,
+            'League\\Csv\\' => 11,
         ),
         'C' => 
         array (
@@ -51,6 +52,10 @@ class ComposerStaticInit85726f4fb9ea8f61594adc488cdc3511
         'League\\Plates\\' => 
         array (
             0 => __DIR__ . '/..' . '/league/plates/src',
+        ),
+        'League\\Csv\\' => 
+        array (
+            0 => __DIR__ . '/..' . '/league/csv/src',
         ),
         'Comodojo\\Zip\\' => 
         array (

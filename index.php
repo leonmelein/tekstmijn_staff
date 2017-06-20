@@ -64,6 +64,7 @@
     $templates->addFolder("admin_students", "view/administration/students");
     $templates->addFolder("admin_personnel", "view/administration/personnel");
     $templates->addFolder("admin_reviewers", "view/administration/reviewers");
+    $templates->addFolder("analysis", "view/analysis");
     $bp = new Bootstrap;
 
     // Initiate router
@@ -450,19 +451,12 @@
     });
 
     /*
-     * Status
-     */
-
-    $router->get("/status/", 'status@generateOverall');
-    $router->get("/status/(.*)", 'status@generateDetail');
-
-    /*
      * Analysis
      */
 
-    $router->mount("/analysis/", function() use ($router){
-        $router->get("/", 'analysis@overview');
-    });
+    $router->get("/analysis/", 'analysis@overview');
+    $router->get("/analysis/status/(.*)", 'analysis@generateStatusDetail');
+    $router->get("/analysis/beoordelingen/(.*)", 'analysis@downloadBeoordelingen');
 
     /*
      * Administration

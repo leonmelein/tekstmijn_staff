@@ -6,9 +6,252 @@
  * Date: 19-06-17
  * Time: 14:38
  */
-class analysis
+
+class analysis extends model
 {
-    function overview(){
-        echo "Hello world"; // TODO: template toevoegen
+    /*
+    * Generates a page with the status and statistics
+    *
+    * @return page
+    */
+    public function overview(){
+        session_start("staff");
+        $menu = $this->menu($this->bootstrap, ["active" => "/staff/analysis/", "align" => "stacked"], $_SESSION['type']);
+        $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "../account/", "Analyse" => "#"]);
+        $tabs = generateTabs($this->bootstrap, ["Status" => "#status", "Statistiek" => "#statistics"], 'Status');
+
+        //Status Table
+        $data = $this->getTotalOverview($this->database);
+        $columns = [
+            ["Opdracht", "title"],
+            ["Toegewezen", "promised"],
+            ["Ingevoerd", "fullfilled"]
+        ];
+        $status_tbl = generateTable($this->bootstrap, $columns, $data, null, '<a href="status/%s/">%s</a>');
+
+        //Analysis Table
+        $data = $this->getAssignments($this->database);
+        $columns = [
+            ["Opdracht", "title"]
+        ];
+        $options = [
+                ["<a class='pull-right' href='beoordelingen/%s'><i class='glyphicon glyphicon-signal'></i> Beoordelingen (csv)</a>"],
+                ["<a class='pull-right' href='beoordelingslijsten/%s'><i class='glyphicon glyphicon-th-list'></i> Beoordelingslijsten (csv)</a>"],
+                ["<a class='pull-right' href='teksten/%s'><i class='glyphicon glyphicon-file'></i> Teksten (zip)</a>"]
+        ];
+
+        $analysis_tbl = $this->table($this->bootstrap, $columns, $data, $options);
+
+        echo $this->templates->render("analysis::overview", [
+            "title" => "Tekstmijn | Analyse",
+            "page_title" => "Analyse",
+            "menu" => $menu,
+            "breadcrumbs" => $breadcrumbs,
+            "status_tbl" => $status_tbl,
+            "tabs" => $tabs,
+            "analysis_tbl" => $analysis_tbl
+            ]);
+    }
+
+    /*
+    * Generates a page with the number of items reviewed for a specific assignment
+    *
+    * @param Medoo $assignment_id An assignment ID
+    * @return page
+    */
+    public function generateStatusDetail($assignment_id){
+        session_start("staff");
+        $title = $this->getAssignmentName($this->database, $assignment_id);
+
+        $breadcrumbs = generateBreadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Analyse" => "/staff/analysis/", "Status : ".$title => "#"]);
+        $menu = generateMenu($this->bootstrap, ["active" => "/staff/analysis/", "align" => "stacked"], $_SESSION['type']);
+        $tabs = generateTabs($this->bootstrap, ["Status" => "#status", "Statistiek" => "#statistics"], 'Status');
+
+        //Status Detail Table
+        $overview = $this->getAssignmentOverview($this->database, $assignment_id);
+        $columns = [
+            ["Naam", "StaffName"],
+            ["Toegewezen", "Promised"],
+            ["Ingevoerd", "Fullfilled"]
+        ];
+        $table = generateTable($this->bootstrap, $columns, $overview);
+
+        //Analysis Table
+        $analysis_tbl = "Analyse Tabel";
+
+        echo $this->templates->render("analysis::statusdetail", [
+            "title" => "Tekstmijn | Analyse",
+            "page_title" => "Analyse",
+            "page_subtitle" => $title,
+            "menu" => $menu,
+            "tabs" => $tabs,
+            "breadcrumbs" => $breadcrumbs,
+            "status_tbl_detail" => $table,
+            "analysis_tbl" => $analysis_tbl
+        ]);
+    }
+
+    /*
+    * Generates a csv file with the reviews of a specific assignement
+    * @param $assignment_id An assignment id
+    * @return csv
+    */
+    public function downloadBeoordelingen($assignment_id){
+        $assignment_name = getAssignmentName($this->database, $assignment_id);
+
+        //Get reviews from database
+        $data = $this->downloadReviews($this->database, $assignment_id);
+        foreach ($data as $key => $value) {
+            echo print_r($key);
+            echo "<br>";
+            echo print_r($value);
+            echo "<br>";
+            echo "---";
+            echo "<br>";
+        }
+    }
+
+    /*
+    * Returns an array with all the reviews of an speciffic assignment
+    * @param Medoo $database A database instance passed as an Medoo object.
+    * @param $assignment_id An assignment id
+    * @return PDO Object
+    */
+    private function downloadReviews($database, $assignement_id){
+        $quoted_assignement_id = $database->quote($assignement_id);
+        $query = "
+                    SELECT `student_id`, CONCAT_WS(' ', `s_firstname`, `s_prefix`, `s_lastname`) as `staff_name`, CONCAT_WS(' ', `firstname`, `prefix`, `lastname`) as `student_name`, `grade` FROM
+                    (
+                        SELECT `student_id`, `staff_id`, `firstname`, `prefix`, `lastname`, `grade` FROM
+                        (
+                            SELECT `student_id_original` as `student_id`, `firstname`, `prefix`, `lastname`, `submission_id` FROM
+                                (
+                                    SELECT `id` as `student_id_original`, `firstname`, `prefix`, `lastname` FROM `students` WHERE `id` IN
+                                        (
+                                            SELECT `student_id` FROM `submissions` WHERE `assignment_id` = $quoted_assignement_id
+                                        ) 
+                                ) `students_ass`
+                    
+                            JOIN
+                    
+                                (
+                                    SELECT `id` as `submission_id`, `student_id` FROM `submissions` WHERE `assignment_id` = $quoted_assignement_id
+                                ) `submissions_ass`
+                    
+                            ON `students_ass`.`student_id_original` = `submissions_ass`.`student_id`
+                        ) `students_submissions`
+                    
+                        LEFT JOIN
+                    
+                            (
+                                SELECT `staff_id`, `submission_id`, `grade`, `notes` FROM `grading`
+                            ) `submissions_grading`
+                    
+                        ON `students_submissions`.`submission_id` = `submissions_grading`.`submission_id`
+                        ORDER BY `student_id`
+                        LIMIT 999999
+                    ) `without_staff_name`
+                    
+                    LEFT JOIN
+                    
+                        (
+                            SELECT `id`, `firstname` as `s_firstname`, `prefix` as `s_prefix`, `lastname` as `s_lastname` FROM `staff`
+                        ) `staff_info`
+                    
+                    ON `staff_info`.`id` = `without_staff_name`.`staff_id`
+                    LIMIT 999999
+                    ";
+        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /*
+    * Gets an overview of the assignments in the system and the number of texts that are reviewed by the reviewers
+    *
+    * @param Medoo $database A database instance passed as an Medoo object.
+    * @return Array, associative
+    */
+    private function getTotalOverview($database){
+        $query = "SELECT promised_grades.assignment_id AS id, title, promised, fullfilled
+                FROM (
+                      SELECT assignments.id AS assignment_id, assignments.title, COUNT(submission_id) AS promised
+                      FROM submissions_staff, submissions, assignments
+                      WHERE submissions_staff.submission_id = submissions.id
+                      AND submissions.assignment_id = assignments.id
+                      AND staff_id NOT IN (1,24)
+                      GROUP BY assignments.id
+                ) AS promised_grades, (
+                                SELECT assignment_id, COUNT(grading.grade) AS fullfilled
+                                FROM grading, submissions
+                                WHERE grading.submission_id = submissions.id
+                                AND grading.staff_id NOT IN (1,24)
+                                AND grading.notes = ''
+                                GROUP BY assignment_id
+                ) AS fullfilled_grades
+                  WHERE promised_grades.assignment_id = fullfilled_grades.assignment_id
+                ORDER BY title";
+        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /*
+    * Gets an overview of the number of reviews made by the reviewers
+    *
+    * @param Medoo $database A database instance passed as an Medoo object.
+    * @param $id An assignment id
+    * @return Array, associative
+    */
+    private function getAssignmentOverview($database, $assignment_id){
+        $quoted_assignment_id = $database->quote($assignment_id);
+        $query = "SELECT CONCAT_WS(' ', firstname, prefix, lastname) AS StaffName, PromisedGrades.Promised, FullfilledGrades.Fullfilled
+                FROM (SELECT grading.staff_id, COUNT(grading.grade) as Fullfilled
+                      FROM grading
+                      WHERE grading.submission_id IN (
+                        SELECT id
+                        FROM submissions
+                        WHERE assignment_id = $quoted_assignment_id
+                      ) AND grading.notes = ''
+                      AND grading.staff_id NOT IN (1,24)
+                      GROUP BY staff_id) AS FullfilledGrades,
+                  (SELECT submissions_staff.staff_id, COUNT(submissions_staff.submission_id) as Promised
+                   FROM submissions_staff
+                   WHERE submissions_staff.submission_id IN (
+                     SELECT id
+                     FROM submissions
+                     WHERE assignment_id = $quoted_assignment_id
+                   ) AND staff_id NOT IN (1, 24)
+                   GROUP BY staff_id) AS PromisedGrades,
+                   staff
+                WHERE PromisedGrades.staff_id = FullfilledGrades.staff_id
+                AND staff.id = FullfilledGrades.staff_id
+                ORDER BY StaffName
+                ";
+
+        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /*
+     * Gets the name of an assignment by selecting an assignment with a specific ID.
+     *
+     * @param Medoo $database A database instance passed as an Medoo object.
+     * @param $id An assignment id
+     * @return Array, associative
+     */
+    private function getAssignmentName($database, $id){
+        return $database->get(
+            "assignments",
+            "title",
+            ["id" => $id]
+        );
+    }
+
+    /*
+     * Gets an array of assignments in the system.
+     *
+     * @param Medoo $database A database instance passed as an Medoo object.
+     * @return Array, associative
+     */
+    private function getAssignments($database)
+    {
+        $query = "SELECT * FROM assignments";
+        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 }

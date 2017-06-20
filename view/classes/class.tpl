@@ -11,6 +11,5 @@
     </div>
     <div class="col-md-9">
         <h1 class="page_title"><?php echo $page_title; ?></h1>
-        <?php echo $table; ?>
     </div>
 </div>

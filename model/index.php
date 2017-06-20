@@ -45,7 +45,7 @@ function generateMenu($bp, $active, $type){
         "Inzendingen" => "<i class='glyphicon glyphicon-pencil' aria-hidden='true'></i>&nbsp;&nbsp;Inzendingen",
         "Leerlingen" => "<i class='glyphicon glyphicon-th-list' aria-hidden='true'></i>&nbsp;&nbsp;Leerlingen",
         "Beoordelen" => "<i class='glyphicon glyphicon-pencil' aria-hidden='true'></i>&nbsp;&nbsp;Beoordelen",
-        "Status" => "<i class='glyphicon glyphicon-stats' aria-hidden=true'></i>&nbsp;&nbsp;Status",
+        "Analyse" => "<i class='glyphicon glyphicon-stats' aria-hidden=true'></i>&nbsp;&nbsp;Analyse",
         "Administratie" => "<i class='glyphicon glyphicon-cog' aria-hidden='true'></i>&nbsp;&nbsp;Administratie",
         "Mijn account" => "<i class='glyphicon glyphicon-user' aria-hidden='true'></i>&nbsp;&nbsp;Mijn account",
     ];
@@ -80,7 +80,7 @@ function generateMenu($bp, $active, $type){
 
         $menu_options = [
             $item["Beoordelen"] => "/staff/review/",
-            $item["Status"] => "/staff/status/",
+            $item["Analyse"] => "/staff/analysis/",
             $item["Administratie"] => "/staff/administration/",
             $item["Mijn account"] => "/staff/account/",
         ];

@@ -9,6 +9,7 @@ return array(
     'Symfony\\Polyfill\\Mbstring\\' => array($vendorDir . '/symfony/polyfill-mbstring'),
     'Symfony\\Component\\HttpFoundation\\' => array($vendorDir . '/symfony/http-foundation'),
     'League\\Plates\\' => array($vendorDir . '/league/plates/src'),
+    'League\\Csv\\' => array($vendorDir . '/league/csv/src'),
     'Comodojo\\Zip\\' => array($vendorDir . '/comodojo/zip/src'),
     'Comodojo\\Exception\\' => array($vendorDir . '/comodojo/exceptions/src/Exception'),
     'Carrooi\\DocxExtractor\\' => array($vendorDir . '/carrooi/docx-extractor/src'),

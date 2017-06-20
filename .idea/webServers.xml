@@ -2,14 +2,6 @@
 <project version="4">
   <component name="WebServers">
     <option name="servers">
-      <webServer id="9dbc9065-07c4-4434-8cad-3c8b46247bae" name="Hofstad Staging" url="http://tekstmijn.reinardvandalen.nl">
-        <fileTransfer host="tekstmijn.reinardvandalen.nl" port="21" rootFolder="/hofstad/staff">
-          <advancedOptions>
-            <advancedOptions dataProtectionLevel="Private" />
-          </advancedOptions>
-          <option name="port" value="21" />
-        </fileTransfer>
-      </webServer>
       <webServer id="22734604-8f6c-4e40-a8d0-98832c2eeef4" name="Hofstad Production" url="http://www.tekstmijn.nl/">
         <fileTransfer host="ftp-plus.mijndomein.nl" port="21" rootFolder="/public/sites/www.tekstmijn.nl/staff">
           <advancedOptions>

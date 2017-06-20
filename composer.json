@@ -12,6 +12,7 @@
         "carrooi/docx-extractor": "^1.0",
         "phpmailer/phpmailer": "^5.2",
         "comodojo/zip": "^2.1",
-        "avbdr/php-bootstrap-form": "dev-master"
+        "avbdr/php-bootstrap-form": "dev-master",
+        "league/csv": "^8.2"
     }
 }
