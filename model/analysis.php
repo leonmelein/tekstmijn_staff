@@ -168,10 +168,61 @@ class analysis extends model
     }
 
     /*
+    * Generates a csv file with the answers of the reviewerslists
+    * @param $assignment_id An assignment id
+    * @return csv
+    */
+    public function downloadBeoordelingslijsten($assignment_id){
+        //Gather all data of the reviewings
+        $assignment_name = $this->getAssignmentName($this->database, $assignment_id);
+        $reviewings = Array();
+        $questions = Array();
+        $data = $this->getReviewingsOfSubmission($this->database, $assignment_id);
+        $staff_members = Array();
+        foreach ($data as $index => $value) {
+            $staff_id = $value['staff_id'];
+            array_push($staff_members, $staff_id);
+            $submission_id = $value['submission_id'];
+            $student_id = $this->getStudentID($this->database, $submission_id);
+            $question_id = $value['question_id'];
+            array_push($questions, $question_id);
+            $question_value = $value['value'];
+            $reviewerlist_id = $value['reviewerlist_id'];
+            $reviewings[$staff_id][$student_id][$question_id] = $question_value;
+        }
+
+        //Make questions array
+        $questions = array_filter(array_unique($questions));
+        sort($questions);
+
+        //Create empty csv files with headers
+        $files = Array();
+        foreach ($staff_members as $index => $staff_id) {
+            $files[$staff_id] = "";
+        }
+        $headers = array_merge(Array('student_id', 'student_name'), $questions);
+        foreach ($files as $staff_id => $csv) {
+            $csv = $csv.join(";",$headers)."\n";
+        }
+
+        pparray($files);
+        //Fill csv files with data
+        foreach ($reviewings as $staff_id => $students) {
+            $row = "";
+
+            foreach ($students as $student_id => $questions) {
+                foreach ($questions as $question => $answer) {
+                }
+            }
+        }
+
+    }
+
+    /*
     * Returns an array with all the reviews of an speciffic assignment
     * @param Medoo $database A database instance passed as an Medoo object.
     * @param $assignment_id An assignment id
-    * @return PDO Object
+    * @return Array
     */
     private function downloadReviews($database, $assignement_id){
         $quoted_assignement_id = $database->quote($assignement_id);
@@ -218,6 +269,35 @@ class analysis extends model
                     LIMIT 999999
                     ";
         return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /*
+    * Returns an array with all the reviewings of the submissions of a specific assignment
+    * @param Medoo $database A database instance passed as an Medoo object.
+    * @param $assignment_id An assignment id
+    * @return Array
+    */
+    private function getReviewingsOfSubmission($database, $assignement_id) {
+        $quoted_assignement_id = $database->quote($assignement_id);
+        $query = "SELECT * FROM reviewing
+                  WHERE reviewerlist_id IN (
+                  SELECT id FROM reviewerlists WHERE assignment_id = $quoted_assignement_id
+                  )";
+        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /*
+     * Gets the id of a student based on a submissions id.
+     *
+     * @param Medoo $database A database instance passed as an Medoo object.
+     * @param $submission_id An submissions id
+     * @return Array, associative
+     */
+    private function getStudentID($database, $submission_id){
+        $quoted_submission_id = $database->quote($submission_id);
+        $query = "SELECT student_id FROM submissions
+                  WHERE id = $quoted_submission_id";
+        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['student_id'];
     }
 
     /*
