@@ -1,5 +1,4 @@
-<?php
-use BootPress\Bootstrap\v3\Component as Bootstrap;
+<?php use BootPress\Bootstrap\v3\Component as Bootstrap;
 
 /**
  * Model base

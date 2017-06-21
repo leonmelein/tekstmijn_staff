@@ -12,7 +12,7 @@
       <paths name="Hofstad Staging">
         <serverdata>
           <mappings>
-            <mapping deploy="/" local="$PROJECT_DIR$" web="/staff" />
+            <mapping deploy="/hofstad/staff" local="$PROJECT_DIR$" web="/staff" />
           </mappings>
         </serverdata>
       </paths>

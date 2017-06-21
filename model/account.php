@@ -1,54 +1,93 @@
 <?php
-
 /**
  * Created by PhpStorm.
  * User: leon
  * Date: 19-06-17
  * Time: 00:05
  */
-class auth extends model {
+class account extends model {
 
     /*
      * Routing functions
      */
 
-    /**
-     * Handles user login and password reset requests
-     */
-    public function login(){
-        $type_redir = [
-            0 => "../submissions/",
-            1 => "../review/",
-            2 => "../review/"
-        ];
+    public function showAccount(){
+        session_start("staff");
+        // Generate menu
+        $menu = generateMenu($this->bootstrap, ["active" => "/staff/account/", "align" => "stacked"], $_SESSION['type']);
+        $breadcrumbs = generateBreadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "../account/", "Mijn account" => "#"]);
 
-        if ($_POST['password_forgotten'] == 1) {
-            $this->send_reset_link();
+        echo $this->templates->render("login::account", ["title" => "Tekstmijn | Mijn account",
+            "page_title" => "Mijn account", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+            "name" => $_SESSION["staff_name"], "email" => $_SESSION["staff_email"], "page_js" => "../vendor/application/register_validate.js"]);
+    }
+
+    public function updateAccount(){
+        if($this->change_password($_POST["username"], $_POST["password"])){
+            $this->redirect("/staff/account/?password_changed=true");
         } else {
-            // Regular login
-            if($this->check_login($_POST['username'], $_POST['password'])){
-                $info = $this->getUserInfo($_POST['username']);
-
-                $this->get_session();
-                $_SESSION['staff_id'] = $info["id"];
-                $_SESSION['type'] = $info["type"];
-                $_SESSION["staff_email"] = $_POST["username"];
-                $_SESSION['staff_name'] = $info["name"];
-                $this->redirect($type_redir[$info['type']]);
-
-            } else {
-                $this->redirect("/staff/login/?failed=true");
-            }
+            $this->redirect("/staff/register/?password_changed=true");
         }
     }
 
     /**
-     * Handles user logout requests
+     * Loads the user's info on first registration
      */
-    public function logout(){
-        $this->get_session();
-        session_destroy();
-        $this->redirect("/staff/login/?logged_out=true");
+    public function startRegistration(){
+        $registration = $this->getRegistrationInfo($_GET["token"]);
+
+        if($registration){
+            echo $this->templates->render("login::register",
+                ["title" => "Tekstmijn | Registreren",
+                    "name" => $registration["name"],
+                    "email" => $registration["email"],
+                    "page_js" => "../vendor/application/register_validate.js"
+                ]
+            );
+        } else {
+            $this->redirect("/staff/login/?failed_registration=true");
+        }
+    }
+
+    /**
+     * Sets the user's password on first registration
+     */
+    public function completeRegistration(){
+        if($this->set_initial_password($_POST["username"], $_POST["password"])){
+            $this->redirect("/staff/login/?registration=true");
+        } else {
+            $this->redirect("/staff/register/?failed=true");
+        }
+    }
+
+    /**
+     * Loads the users info on password reset
+     */
+    public function startPasswordReset(){
+        $registration = $this->getResetInfo($_GET["token"]);
+
+        if($registration){
+            echo $this->templates->render("login::reset",
+                ["title" => "Tekstmijn | Registreren",
+                    "name" => $registration["name"],
+                    "email" => $registration["email"],
+                    "page_js" => "../vendor/application/register_validate.js"
+                ]
+            );
+        } else {
+            $this->redirect("/staff/login/?pwd_reset=false");
+        }
+    }
+
+    /**
+     * Resets the users password on reset
+     */
+    public function completePasswordReset(){
+        if($this->change_password($_POST["username"], $_POST["password"])){
+            $this->redirect("/staff/login/?pwd_reset=true");
+        } else {
+            $this->redirect("/staff/reset_password/?failed=true");
+        }
     }
 
     /**
@@ -75,18 +114,6 @@ class auth extends model {
     /*
      * Supporting functions
      */
-
-    /**
-     * Check if user's credentials are valid
-     *
-     * @param $username string containing the username
-     * @param $password string containing the password
-     * @return bool boolean indicating if the credentials are valid
-     */
-    private function check_login($username, $password){
-        $retrievedPassword = $this->database->get("staff", "password", ["email" => $username]);
-        return hash_equals($retrievedPassword, crypt($password, $retrievedPassword));
-    }
 
     /**
      * Retrieve a user's information
