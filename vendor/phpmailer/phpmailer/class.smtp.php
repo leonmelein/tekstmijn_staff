@@ -400,7 +400,7 @@ class SMTP
         if (array_key_exists('EHLO', $this->server_caps)) {
         // SMTP extensions are available. Let's try to find a proper authentication method
 
-            if (!array_key_exists('AUTH', $this->server_caps)) {
+            if (!array_key_exists('account', $this->server_caps)) {
                 $this->setError('Authentication is not allowed at this stage');
                 // 'at this stage' means that auth may be allowed after the stage changes
                 // e.g. after STARTTLS
@@ -409,13 +409,13 @@ class SMTP
 
             self::edebug('Auth method requested: ' . ($authtype ? $authtype : 'UNKNOWN'), self::DEBUG_LOWLEVEL);
             self::edebug(
-                'Auth methods available on the server: ' . implode(',', $this->server_caps['AUTH']),
+                'Auth methods available on the server: ' . implode(',', $this->server_caps['account']),
                 self::DEBUG_LOWLEVEL
             );
 
             if (empty($authtype)) {
                 foreach (array('CRAM-MD5', 'LOGIN', 'PLAIN', 'NTLM', 'XOAUTH2') as $method) {
-                    if (in_array($method, $this->server_caps['AUTH'])) {
+                    if (in_array($method, $this->server_caps['account'])) {
                         $authtype = $method;
                         break;
                     }
@@ -427,7 +427,7 @@ class SMTP
                 self::edebug('Auth method selected: '.$authtype, self::DEBUG_LOWLEVEL);
             }
 
-            if (!in_array($authtype, $this->server_caps['AUTH'])) {
+            if (!in_array($authtype, $this->server_caps['account'])) {
                 $this->setError("The requested authentication method \"$authtype\" is not supported by the server");
                 return false;
             }
@@ -437,7 +437,7 @@ class SMTP
         switch ($authtype) {
             case 'PLAIN':
                 // Start authentication
-                if (!$this->sendCommand('AUTH', 'AUTH PLAIN', 334)) {
+                if (!$this->sendCommand('account', 'AUTH PLAIN', 334)) {
                     return false;
                 }
                 // Send encoded username and password
@@ -452,7 +452,7 @@ class SMTP
                 break;
             case 'LOGIN':
                 // Start authentication
-                if (!$this->sendCommand('AUTH', 'AUTH LOGIN', 334)) {
+                if (!$this->sendCommand('account', 'AUTH LOGIN', 334)) {
                     return false;
                 }
                 if (!$this->sendCommand("Username", base64_encode($username), 334)) {
@@ -471,7 +471,7 @@ class SMTP
                 $oauth = $OAuth->getOauth64();
 
                 // Start authentication
-                if (!$this->sendCommand('AUTH', 'AUTH XOAUTH2 ' . $oauth, 235)) {
+                if (!$this->sendCommand('account', 'AUTH XOAUTH2 ' . $oauth, 235)) {
                     return false;
                 }
                 break;
@@ -780,7 +780,7 @@ class SMTP
                         case 'SIZE':
                             $fields = ($fields ? $fields[0] : 0);
                             break;
-                        case 'AUTH':
+                        case 'account':
                             if (!is_array($fields)) {
                                 $fields = array();
                             }

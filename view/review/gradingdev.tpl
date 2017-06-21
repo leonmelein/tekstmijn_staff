@@ -92,7 +92,7 @@
             <?php if ($user_type == 2) { ?>
             <div id="beoordelingslijst" class="tab-pane">
                 <div class="row spacer" style="height: 6px;"></div>
-                <?php generate_reviewquestionnaire($db, $assignment_id, $staff_id, $submission_id); ?>
+                    <?php echo $form; ?>
             </div>
             <?php } ?>
 

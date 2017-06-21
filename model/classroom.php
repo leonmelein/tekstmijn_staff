@@ -49,6 +49,18 @@ class classroom extends model
             "table" => $table, "page_js" => "/staff/vendor/application/reset_pwd_students.js"]);
     }
 
+    public function resetStudentPwd($student_id){
+        if($this->resetStudentPassword($student_id)){
+            echo '{"status": "success"}';
+        } else {
+            echo '{"status": "failure"}';
+        }
+    }
+
+
+    /**
+     * Supporting functions
+     */
     private function getClassesForStaff($id){
         $quoted_id = $this->database->quote($id);
         $query = "SELECT class.id, class.year AS year, level.name AS level, class.name AS name
@@ -63,7 +75,7 @@ class classroom extends model
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    private function getClassName($id){
+    function getClassName($id){
         return $this->database->get("class", "name", ["id" => $id]);
     }
 
@@ -79,4 +91,6 @@ class classroom extends model
     private function resetStudentPassword($student_id){
         return $this->database->update("students", ["password" => null], ["id" => $student_id]);
     }
+
+
 }
