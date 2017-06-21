@@ -97,18 +97,74 @@ class analysis extends model
     * @return csv
     */
     public function downloadBeoordelingen($assignment_id){
-        $assignment_name = getAssignmentName($this->database, $assignment_id);
+        $assignment_name = $this->getAssignmentName($this->database, $assignment_id);
 
         //Get reviews from database
+        //Based on Python Program export_grades.py
         $data = $this->downloadReviews($this->database, $assignment_id);
+        $grades = Array();
+        $students = Array();
+        $beoordelaars = Array();
+
+        //Save grades of students in $grades
+        //Save names of students in $students
         foreach ($data as $key => $value) {
-            echo print_r($key);
-            echo "<br>";
-            echo print_r($value);
-            echo "<br>";
-            echo "---";
-            echo "<br>";
+            $student_id = $value['student_id'];
+            $beoordelaar = $value['staff_name'];
+            array_push($beoordelaars, $beoordelaar);
+            $student_name = $value['student_name'];
+            $grade = $value['grade'];
+
+            if (array_key_exists($student_id, $grades) == False){
+                $grades[$student_id] = Array($beoordelaar => $grade);
+            }
+            else {
+                $grades[$student_id][$beoordelaar] = $grade;
+            }
+            if (array_key_exists($student_id, $students) == False){
+                $students[$student_id] = $student_name;
+            }
         }
+
+        //Remove empty items
+        $items_to_remove = Array();
+        foreach($grades as $student_id => $grading) {
+            $grading = array_filter($grading);
+            if (empty($grading)) {
+                array_push($items_to_remove, $student_id);
+            }
+        }
+        foreach($items_to_remove as $index => $student_id) {
+            unset($grades[$student_id]);
+        }
+
+        //Create a list of beoordelaars
+        $beoordelaars = array_filter(array_unique($beoordelaars));
+        sort($beoordelaars);
+
+        //Prepare csv file
+        $file = "";
+        $header = array_merge(Array('student_id', 'student_name'),$beoordelaars);
+        $file = $file.join(';', $header)."\n";
+        foreach ($grades as $student_id => $grading) {
+            $export_row = Array();
+            array_push($export_row, $student_id);
+            array_push($export_row, $students[$student_id]);
+            foreach (range(0,count($beoordelaars)-1) as $index) {
+                array_push($export_row, '');
+            }
+            foreach ($grading as $beoordelaar => $grade) {
+                $index = array_search($beoordelaar, $beoordelaars);
+                $export_row[$index+2] = $grade;
+            }
+            $file = $file.join(';', $export_row)."\n";
+        }
+
+        //Write to csv file
+        $filename = $assignment_name.date("d-m-Y_H:i:s").'.csv';
+        header('Content-type: text/csv');
+        header('Content-Disposition: attachment; filename='.$filename.'');
+        echo $file;
     }
 
     /*
