@@ -35,9 +35,9 @@ class analysis extends model
             ["Opdracht", "title"]
         ];
         $options = [
-                ["<a class='pull-right' href='beoordelingen/%s'><i class='glyphicon glyphicon-signal'></i> Beoordelingen (csv)</a>"],
-                ["<a class='pull-right' href='beoordelingslijsten/%s'><i class='glyphicon glyphicon-th-list'></i> Beoordelingslijsten (csv)</a>"],
-                ["<a class='pull-right' href='teksten/%s'><i class='glyphicon glyphicon-file'></i> Teksten (zip)</a>"]
+                ["<a download='' class='pull-right' href='beoordelingen/%s'><i class='glyphicon glyphicon-signal'></i> Beoordelingen (csv)</a>"],
+                ["<a download='' class='pull-right' href='beoordelingslijsten/%s'><i class='glyphicon glyphicon-th-list'></i> Beoordelingslijsten (csv)</a>"],
+                ["<a download='' class='pull-right' href='teksten/%s'><i class='glyphicon glyphicon-file'></i> Teksten (zip)</a>"]
         ];
 
         $analysis_tbl = $this->table($this->bootstrap, $columns, $data, $options);
@@ -77,7 +77,17 @@ class analysis extends model
         $table = generateTable($this->bootstrap, $columns, $overview);
 
         //Analysis Table
-        $analysis_tbl = "Analyse Tabel";
+        $data = $this->getAssignments($this->database);
+        $columns = [
+            ["Opdracht", "title"]
+        ];
+        $options = [
+            ["<a download='' class='pull-right' href='../../beoordelingen/%s'><i class='glyphicon glyphicon-signal'></i> Beoordelingen (csv)</a>"],
+            ["<a download='' class='pull-right' href='../../beoordelingslijsten/%s'><i class='glyphicon glyphicon-th-list'></i> Beoordelingslijsten (csv)</a>"],
+            ["<a download='' class='pull-right' href='../../teksten/%s'><i class='glyphicon glyphicon-file'></i> Teksten (zip)</a>"]
+        ];
+
+        $analysis_tbl = $this->table($this->bootstrap, $columns, $data, $options);
 
         echo $this->templates->render("analysis::statusdetail", [
             "title" => "Tekstmijn | Analyse",
@@ -194,28 +204,80 @@ class analysis extends model
         //Make questions array
         $questions = array_filter(array_unique($questions));
         sort($questions);
+        $questions_name = Array();
+        foreach ($questions as $index => $question_id) {
+            $question_txt = $this->getQuestionTxt($this->database, $question_id);
+            array_push($questions_name, $question_txt);
+        }
 
         //Create empty csv files with headers
         $files = Array();
+        $headers = array_merge(Array('student_id', 'student_name'), $questions_name);
         foreach ($staff_members as $index => $staff_id) {
-            $files[$staff_id] = "";
-        }
-        $headers = array_merge(Array('student_id', 'student_name'), $questions);
-        foreach ($files as $staff_id => $csv) {
-            $csv = $csv.join(";",$headers)."\n";
+            $files[$staff_id] = join(";",$headers)."\n";
         }
 
-        pparray($files);
         //Fill csv files with data
         foreach ($reviewings as $staff_id => $students) {
-            $row = "";
+            foreach ($students as $student_id => $question_answer) {
+                //Initialize variables
+                $student_name = $this->getStudentName($this->database, $student_id);
+                $firstname = $student_name['firstname'];
+                $prefix = $student_name['prefix'];
+                $lastname = $student_name['lastname'];
+                $student_name = $this->generateNameStr($firstname, $prefix, $lastname);
 
-            foreach ($students as $student_id => $questions) {
-                foreach ($questions as $question => $answer) {
+                //Create export row
+                $export_row = Array();
+                array_push($export_row, $student_id);
+                array_push($export_row, $student_name);
+                foreach (range(0,count($questions)-1) as $index) {
+                    array_push($export_row, '');
                 }
+                //Save every answer
+                foreach ($question_answer as $question => $answer) {
+                    $index = array_search($question, $questions);
+                    $export_row[$index+2] = $answer;
+                }
+                $result = $files[$staff_id];
+                $result = $result.join(';', $export_row)."\n";
+                $files[$staff_id] = $result;
             }
         }
 
+        //Write csv files
+        chdir("tmp");
+        $csv_files = Array();
+        foreach ($files as $staff_id => $csv) {
+            //Set variables
+            $staff_name = $this->getStaffName($this->database, $staff_id);
+            $firstname = $staff_name['firstname'];
+            $prefix = $staff_name['prefix'];
+            $lastname = $staff_name['lastname'];
+            $staff_name = $this->generateNameStr($firstname, $prefix, $lastname);
+
+            //Write to csv file
+            $filename = "Beoordelingslijst_".$assignment_name."_".$staff_name."_".date("d-m-Y_H:i:s").'.csv';
+            $tmp_file = fopen($filename, "w");
+            fwrite($tmp_file, $csv);
+            fclose($tmp_file);
+            array_push($csv_files, $filename);
+        }
+
+        //Zip csv files and download
+        $filename = "Beoordelingslijst_".$assignment_name."_".date("d-m-Y_H:i:s").'.zip';
+        $zip = \Comodojo\Zip\Zip::create($filename);
+        $zip->add($csv_files);
+        $zip->close();
+
+        header("Content-Description: File Transfer");
+        header("Content-Type: application/octet-stream");
+        header("Content-Disposition: attachment; filename=$filename");
+        readfile($filename);
+        unlink($filename);
+        foreach ($csv_files as $index => $filename) {
+            unlink($filename);
+        }
     }
 
     /*
@@ -269,6 +331,62 @@ class analysis extends model
                     LIMIT 999999
                     ";
         return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    /*
+    * Returns an string with the formatted name
+    * @param Medoo $database A database instance passed as an Medoo object.
+    * @param $firstname
+    * @param $prefix
+    * @param $lastname
+    * @return Str
+    */
+    private function generateNameStr($firstname, $prefix, $lastname){
+        if (isset($prefix)){
+            return sprintf("%s %s %s", $firstname, $prefix, $lastname);
+        } else {
+            return sprintf("%s %s", $firstname, $lastname);
+        }
+    }
+
+    /*
+    * Returns the question txt of a question id
+    * @param Medoo $database A database instance passed as an Medoo object.
+    * @param $question_id An question id
+    * @param $questionnaire_id An questionnaire_id id
+    * @return String
+    */
+    private function getQuestionTxt($database, $question_id) {
+        $quoted_question_id = $database->quote($question_id);
+        $query = "SELECT label FROM reviewerlistsquestions
+                  WHERE id = $quoted_question_id";
+        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['label'];
+    }
+
+    /*
+    * Returns the firstname, prefix and lastname of a student
+    * @param Medoo $database A database instance passed as an Medoo object.
+    * @param $student_id An assignment id
+    * @return Array
+    */
+    private function getStudentName($database, $student_id) {
+        $quoted_student_id = $database->quote($student_id);
+        $query = "SELECT firstname, prefix, lastname FROM students
+                  WHERE id = $quoted_student_id";
+        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
+    }
+
+    /*
+    * Returns the firstname, prefix and lastname of a staff member
+    * @param Medoo $database A database instance passed as an Medoo object.
+    * @param $staff_id An assignment id
+    * @return Array
+    */
+    private function getStaffName($database, $staff_id) {
+        $quoted_staff_id = $database->quote($staff_id);
+        $query = "SELECT firstname, prefix, lastname FROM staff
+                  WHERE id = $quoted_staff_id";
+        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
     }
 
     /*
@@ -387,7 +505,7 @@ class analysis extends model
      */
     private function getAssignments($database)
     {
-        $query = "SELECT * FROM assignments";
+        $query = "SELECT * FROM assignments ORDER BY title";
         return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 }

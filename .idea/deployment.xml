@@ -1,6 +1,6 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <project version="4">
-  <component name="PublishConfigData" serverName="Hofstad Staging">
+  <component name="PublishConfigData" serverName="Hofstad Staging (project level)">
     <serverData>
       <paths name="Hofstad Production">
         <serverdata>
@@ -13,6 +13,13 @@
         <serverdata>
           <mappings>
             <mapping deploy="/hofstad/staff" local="$PROJECT_DIR$" web="/staff" />
+          </mappings>
+        </serverdata>
+      </paths>
+      <paths name="Hofstad Staging (project level)">
+        <serverdata>
+          <mappings>
+            <mapping deploy="/" local="$PROJECT_DIR$" web="/staff" />
           </mappings>
         </serverdata>
       </paths>
