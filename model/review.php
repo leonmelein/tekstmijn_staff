@@ -21,8 +21,12 @@ class review extends submissions
         $columns = [
             ["Titel", "title"]
         ];
+        $options = [
+            ["<a class='pull-right' href='%s/'><i class='glyphicon glyphicon-pencil'></i> Beoordelen</a>"],
+            ["<a download class='pull-right' href='%s/download'><i class='glyphicon glyphicon-download-alt'></i> Download beoordelingspakket</a>"],
+        ];
 
-        $table = $this->table($this->bootstrap, $columns, $students, null, '<a href="%s/">%s</a>');
+        $table = $this->table($this->bootstrap, $columns, $students, $options, '<a href="%s/">%s</a>');
         echo $this->templates->render("submissions::classes", ["title" => "Tekstmijn | Beoordelen",
             "page_title" => "Beoordelen", "page_subtitle" => $_SESSION["staff_name"],  "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table]);
@@ -101,7 +105,7 @@ class review extends submissions
                 "submission_date" => $submission_info["submission_date"],
                 "submission_file" => $submission_info["submission_file"],
                 "submission_count" => $submission_info["submission_count"],
-                "submission_originalfile" => $submission_info["submission_originalfile"],
+                "submission_originalfile" => $submission_info["original_file"],
                 "text" => $submission_info["text"],
                 "current_grades" => $current_grades,
                 "tabs" => $tabs,
@@ -127,6 +131,38 @@ class review extends submissions
         } else {
             getRedirect("../?success=false");
         }
+    }
+
+    public function downloadSubmissions($assignmentid){
+        $this->get_session();
+        $staff_id = $_SESSION['staff_id'];
+        $files = $this->gatherSubmissionFiles($staff_id, $assignmentid);
+        $filename_vars = $this->gatherNames($staff_id, $assignmentid);
+        chdir("tmp");
+        $filename = sprintf("Beoordelingspakket - %s - %s.zip", $filename_vars['fullname'], $filename_vars['assignment_name']);
+        $zip = \Comodojo\Zip\Zip::create($filename);
+        foreach ($files as $file){
+            $zip->add("../assets/submissions/".$file['file'], $file['original_file']);
+        }
+        $zip->close();
+
+        $is_valid = false;
+        try {
+            $is_valid = \Comodojo\Zip\Zip::check($filename);
+        } catch (\Comodojo\Exception\ZipException $exception){
+            $this->redirect('../../?download_generated=false');
+        }
+
+        if ($is_valid) {
+            header("Content-Description: File Transfer");
+            header("Content-Type: application/octet-stream");
+            header("Content-Disposition: attachment; filename=$filename");
+            readfile($filename);
+            unlink($filename);
+        } else {
+            $this->redirect('../../?download_generated=false');
+        }
+
     }
 
     /*
@@ -256,5 +292,26 @@ class review extends submissions
 
         $result = 1;
         return $result;
+    }
+
+    function gatherSubmissionFiles($staffid, $assignmentid){
+        $quoted_staffid = $this->database->quote($staffid);
+        $quoted_assignemntid = $this->database->quote($assignmentid);
+        $query = "SELECT file, original_file
+                FROM submissions, submissions_staff
+                WHERE submissions_staff.staff_id = $quoted_staffid
+                AND submissions_staff.submission_id = submissions.id
+                AND submissions.assignment_id = $quoted_assignemntid";
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    function gatherNames($staffid, $assignmentid){
+        $quoted_staffid = $this->database->quote($staffid);
+        $quoted_assignemntid = $this->database->quote($assignmentid);
+        $query = "SELECT CONCAT(firstname,prefix,lastname) as fullname, title as assignment_name
+                FROM staff, assignments
+                WHERE staff.id = $quoted_staffid
+                AND assignments.id = $quoted_assignemntid";
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
     }
 }

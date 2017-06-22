@@ -13,8 +13,6 @@
     require("model/index.php");
     require("model/students.php");
     require("model/submission.php");
-    require("model/download.php");
-    require("model/reviews.php");
     require("model/administration.php");
 
     // Main model
@@ -24,6 +22,7 @@
     require("model/classroom.php");
     require("model/auth.php");
     require("model/analysis.php");
+    require("model/downloads.php");
     require("model/account.php");
     require("model/submissions.php");
     require("model/grading.php");
@@ -147,6 +146,7 @@
     $router->mount('/review', function() use ($router, $db, $templates, $bp){
         $router->get("/", "review@overview");
         $router->get("/([a-z0-9_-]+)", "review@assignment");
+        $router->get("/([a-z0-9_-]+)/download", "review@downloadSubmissions");
         $router->get("/([a-z0-9_-]+)/(\d+)", "review@submission");
         $router->post("/(.*)/saveques", "review@questionnaire");
         $router->post("/(.*)/grade", "grading@setIndividualGrade");
@@ -159,13 +159,11 @@
     $router->get("/download/(\d+)/([a-z0-9_-]+)", function($staffid, $assignmentid) use ($db){
         $files = getFiles($db, $staffid, $assignmentid);
         $filename_vars = getNames($db, $staffid, $assignmentid);
-        $filename = sprintf("download_%s_%s.zip", $filename_vars['fullname'], $filename_vars['assignment_name']);
-
+        chdir("tmp");
+        $filename = sprintf("Beoordelingspakket - %s - %s.zip", $filename_vars['fullname'], $filename_vars['assignment_name']);
         $zip = \Comodojo\Zip\Zip::create($filename);
-
         foreach ($files as $file){
-            $filepath = sprintf($_SERVER['DOCUMENT_ROOT'] . '/assets/submissions/%s', $file);
-            $zip->add($filepath);
+            $zip->add($file['file'], $file['original_file']);
         }
         $zip->close();
 
@@ -173,7 +171,9 @@
         header("Content-Type: application/octet-stream");
         header("Content-Disposition: attachment; filename=$filename");
         readfile($filename);
+        unlink($filename);
         exit();
+
     });
 
     /**
