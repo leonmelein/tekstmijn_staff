@@ -13,6 +13,20 @@ class auth extends model {
      */
 
     /**
+     * Redirects homepage to login page
+     */
+    public function homepage(){
+        $this->redirect("/staff/login");
+    }
+
+    /**
+     * Renders login page
+     */
+    public function loginpage(){
+        echo $this->templates->render("login::login", ["title" => "Tekstmijn | Inloggen"]);
+    }
+
+    /**
      * Handles user login and password reset requests
      */
     public function login(){

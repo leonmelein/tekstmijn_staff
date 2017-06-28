@@ -12,10 +12,10 @@ class account extends model {
      */
 
     public function showAccount(){
-        session_start("staff");
+        $this->get_session();
         // Generate menu
-        $menu = generateMenu($this->bootstrap, ["active" => "/staff/account/", "align" => "stacked"], $_SESSION['type']);
-        $breadcrumbs = generateBreadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "../account/", "Mijn account" => "#"]);
+        $menu = $this->menu($this->bootstrap, ["active" => "/staff/account/", "align" => "stacked"], $_SESSION['type']);
+        $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "../account/", "Mijn account" => "#"]);
 
         echo $this->templates->render("login::account", ["title" => "Tekstmijn | Mijn account",
             "page_title" => "Mijn account", "menu" => $menu, "breadcrumbs" => $breadcrumbs,

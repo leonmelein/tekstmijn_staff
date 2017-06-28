@@ -90,6 +90,7 @@ class model
             "Analyse" => "<i class='glyphicon glyphicon-stats' aria-hidden=true'></i>&nbsp;&nbsp;Analyse",
             "Administratie" => "<i class='glyphicon glyphicon-cog' aria-hidden='true'></i>&nbsp;&nbsp;Administratie",
             "Mijn account" => "<i class='glyphicon glyphicon-user' aria-hidden='true'></i>&nbsp;&nbsp;Mijn account",
+            "Opdrachten" => "<i class='glyphicon glyphicon-file' aria-hidden='true'></i>&nbsp;&nbsp;Opdrachten",
         ];
 
         if ($type == 0) {
@@ -100,7 +101,11 @@ class model
                            <div class="panel-body">%s</div>
                         </div>';
 
-            $menu_options = [$item["Inzendingen"] => "/staff/submissions/", $item["Leerlingen"] => "/staff/classes/", $item["Mijn account"] => "/staff/account/"];
+            $menu_options = [
+                $item["Inzendingen"] => "/staff/submissions/",
+                $item["Leerlingen"] => "/staff/classes/",
+                $item["Mijn account"] => "/staff/account/"
+            ];
         }
         elseif ($type == 1) {
             $menu_panel = '<div class="panel panel-default">
@@ -110,7 +115,10 @@ class model
                            <div class="panel-body">%s</div>
                         </div>';
 
-            $menu_options = [$item["Beoordelen"] => "/staff/review/", $item["Mijn account"] => "/staff/account/"];
+            $menu_options = [
+                $item["Beoordelen"] => "/staff/review/",
+                $item["Mijn account"] => "/staff/account/"
+            ];
         }
         elseif ($type == 2) {
             $menu_panel = '<div class="panel panel-default">
@@ -122,6 +130,7 @@ class model
 
             $menu_options = [
                 $item["Beoordelen"] => "/staff/review/",
+                $item["Opdrachten"] => "/staff/assignment/",
                 $item["Analyse"] => "/staff/analysis/",
                 $item["Administratie"] => "/staff/administration/",
                 $item["Mijn account"] => "/staff/account/",
@@ -159,6 +168,20 @@ class model
 
     public function get_session(){
         session_start("staff");
+    }
+
+    public function pparray($array){
+        echo "<pre>";
+        print_r($array);
+        echo "</pre>";
+        exit();
+    }
+
+    public function ppstring($string){
+        echo "<pre>";
+        echo $string;
+        echo "</pre>";
+        exit();
     }
 
 }

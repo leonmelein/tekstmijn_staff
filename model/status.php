@@ -10,9 +10,9 @@ class status extends model
 {
 
     public function generateOverall(){
-        session_start("staff");
-        $breadcrumbs = generateBreadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Status" => "#"]);
-        $menu = generateMenu($this->bootstrap, ["active" => "/staff/status/", "align" => "stacked"], $_SESSION['type']);
+        $this->get_session();
+        $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Status" => "#"]);
+        $menu = $this->menu($this->bootstrap, ["active" => "/staff/status/", "align" => "stacked"], $_SESSION['type']);
         $data = $this->getTotalOverview($this->database);
 
         $columns = [
@@ -20,7 +20,7 @@ class status extends model
             ["Toegewezen", "promised"],
             ["Ingevoerd", "fullfilled"]
         ];
-        $tbl = generateTable($this->bootstrap, $columns, $data, null, '<a href="%s/">%s</a>');
+        $tbl = $this->table($this->bootstrap, $columns, $data, null, '<a href="%s/">%s</a>');
 
         echo $this->templates->render("status::overview", ["title" => "Tekstmijn | Status",
             "page_title" => "Status",
@@ -30,18 +30,18 @@ class status extends model
     }
 
     public function generateDetail($assignment_id){
-        session_start("staff");
+        $this->get_session();
         $title = $this->getAssignmentName($this->database, $assignment_id);
 
-        $breadcrumbs = generateBreadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Status" => "/staff/status/", $title => "#"]);
-        $menu = generateMenu($this->bootstrap, ["active" => "/staff/status/", "align" => "stacked"], $_SESSION['type']);
+        $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Status" => "/staff/status/", $title => "#"]);
+        $menu = $this->menu($this->bootstrap, ["active" => "/staff/status/", "align" => "stacked"], $_SESSION['type']);
         $overview = $this->getAssignmentOverview($this->database, $assignment_id);
         $columns = [
             ["Naam", "StaffName"],
             ["Toegewezen", "Promised"],
             ["Ingevoerd", "Fullfilled"]
         ];
-        $table = generateTable($this->bootstrap, $columns, $overview);
+        $table = $this->table($this->bootstrap, $columns, $overview);
         echo $this->templates->render("status::assignment", ["title" => "Tekstmijn | Status",
             "page_title" => "Status", "page_subtitle" => $title,
             "menu" => $menu, "breadcrumbs" => $breadcrumbs,

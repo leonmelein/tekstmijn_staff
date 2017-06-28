@@ -15,22 +15,22 @@ class analysis extends model
     * @return page
     */
     public function overview(){
-        session_start("staff");
+        $this->get_session();
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/analysis/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "../account/", "Analyse" => "#"]);
-        $tabs = generateTabs($this->bootstrap, ["Status" => "#status", "Statistiek" => "#statistics"], 'Status');
+        $tabs = $this->tabs($this->bootstrap, ["Status" => "#status", "Statistiek" => "#statistics"], 'Status');
 
         //Status Table
-        $data = $this->getTotalOverview($this->database);
+        $data = $this->getTotalOverview();
         $columns = [
             ["Opdracht", "title"],
             ["Toegewezen", "promised"],
             ["Ingevoerd", "fullfilled"]
         ];
-        $status_tbl = generateTable($this->bootstrap, $columns, $data, null, '<a href="status/%s/">%s</a>');
+        $status_tbl = $this->table($this->bootstrap, $columns, $data, null, '<a href="status/%s/">%s</a>');
 
         //Analysis Table
-        $data = $this->getAssignments($this->database);
+        $data = $this->getAssignments();
         $columns = [
             ["Opdracht", "title"]
         ];
@@ -60,24 +60,24 @@ class analysis extends model
     * @return page
     */
     public function generateStatusDetail($assignment_id){
-        session_start("staff");
-        $title = $this->getAssignmentName($this->database, $assignment_id);
+        $this->get_session();
+        $title = $this->getAssignmentName($assignment_id);
 
-        $breadcrumbs = generateBreadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Analyse" => "/staff/analysis/", "Status : ".$title => "#"]);
-        $menu = generateMenu($this->bootstrap, ["active" => "/staff/analysis/", "align" => "stacked"], $_SESSION['type']);
-        $tabs = generateTabs($this->bootstrap, ["Status" => "#status", "Statistiek" => "#statistics"], 'Status');
+        $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Analyse" => "/staff/analysis/", "Status : ".$title => "#"]);
+        $menu = $this->menu($this->bootstrap, ["active" => "/staff/analysis/", "align" => "stacked"], $_SESSION['type']);
+        $tabs = $this->tabs($this->bootstrap, ["Status" => "#status", "Statistiek" => "#statistics"], 'Status');
 
         //Status Detail Table
-        $overview = $this->getAssignmentOverview($this->database, $assignment_id);
+        $overview = $this->getAssignmentOverview($assignment_id);
         $columns = [
             ["Naam", "StaffName"],
             ["Toegewezen", "Promised"],
             ["Ingevoerd", "Fullfilled"]
         ];
-        $table = generateTable($this->bootstrap, $columns, $overview);
+        $table = $this->table($this->bootstrap, $columns, $overview);
 
         //Analysis Table
-        $data = $this->getAssignments($this->database);
+        $data = $this->getAssignments();
         $columns = [
             ["Opdracht", "title"]
         ];
@@ -107,11 +107,11 @@ class analysis extends model
     * @return csv
     */
     public function downloadBeoordelingen($assignment_id){
-        $assignment_name = $this->getAssignmentName($this->database, $assignment_id);
+        $assignment_name = $this->getAssignmentName($assignment_id);
 
         //Get reviews from database
         //Based on Python Program export_grades.py
-        $data = $this->downloadReviews($this->database, $assignment_id);
+        $data = $this->downloadReviews($assignment_id);
         $grades = Array();
         $students = Array();
         $beoordelaars = Array();
@@ -184,16 +184,16 @@ class analysis extends model
     */
     public function downloadBeoordelingslijsten($assignment_id){
         //Gather all data of the reviewings
-        $assignment_name = $this->getAssignmentName($this->database, $assignment_id);
+        $assignment_name = $this->getAssignmentName($assignment_id);
         $reviewings = Array();
         $questions = Array();
-        $data = $this->getReviewingsOfSubmission($this->database, $assignment_id);
+        $data = $this->getReviewingsOfSubmission($assignment_id);
         $staff_members = Array();
         foreach ($data as $index => $value) {
             $staff_id = $value['staff_id'];
             array_push($staff_members, $staff_id);
             $submission_id = $value['submission_id'];
-            $student_id = $this->getStudentID($this->database, $submission_id);
+            $student_id = $this->getStudentID($submission_id);
             $question_id = $value['question_id'];
             array_push($questions, $question_id);
             $question_value = $value['value'];
@@ -206,7 +206,7 @@ class analysis extends model
         sort($questions);
         $questions_name = Array();
         foreach ($questions as $index => $question_id) {
-            $question_txt = $this->getQuestionTxt($this->database, $question_id);
+            $question_txt = $this->getQuestionTxt($question_id);
             array_push($questions_name, $question_txt);
         }
 
@@ -221,7 +221,7 @@ class analysis extends model
         foreach ($reviewings as $staff_id => $students) {
             foreach ($students as $student_id => $question_answer) {
                 //Initialize variables
-                $student_name = $this->getStudentName($this->database, $student_id);
+                $student_name = $this->getStudentName($student_id);
                 $firstname = $student_name['firstname'];
                 $prefix = $student_name['prefix'];
                 $lastname = $student_name['lastname'];
@@ -250,7 +250,7 @@ class analysis extends model
         $csv_files = Array();
         foreach ($files as $staff_id => $csv) {
             //Set variables
-            $staff_name = $this->getStaffName($this->database, $staff_id);
+            $staff_name = $this->getStaffName($staff_id);
             $firstname = $staff_name['firstname'];
             $prefix = $staff_name['prefix'];
             $lastname = $staff_name['lastname'];
@@ -288,8 +288,8 @@ class analysis extends model
     */
     public function downloadTeksten($assignment_id){
         //Get texts from database
-        $assignment_name = $this->getAssignmentName($this->database, $assignment_id);
-        $texts = $this->getTexts($this->database, $assignment_id);
+        $assignment_name = $this->getAssignmentName($assignment_id);
+        $texts = $this->getTexts($assignment_id);
 
         //Create empty csv files with headers
         $file = "";
@@ -304,7 +304,7 @@ class analysis extends model
             array_push($export_row, $attributes['student_id']);
 
             //Set variables
-            $student_name = $this->getStudentName($this->database, $attributes['student_id']);
+            $student_name = $this->getStudentName($attributes['student_id']);
             $firstname = $student_name['firstname'];
             $prefix = $student_name['prefix'];
             $lastname = $student_name['lastname'];
@@ -338,12 +338,12 @@ class analysis extends model
     * @param $assignment_id An assignment id
     * @return Array
     */
-    private function getTexts($database, $assignement_id){
-        $quoted_assignement_id = $database->quote($assignement_id);
+    private function getTexts($assignement_id){
+        $quoted_assignement_id = $this->database->quote($assignement_id);
         $query = "
                     SELECT student_id, text from submissions WHERE assignment_id = $quoted_assignement_id
            ";
-        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /*
@@ -352,8 +352,8 @@ class analysis extends model
     * @param $assignment_id An assignment id
     * @return Array
     */
-    private function downloadReviews($database, $assignement_id){
-        $quoted_assignement_id = $database->quote($assignement_id);
+    private function downloadReviews($assignement_id){
+        $quoted_assignement_id = $this->database->quote($assignement_id);
         $query = "
                     SELECT `student_id`, CONCAT_WS(' ', `s_firstname`, `s_prefix`, `s_lastname`) as `staff_name`, CONCAT_WS(' ', `firstname`, `prefix`, `lastname`) as `student_name`, `grade` FROM
                     (
@@ -396,7 +396,7 @@ class analysis extends model
                     ON `staff_info`.`id` = `without_staff_name`.`staff_id`
                     LIMIT 999999
                     ";
-        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /*
@@ -422,11 +422,11 @@ class analysis extends model
     * @param $questionnaire_id An questionnaire_id id
     * @return String
     */
-    private function getQuestionTxt($database, $question_id) {
-        $quoted_question_id = $database->quote($question_id);
+    private function getQuestionTxt($question_id) {
+        $quoted_question_id = $this->database->quote($question_id);
         $query = "SELECT label FROM reviewerlistsquestions
                   WHERE id = $quoted_question_id";
-        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['label'];
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['label'];
     }
 
     /*
@@ -435,11 +435,11 @@ class analysis extends model
     * @param $student_id An assignment id
     * @return Array
     */
-    private function getStudentName($database, $student_id) {
-        $quoted_student_id = $database->quote($student_id);
+    private function getStudentName($student_id) {
+        $quoted_student_id = $this->database->quote($student_id);
         $query = "SELECT firstname, prefix, lastname FROM students
                   WHERE id = $quoted_student_id";
-        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
     }
 
     /*
@@ -448,11 +448,11 @@ class analysis extends model
     * @param $staff_id An assignment id
     * @return Array
     */
-    private function getStaffName($database, $staff_id) {
-        $quoted_staff_id = $database->quote($staff_id);
+    private function getStaffName($staff_id) {
+        $quoted_staff_id = $this->database->quote($staff_id);
         $query = "SELECT firstname, prefix, lastname FROM staff
                   WHERE id = $quoted_staff_id";
-        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
     }
 
     /*
@@ -461,13 +461,13 @@ class analysis extends model
     * @param $assignment_id An assignment id
     * @return Array
     */
-    private function getReviewingsOfSubmission($database, $assignement_id) {
-        $quoted_assignement_id = $database->quote($assignement_id);
+    private function getReviewingsOfSubmission($assignement_id) {
+        $quoted_assignement_id = $this->database->quote($assignement_id);
         $query = "SELECT * FROM reviewing
                   WHERE reviewerlist_id IN (
                   SELECT id FROM reviewerlists WHERE assignment_id = $quoted_assignement_id
                   )";
-        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /*
@@ -477,11 +477,11 @@ class analysis extends model
      * @param $submission_id An submissions id
      * @return Array, associative
      */
-    private function getStudentID($database, $submission_id){
-        $quoted_submission_id = $database->quote($submission_id);
+    private function getStudentID($submission_id){
+        $quoted_submission_id = $this->database->quote($submission_id);
         $query = "SELECT student_id FROM submissions
                   WHERE id = $quoted_submission_id";
-        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['student_id'];
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['student_id'];
     }
 
     /*
@@ -490,7 +490,7 @@ class analysis extends model
     * @param Medoo $database A database instance passed as an Medoo object.
     * @return Array, associative
     */
-    private function getTotalOverview($database){
+    private function getTotalOverview(){
         $query = "SELECT promised_grades.assignment_id AS id, title, promised, fullfilled
                 FROM (
                       SELECT assignments.id AS assignment_id, assignments.title, COUNT(submission_id) AS promised
@@ -509,7 +509,7 @@ class analysis extends model
                 ) AS fullfilled_grades
                   WHERE promised_grades.assignment_id = fullfilled_grades.assignment_id
                 ORDER BY title";
-        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /*
@@ -519,8 +519,8 @@ class analysis extends model
     * @param $id An assignment id
     * @return Array, associative
     */
-    private function getAssignmentOverview($database, $assignment_id){
-        $quoted_assignment_id = $database->quote($assignment_id);
+    private function getAssignmentOverview($assignment_id){
+        $quoted_assignment_id = $this->database->quote($assignment_id);
         $query = "SELECT CONCAT_WS(' ', firstname, prefix, lastname) AS StaffName, PromisedGrades.Promised, FullfilledGrades.Fullfilled
                 FROM (SELECT grading.staff_id, COUNT(grading.grade) as Fullfilled
                       FROM grading
@@ -545,7 +545,7 @@ class analysis extends model
                 ORDER BY StaffName
                 ";
 
-        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /*
@@ -555,8 +555,8 @@ class analysis extends model
      * @param $id An assignment id
      * @return Array, associative
      */
-    private function getAssignmentName($database, $id){
-        return $database->get(
+    private function getAssignmentName($id){
+        return $this->database->get(
             "assignments",
             "title",
             ["id" => $id]
@@ -569,9 +569,9 @@ class analysis extends model
      * @param Medoo $database A database instance passed as an Medoo object.
      * @return Array, associative
      */
-    private function getAssignments($database)
+    private function getAssignments()
     {
         $query = "SELECT * FROM assignments ORDER BY title";
-        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 }
