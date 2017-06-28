@@ -10,8 +10,8 @@
           <option name="port" value="21" />
         </fileTransfer>
       </webServer>
-      <webServer id="6f041ea4-9a43-4145-95c5-5a6638bc08f6" name="Hofstad Staging" url="http://tekstmijn.reinardvandalen.nl">
-        <fileTransfer host="tekstmijn.reinardvandalen.nl" port="21">
+      <webServer id="6f041ea4-9a43-4145-95c5-5a6638bc08f6" name="Hofstad Staging (project level)" url="http://tekstmijn.reinardvandalen.nl">
+        <fileTransfer host="tekstmijn.reinardvandalen.nl" port="21" rootFolder="/hofstad/staff">
           <advancedOptions>
             <advancedOptions dataProtectionLevel="Private" />
           </advancedOptions>
