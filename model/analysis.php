@@ -35,9 +35,9 @@ class analysis extends model
             ["Opdracht", "title"]
         ];
         $options = [
-                ["<a download='' class='pull-right' href='beoordelingen/%s'><i class='glyphicon glyphicon-signal'></i> Beoordelingen (csv)</a>"],
-                ["<a download='' class='pull-right' href='beoordelingslijsten/%s'><i class='glyphicon glyphicon-th-list'></i> Beoordelingslijsten (csv)</a>"],
-                ["<a download='' class='pull-right' href='teksten/%s'><i class='glyphicon glyphicon-file'></i> Teksten (zip)</a>"]
+                ["<a download='' class='pull-right' href='beoordelingen/%s'><i class='glyphicon glyphicon-signal'></i> Beoordelingen</a>"],
+                ["<a download='' class='pull-right' href='beoordelingslijsten/%s'><i class='glyphicon glyphicon-th-list'></i> Beoordelingslijsten</a>"],
+                ["<a download='' class='pull-right' href='teksten/%s'><i class='glyphicon glyphicon-file'></i> Teksten</a>"]
         ];
 
         $analysis_tbl = $this->table($this->bootstrap, $columns, $data, $options);
@@ -82,9 +82,9 @@ class analysis extends model
             ["Opdracht", "title"]
         ];
         $options = [
-            ["<a download='' class='pull-right' href='../../beoordelingen/%s'><i class='glyphicon glyphicon-signal'></i> Beoordelingen (csv)</a>"],
-            ["<a download='' class='pull-right' href='../../beoordelingslijsten/%s'><i class='glyphicon glyphicon-th-list'></i> Beoordelingslijsten (csv)</a>"],
-            ["<a download='' class='pull-right' href='../../teksten/%s'><i class='glyphicon glyphicon-file'></i> Teksten (zip)</a>"]
+            ["<a download='' class='pull-right' href='../../beoordelingen/%s'><i class='glyphicon glyphicon-signal'></i> Beoordelingen</a>"],
+            ["<a download='' class='pull-right' href='../../beoordelingslijsten/%s'><i class='glyphicon glyphicon-th-list'></i> Beoordelingslijsten</a>"],
+            ["<a download='' class='pull-right' href='../../teksten/%s'><i class='glyphicon glyphicon-file'></i> Teksten</a>"]
         ];
 
         $analysis_tbl = $this->table($this->bootstrap, $columns, $data, $options);
@@ -278,6 +278,72 @@ class analysis extends model
         foreach ($csv_files as $index => $filename) {
             unlink($filename);
         }
+    }
+
+
+    /*
+    * Generates a csv file with the texts of the assignements
+    * @param $assignment_id An assignment id
+    * @return
+    */
+    public function downloadTeksten($assignment_id){
+        //Get texts from database
+        $assignment_name = $this->getAssignmentName($this->database, $assignment_id);
+        $texts = $this->getTexts($this->database, $assignment_id);
+
+        //Create empty csv files with headers
+        $file = "";
+        $header = Array('student_id', 'student_name', 'text');
+        $file = $file.join(';', $header)."\n";
+
+        //Loop through all texts
+        foreach ($texts as $text => $attributes) {
+            $export_row = Array();
+
+            //Push student_id
+            array_push($export_row, $attributes['student_id']);
+
+            //Set variables
+            $student_name = $this->getStudentName($this->database, $attributes['student_id']);
+            $firstname = $student_name['firstname'];
+            $prefix = $student_name['prefix'];
+            $lastname = $student_name['lastname'];
+            $student_name = $this->generateNameStr($firstname, $prefix, $lastname);
+
+            //Push student name
+            array_push($export_row, $student_name);
+
+            //Push grade
+            $individual_text =  $attributes['text'];
+            $individual_text = str_replace('"',"'",$individual_text);
+            $individual_text =  '"'.$individual_text.'"';
+            array_push($export_row, $individual_text);
+
+            //Write to csv
+            $file = $file.join(';', $export_row)."\n";
+        }
+
+        //Download csv file
+        $filename = $assignment_name.date("d-m-Y_H:i:s").'.csv';
+        header('Content-type: text/csv');
+        header('Content-Disposition: attachment; filename='.$filename.'');
+        echo $file;
+
+    }
+
+
+    /*
+    * Returns an array with all the reviews of an speciffic assignment
+    * @param Medoo $database A database instance passed as an Medoo object.
+    * @param $assignment_id An assignment id
+    * @return Array
+    */
+    private function getTexts($database, $assignement_id){
+        $quoted_assignement_id = $database->quote($assignement_id);
+        $query = "
+                    SELECT student_id, text from submissions WHERE assignment_id = $quoted_assignement_id
+           ";
+        return $database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
     /*
