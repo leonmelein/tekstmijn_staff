@@ -83,6 +83,7 @@ class review extends submissions
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/review/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Beoordelen" => "/staff/review/", $assignment_name => "/staff/review/$assignmentid", "Beoordeel inzending" => "#"]);
 
+        $tabs = "";
         if ($_SESSION['type'] == 1) {$tabs = $this->tabs($this->bootstrap, ["Lezen en beoordelen" => "#beoordelen"], 'Lezen en beoordelen');}
         elseif ($_SESSION['type'] == 2) {$tabs = $this->tabs($this->bootstrap, ["Lezen en beoordelen" => "#beoordelen", "Beoordelingslijst" => "#beoordelingslijst"], 'Lezen en beoordelen');}
 
@@ -92,9 +93,8 @@ class review extends submissions
         $staff_id = $_SESSION['staff_id'];
         $current_grades= $this->getIndividualGrades($staff_id, $submissionid, ["Score"]);
 
-        /** @noinspection PhpUndefinedVariableInspection */
         echo $this->templates->render(
-            "review::gradingdev",
+            "review::grading",
             [
                 "title" => "Tekstmijn | Beoordelen",
                 "page_title" => $title, "page_subtitle" => $subtitle, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
@@ -110,7 +110,7 @@ class review extends submissions
                 "current_grades" => $current_grades,
                 "tabs" => $tabs,
                 "user_type" => $_SESSION['type'],
-                "form" => $this->generateQuestionnaire($assignmentid, $staff_id, $submission_id)
+                "form" => $this->generateQuestionnaire($assignmentid, $staff_id, $submissionid)
             ]
         );
     }
@@ -192,7 +192,7 @@ class review extends submissions
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    public function generateQuestionnaire($assignment_id, $staff_id, $submission_id) {
+    function generateQuestionnaire($assignment_id, $staff_id, $submission_id) {
         ob_start();
         $staff_id_quoted = $this->database->quote($staff_id);
         $submission_id_quoted = $this->database->quote($submission_id);

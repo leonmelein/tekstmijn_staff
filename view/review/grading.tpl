@@ -31,7 +31,7 @@
         </div>
         <div class="row">
             <div class="col-md-2"><strong>Bestand</strong></div>
-            <div class="col-md-4"><a href="/assets/submissions/<?php echo $submission_file; ?>" target="_blank"><?php echo $submission_originalfile; ?></a></div>
+            <div class="col-md-4"><a download href="/assets/submissions/<?php echo $submission_file; ?>"><?php echo $submission_originalfile; ?></a></div>
         </div>
         <div class="row">
             <div class="col-md-2"><strong>Aantal pogingen</strong></div>
@@ -92,7 +92,7 @@
             <?php if ($user_type == 2) { ?>
             <div id="beoordelingslijst" class="tab-pane">
                 <div class="row spacer" style="height: 6px;"></div>
-                <h4>Beoordelingslijst</h4>
+                    <?php echo $form; ?>
             </div>
             <?php } ?>
 
