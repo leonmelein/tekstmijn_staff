@@ -34,6 +34,7 @@ class model
         $templates->addFolder("review", "view/review");
         $templates->addFolder("status", "view/status");
         $templates->addFolder("analysis", "view/analysis");
+        $templates->addFolder("assignment", "view/assignment");
         $templates->addFolder("administration", "view/administration");
         $templates->addFolder("admin_classes", "view/administration/classes");
         $templates->addFolder("admin_students", "view/administration/students");

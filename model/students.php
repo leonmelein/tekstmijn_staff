@@ -95,7 +95,7 @@ class students extends admin {
                     "menu" => $menu,
                     "breadcrumbs" => $breadcrumbs,
                     "student" => $student,
-                    "classes" => generateOptions($classes),
+                    "classes" => $this->options($classes),
                     "page_js" => "/staff/vendor/application/load_date_picker.js"
                 ]
             );
