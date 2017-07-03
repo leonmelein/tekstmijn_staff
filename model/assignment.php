@@ -7,11 +7,16 @@
  * Time: 11:48
  */
 class assignment extends model {
+
+    /*
+     * Page functions
+     */
+
     function overview(){
         $this->get_session();
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Opdrachten" => "#"]);
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/assignment/", "align" => "stacked"], $_SESSION['type']);
-        $students = $this->getAssignment($_SESSION['staff_id']);
+        $students = $this->getAssignments();
         $columns = [
             ["Titel", "title"]
         ];
@@ -32,6 +37,24 @@ class assignment extends model {
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Opdrachten" => "/staff/assignment", "Bewerk opdracht" => "#"]);
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/assignment/", "align" => "stacked"], $_SESSION['type']);
 
+        $assignment = $this->getAssignment($assignmentid);
+        $classes = $this->options($this->getSchoolsAndClasses());
+        $reviewers = $this->options($this->getReviewers());
+
+        echo $this->templates->render("assignment::edit", ["title" => "Tekstmijn | Opdrachten",
+            "page_title" => "Nieuwe opdracht",
+            "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+            "classes" => $classes, "reviewers" => $reviewers,
+            "assignment" => $assignment,
+            "page_js" => "/staff/vendor/application/load_date_picker.js"
+        ]);
+    }
+
+    function newAssignment(){
+        $this->get_session();
+        $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Opdrachten" => "/staff/assignment", "Nieuwe opdracht" => "#"]);
+        $menu = $this->menu($this->bootstrap, ["active" => "/staff/assignment/", "align" => "stacked"], $_SESSION['type']);
+
         $classes = $this->options($this->getSchoolsAndClasses());
         $reviewers = $this->options($this->getReviewers());
 
@@ -43,8 +66,33 @@ class assignment extends model {
         ]);
     }
 
-    function getAssignment($staff){
-        $quoted_staff_id = $this->database->quote($staff);
+    function addAssignment(){
+        // TODO: something useful
+    }
+
+    function updateAssignment(){
+        // TODO: something useful
+    }
+
+    function deleteAssignment(){
+        // TODO: something useful
+    }
+
+
+    /*
+     * Supporting functions
+     */
+
+    function getAssignment($id){
+        $id = $this->database->quote($id);
+        return $this->database->query("SELECT assignments.title, assignments_class.start_date, assignments_class.end_date
+                                              FROM assignments, assignments_class
+                                              WHERE assignments.id = assignments_class.assignment_id
+                                              AND assignments.id = $id
+                                              LIMIT 1")->fetch();
+    }
+
+    function getAssignments(){
         $query = "SELECT assignments.title, assignments.id FROM assignments ORDER BY title ASC";
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }

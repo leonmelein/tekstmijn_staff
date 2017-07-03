@@ -144,7 +144,12 @@
      */
     $router->mount('/assignment', function() use ($router){
         $router->get("/", "assignment@overview");
+        $router->get("/new", "assignment@newAssignment");
+        $router->post("/save", "assignment@addAssignment");
         $router->get("/([a-z0-9_-]+)", "assignment@individualAssignment");
+        $router->get("/([a-z0-9_-]+)/edit", "assignment@editAssignment");
+        $router->get("/([a-z0-9_-]+)/delete", "assignment@individualAssignment");
+        $router->post("/([a-z0-9_-]+)/save", "assignment@updateAssignment");
     });
 
     /**

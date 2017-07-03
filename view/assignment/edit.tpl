@@ -18,8 +18,7 @@
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="titel">Titel</label>
                     <div class="col-md-4">
-                        <input id="titel" name="titel" type="text" placeholder="Opdracht" class="form-control input-md" required="">
-
+                        <input id="titel" name="titel" type="text" placeholder="Opdracht" class="form-control input-md" required="" value="<?=$this->e($assignment['title'])?>">
                     </div>
                 </div>
 
@@ -37,7 +36,7 @@
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="start_date">Begindatum en -tijd</label>
                     <div class='col-md-4 input-group date' id='datetimepicker2'>
-                        <input type='text' class="form-control input-md datetimepicker" name="start_date" id="start_date" value="<?=$this->escape($student['start_date'])?>" required />
+                        <input type='text' class="form-control input-md datetimepicker" name="start_date" id="start_date" value="<?=$this->e($assignment['start_date'])?>" required />
                         <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                     </div>
                 </div>
@@ -45,7 +44,7 @@
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="end_date">Einddatum en -tijd</label>
                     <div class='col-md-4 input-group date' id='datetimepicker3'>
-                        <input type='text' class="form-control input-md datetimepicker" name="end_date" id="end_date" value="<?=$this->escape($student['end_date'])?>" required />
+                        <input type='text' class="form-control input-md datetimepicker" name="end_date" id="end_date" value="<?=$this->e($assignment['end_date'])?>" required />
                         <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                     </div>
                 </div>
