@@ -38,9 +38,17 @@
             <div class="col-md-4"><?php echo $submission_count; ?></div>
         </div>
 
+
         <div class="row spacer" style="height: 20px;"></div>
 
-        <?php echo $tabs; ?>
+        <ul class="nav nav-tabs">
+            <li role="presentation" class="active"><a href="#beoordelen" aria-controls="beoordelen" role="tab" data-toggle="tab" aria-expanded="true">Lezen en beoordelen</a></li>
+            <li role="presentation" class=""><a href="#beoordelingslijst" aria-controls="beoordelingslijst" role="tab" data-toggle="tab" aria-expanded="false">Beoordelingslijst</a></li>
+            <?php if($questionnaire): ?>
+            <li role="presentation" class=""><a href="<?=$this->e($questionnaire)?>" target="_blank" aria-controls="beoordelingslijst" role="tab" data-toggle="" aria-expanded="false">Qualtrics <i class="glyphicon glyphicon-new-window"></i></a></li>
+            <?php endif; ?>
+        </ul>
+
         <div class="tab-content">
             <div id="beoordelen" class="tab-pane active">
                 <div class="row spacer" style="height: 6px;"></div>

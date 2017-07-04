@@ -85,13 +85,14 @@ class review extends submissions
 
         $tabs = "";
         if ($_SESSION['type'] == 1) {$tabs = $this->tabs($this->bootstrap, ["Lezen en beoordelen" => "#beoordelen"], 'Lezen en beoordelen');}
-        elseif ($_SESSION['type'] == 2) {$tabs = $this->tabs($this->bootstrap, ["Lezen en beoordelen" => "#beoordelen", "Beoordelingslijst" => "#beoordelingslijst"], 'Lezen en beoordelen');}
+        elseif ($_SESSION['type'] == 2) {$tabs = $this->tabs($this->bootstrap, ["Lezen en beoordelen" => "#beoordelen", "Beoordelingslijst" => "#beoordelingslijst", "Qualtrics" => "http://rug.eu.qualtrics.com/jfe/form/SV_6tCfini6XjL53md"], 'Lezen en beoordelen');}
 
         $submission_info = $this->getSubmissionInfo($submissionid);
         $page_js = "/staff/vendor/application/add_field.js";
 
         $staff_id = $_SESSION['staff_id'];
         $current_grades= $this->getIndividualGrades($staff_id, $submissionid, ["Score"]);
+        $questionnaire = $this->getQuestionnaire($assignmentid);
 
         echo $this->templates->render(
             "review::grading",
@@ -110,7 +111,8 @@ class review extends submissions
                 "current_grades" => $current_grades,
                 "tabs" => $tabs,
                 "user_type" => $_SESSION['type'],
-                "form" => $this->generateQuestionnaire($assignmentid, $staff_id, $submissionid)
+                "form" => $this->generateQuestionnaire($assignmentid, $staff_id, $submissionid),
+                "questionnaire" => $questionnaire
             ]
         );
     }
@@ -197,6 +199,10 @@ class review extends submissions
                                                    WHERE assignment_id = $quoted_assignment_id
                                                          AND staff_id = $quoted_staff_id)";
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    function getQuestionnaire($assignment_id){
+        return $this->database->get("reviewerlist", "qualtrics_url", ["assignment_id" => $assignment_id]);
     }
 
     function generateQuestionnaire($assignment_id, $staff_id, $submission_id) {
