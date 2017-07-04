@@ -50,6 +50,37 @@ class assignment extends model {
         ]);
     }
 
+    function downloadSubmissions(){
+        $this->get_session();
+        $staff_id = $_SESSION['staff_id'];
+        $files = $this->gatherSubmissionFiles($staff_id, $assignmentid);
+        $filename_vars = $this->gatherNames($staff_id, $assignmentid);
+        chdir("tmp");
+        $filename = sprintf("Beoordelingspakket - %s - %s.zip", $filename_vars['fullname'], $filename_vars['assignment_name']);
+        $zip = \Comodojo\Zip\Zip::create($filename);
+        foreach ($files as $file){
+            $zip->add("../assets/submissions/".$file['file'], $file['original_file']);
+        }
+        $zip->close();
+
+        $is_valid = false;
+        try {
+            $is_valid = \Comodojo\Zip\Zip::check($filename);
+        } catch (\Comodojo\Exception\ZipException $exception){
+            $this->redirect('../../?download_generated=false');
+        }
+
+        if ($is_valid) {
+            header("Content-Description: File Transfer");
+            header("Content-Type: application/octet-stream");
+            header("Content-Disposition: attachment; filename=$filename");
+            readfile($filename);
+            unlink($filename);
+        } else {
+            $this->redirect('../../?download_generated=false');
+        }
+    }
+
     function newAssignment(){
         $this->get_session();
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Opdrachten" => "/staff/assignment", "Nieuwe opdracht" => "#"]);
@@ -335,5 +366,29 @@ class assignment extends model {
         } else {
             return sprintf("%s %s", $firstname, $lastname);
         }
+    }
+
+    function gatherSubmissionFiles($staffid, $assignmentid){
+        $quoted_staffid = $this->database->quote($staffid);
+        $quoted_assignmentid = $this->database->quote($assignmentid);
+        $query = "SELECT submissions.file, submissions.original_file
+                    FROM submissions, students
+                    WHERE submissions.assignment_id = $quoted_assignmentid
+                    AND submissions.student_id = students.id
+                    AND submissions.student_id IN (SELECT student_id
+                                                   FROM allocations
+                                                   WHERE assignment_id = $quoted_assignmentid
+                                                         AND staff_id = $quoted_staffid);";
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    function gatherNames($staffid, $assignmentid){
+        $quoted_staffid = $this->database->quote($staffid);
+        $quoted_assignemntid = $this->database->quote($assignmentid);
+        $query = "SELECT CONCAT(firstname,prefix,lastname) as fullname, title as assignment_name
+                FROM staff, assignments
+                WHERE staff.id = $quoted_staffid
+                AND assignments.id = $quoted_assignemntid";
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
     }
 }
