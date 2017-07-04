@@ -90,7 +90,6 @@ class assignment extends model {
         array_push($results, $result);
 
         //Insert the new assignment into the assignment_class table
-
         foreach ($_POST['class_id'] as $id=>$class_id) {
             $result = $this->database->insert(
                 "assignments_class",
@@ -165,7 +164,6 @@ class assignment extends model {
             }
         }
 
-        echo $UUID;
         //Save the to_review array into the allocations table
         foreach ($to_review as $staff_id=>$students) {
             foreach ($students as $index => $student_id) {
@@ -181,8 +179,6 @@ class assignment extends model {
             }
         }
 
-        $this->pparray($results);
-
         //Insert the qualtrics url into the reviewerlist table
         $result =$this->database->insert(
             "reviewerlist",
@@ -195,15 +191,55 @@ class assignment extends model {
 
         //Check if adding the assignment works fine
         if (!in_array(False,$results)) {
-            return True;
+            $this->redirect("../?success=true", 303);
         }
         else {
-            return False;
+            $this->redirect("../?success=false", 303);
         }
     }
 
-    function updateAssignment(){
-        // TODO: something useful
+    /*
+    * Updates the assignment in the database based on the changes made on the edit page
+    *
+    * @return Boolean
+    */
+    function updateAssignment($assignment_id){
+        //Quote assignment id
+        $assignment_id_quoted = $this->database->quote($assignment_id);
+
+        //Create empty array to check if adding the assignment works fine
+        $results = Array();
+
+        //Edit the Assignment in the Assignments Table
+        $result = $this->database->update("assignments", [
+            "title" => $_POST['titel']
+            ], ["id" => $assignment_id]);
+        array_push($results, $result);
+
+        //Update the assignment values (start_date & end_date) into the assignment_class table
+        $result = $this->database->update(
+            "assignments_class",
+            [
+                "start_date" => $_POST['start_date'],
+                "end_date" => $_POST['end_date']
+            ], ["assignment_id" => $assignment_id]);
+        array_push($results, $result);
+
+        //Update the qualtrics url into the reviewerlist table
+        $result =$this->database->update(
+            "reviewerlist",
+            [
+                "qualtrics_url" => $_POST['review_list']
+            ], ["assignment_id" => $assignment_id]);
+        array_push($results, $result);
+
+        //Check if adding the assignment works fine
+        if (!in_array(False,$results)) {
+            $this->redirect("../../?success=true", 303);
+        }
+        else {
+            $this->redirect("../../?success=true", 303);
+        }
     }
 
     function deleteAssignment(){

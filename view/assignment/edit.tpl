@@ -11,7 +11,7 @@
     </div>
     <div class="col-md-9">
         <h1 class="page_title"><?php echo $page_title; ?></h1>
-        <form class="form-horizontal" method="post" action="../save/">
+        <form class="form-horizontal" method="post" action="save/">
             <fieldset>
 
                 <!-- Text input-->
@@ -63,7 +63,7 @@
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="review_list">Beoordelingslijst</label>
                     <div class="col-md-4">
-                        <input id="review_list" name="review_list" type="text" placeholder="rug.eu.qualtrics.com" class="form-control input-md" required="">
+                        <input id="review_list" name="review_list" type="text" placeholder="rug.eu.qualtrics.com" class="form-control input-md" required>
                         <span class="help-block">Plak hier de Qualtrics URL</span>
                     </div>
                 </div>
