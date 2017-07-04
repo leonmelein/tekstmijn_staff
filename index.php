@@ -14,7 +14,6 @@
     // Main model
     require("model/model.php");
     // New type Submodels
-    require("model/status.php");
     require("model/classroom.php");
     require("model/auth.php");
     require("model/analysis.php");

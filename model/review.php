@@ -171,24 +171,31 @@ class review extends submissions
 
     function getAssignment($staff){
         $quoted_staff_id = $this->database->quote($staff);
-        $query = "SELECT DISTINCT assignments.title, assignments.id
-    FROM assignments, submissions_staff, submissions
-    WHERE submissions_staff.submission_id = submissions.id
-    AND submissions.assignment_id = assignments.id
-    AND submissions_staff.staff_id = $quoted_staff_id";
+        $query = "SELECT DISTINCT assignments.id, assignments.title
+                    FROM assignments, allocations
+                    WHERE assignments.id in (
+                      SELECT DISTINCT assignment_id
+                      FROM allocations
+                      WHERE staff_id = $quoted_staff_id
+                    )
+                    ORDER BY title ASC";
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
     function getSubmissions($assignment, $staff){
         $quoted_assignment_id = $this->database->quote($assignment);
         $quoted_staff_id = $this->database->quote($staff);
-        $query = "SELECT submissions.id, student_id, CONCAT_WS(' ',students.firstname, students.prefix, students.lastname) as name, DATE_FORMAT(submissions.time, '%d %M %Y, %H:%i') as submission_date, submissions.submission_count as submission_count
-            FROM students, submissions, submissions_staff
-            WHERE submissions.id = submissions_staff.submission_id
-            AND staff_id = $quoted_staff_id
-            AND students.id = submissions.student_id
-            AND submissions.assignment_id = $quoted_assignment_id
-            ORDER BY student_id;";
+        $query = "SELECT submissions.id, submissions.student_id, submissions.assignment_id,
+                      CONCAT_WS(' ',students.firstname, students.prefix, students.lastname) as name,
+                      DATE_FORMAT(submissions.time, '%d %M %Y, %H:%i') as submission_date,
+                      submissions.submission_count as submission_count
+                    FROM submissions, students
+                    WHERE submissions.assignment_id = $quoted_assignment_id
+                    AND submissions.student_id = students.id
+                    AND submissions.student_id IN (SELECT student_id
+                                                   FROM allocations
+                                                   WHERE assignment_id = $quoted_assignment_id
+                                                         AND staff_id = $quoted_staff_id)";
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
@@ -296,12 +303,15 @@ class review extends submissions
 
     function gatherSubmissionFiles($staffid, $assignmentid){
         $quoted_staffid = $this->database->quote($staffid);
-        $quoted_assignemntid = $this->database->quote($assignmentid);
-        $query = "SELECT file, original_file
-                FROM submissions, submissions_staff
-                WHERE submissions_staff.staff_id = $quoted_staffid
-                AND submissions_staff.submission_id = submissions.id
-                AND submissions.assignment_id = $quoted_assignemntid";
+        $quoted_assignmentid = $this->database->quote($assignmentid);
+        $query = "SELECT submissions.file, submissions.original_file
+                    FROM submissions, students
+                    WHERE submissions.assignment_id = $quoted_assignmentid
+                    AND submissions.student_id = students.id
+                    AND submissions.student_id IN (SELECT student_id
+                                                   FROM allocations
+                                                   WHERE assignment_id = $quoted_assignmentid
+                                                         AND staff_id = $quoted_staffid);";
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 

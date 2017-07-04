@@ -32,7 +32,6 @@ class model
         $templates->addFolder("classes", "view/classes");
         $templates->addFolder("submissions", "view/submissions");
         $templates->addFolder("review", "view/review");
-        $templates->addFolder("status", "view/status");
         $templates->addFolder("analysis", "view/analysis");
         $templates->addFolder("assignment", "view/assignment");
         $templates->addFolder("administration", "view/administration");
@@ -164,6 +163,21 @@ class model
             $options .= sprintf($option, $value["id"], $value["name"]) . "\n";
         }
 
+        return $options;
+    }
+
+    public function options_selected($array, $selected){
+        $option = "<option value='%s'>%s</option>";
+        $option_selected = "<option value='%s' selected>%s</option>";
+        $options = "";
+        foreach ($array as $key => $value) {
+            if (in_array($value["id"], $selected)) {
+                $options .= sprintf($option_selected, $value["id"], $value["name"]) . "\n";
+            }
+            else {
+                $options .= sprintf($option, $value["id"], $value["name"]) . "\n";
+            }
+        }
         return $options;
     }
 
