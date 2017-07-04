@@ -28,6 +28,7 @@
     require("model/students.php");
     require("model/personnel.php");
     require("model/reviewers.php");
+    require("model/questionnaires.php");
 
     // Reroute HTTP traffic to HTTPS
     if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
@@ -150,6 +151,18 @@
         $router->get("/([a-z0-9_-]+)/edit", "assignment@editAssignment");
         $router->get("/([a-z0-9_-]+)/delete", "assignment@individualAssignment");
         $router->post("/([a-z0-9_-]+)/save", "assignment@updateAssignment");
+    });
+
+    /**
+     * Questionnaires
+     */
+    $router->mount('/questionnaire', function () use ($router) {
+        $router->get('/', "questionnaires@overview");
+        $router->get('/new', "questionnaires@newQuestionnaire");
+        $router->post('/save', "questionnaires@addQuestionnaire");
+        $router->get('/(\d+)', "questionnaires@editQuestionnaire");
+        $router->get('/(\d+)/delete', "questionnaires@deleteQuestionnaire");
+        $router->post('/(\d+)/save', "questionnaires@updateQuestionnaire");
     });
 
     /**
