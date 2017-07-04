@@ -121,15 +121,16 @@ class analysis extends model
         foreach ($data as $key => $value) {
             $student_id = $value['student_id'];
             $beoordelaar = $value['staff_name'];
-            array_push($beoordelaars, $beoordelaar);
+            $beoordelaar_id = $value['staff_id'];
+            $beoordelaars[$beoordelaar_id] = $beoordelaar;
             $student_name = $value['student_name'];
             $grade = $value['grade'];
 
             if (array_key_exists($student_id, $grades) == False){
-                $grades[$student_id] = Array($beoordelaar => $grade);
+                $grades[$student_id] = Array($beoordelaar_id => $grade);
             }
             else {
-                $grades[$student_id][$beoordelaar] = $grade;
+                $grades[$student_id][$beoordelaar_id] = $grade;
             }
             if (array_key_exists($student_id, $students) == False){
                 $students[$student_id] = $student_name;
@@ -150,7 +151,10 @@ class analysis extends model
 
         //Create a list of beoordelaars
         $beoordelaars = array_filter(array_unique($beoordelaars));
-        sort($beoordelaars);
+        $beoordelaars_id = Array();
+        foreach ($beoordelaars as $staff_id => $staff_name) {
+            array_push($beoordelaars_id, $staff_id);
+        }
 
         //Prepare csv file
         $file = "";
@@ -164,7 +168,7 @@ class analysis extends model
                 array_push($export_row, '');
             }
             foreach ($grading as $beoordelaar => $grade) {
-                $index = array_search($beoordelaar, $beoordelaars);
+                $index = array_search($beoordelaar, $beoordelaars_id);
                 $export_row[$index+2] = $grade;
             }
             $file = $file.join(';', $export_row)."\n";
@@ -355,7 +359,7 @@ class analysis extends model
     private function downloadReviews($assignement_id){
         $quoted_assignement_id = $this->database->quote($assignement_id);
         $query = "
-                    SELECT `student_id`, CONCAT_WS(' ', `s_firstname`, `s_prefix`, `s_lastname`) as `staff_name`, CONCAT_WS(' ', `firstname`, `prefix`, `lastname`) as `student_name`, `grade` FROM
+                    SELECT `student_id`, `staff_id`, CONCAT_WS(' ', `s_firstname`, `s_prefix`, `s_lastname`) as `staff_name`, CONCAT_WS(' ', `firstname`, `prefix`, `lastname`) as `student_name`, `grade` FROM
                     (
                         SELECT `student_id`, `staff_id`, `firstname`, `prefix`, `lastname`, `grade` FROM
                         (

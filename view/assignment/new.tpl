@@ -63,7 +63,7 @@
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="review_list">Beoordelingslijst</label>
                     <div class="col-md-4">
-                        <input id="review_list" name="review_list" type="text" placeholder="rug.eu.qualtrics.com" class="form-control input-md" required="">
+                        <input id="review_list" name="review_list" type="text" placeholder="rug.eu.qualtrics.com" class="form-control input-md">
                         <span class="help-block">Plak hier de Qualtrics URL</span>
                     </div>
                 </div>

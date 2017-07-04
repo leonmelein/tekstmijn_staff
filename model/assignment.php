@@ -41,13 +41,15 @@ class assignment extends model {
         $assignment = $this->getAssignment($assignmentid);
         $classes = $this->options_selected($this->getSchoolsAndClasses(),$this->getCoupledClasses($assignmentid));
         $reviewers = $this->options_selected($this->getReviewers(),$this->getCoupledReviewers($assignmentid));
+        $qualtrics_url = $this->getQualtricsURL($assignmentid);
 
         echo $this->templates->render("assignment::edit", ["title" => "Tekstmijn | Opdrachten",
             "page_title" => "Nieuwe opdracht",
             "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "classes" => $classes, "reviewers" => $reviewers,
             "assignment" => $assignment,
-            "page_js" => "/staff/vendor/application/load_date_picker.js"
+            "page_js" => "/staff/vendor/application/load_date_picker.js",
+            "qualtrics_url" => $qualtrics_url
         ]);
     }
 
@@ -299,6 +301,14 @@ class assignment extends model {
     /*
      * Supporting functions
      */
+
+    function getQualtricsURL($id){
+        $assignmentid = $this->database->quote($id);
+        $query = "SELECT qualtrics_url
+                    FROM reviewerlist
+                    WHERE assignment_id = $assignmentid;";
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['qualtrics_url'];
+    }
 
     function getReviewersforAssignment($id) {
         $assignment_id = $this->database->quote($id);
