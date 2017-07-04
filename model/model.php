@@ -34,6 +34,7 @@ class model
         $templates->addFolder("review", "view/review");
         $templates->addFolder("analysis", "view/analysis");
         $templates->addFolder("assignment", "view/assignment");
+        $templates->addFolder("questionnaire", "view/questionnaire");
         $templates->addFolder("administration", "view/administration");
         $templates->addFolder("admin_classes", "view/administration/classes");
         $templates->addFolder("admin_students", "view/administration/students");
@@ -91,6 +92,7 @@ class model
             "Administratie" => "<i class='glyphicon glyphicon-cog' aria-hidden='true'></i>&nbsp;&nbsp;Administratie",
             "Mijn account" => "<i class='glyphicon glyphicon-user' aria-hidden='true'></i>&nbsp;&nbsp;Mijn account",
             "Opdrachten" => "<i class='glyphicon glyphicon-file' aria-hidden='true'></i>&nbsp;&nbsp;Opdrachten",
+            "Vragenlijsten" => "<i class='glyphicon glyphicon-th-list' aria-hidden='true'></i>&nbsp;&nbsp;Vragenlijsten",
         ];
 
         if ($type == 0) {
@@ -131,6 +133,7 @@ class model
             $menu_options = [
                 $item["Beoordelen"] => "/staff/review/",
                 $item["Opdrachten"] => "/staff/assignment/",
+                $item["Vragenlijsten"] => "/staff/questionnaire/",
                 $item["Analyse"] => "/staff/analysis/",
                 $item["Administratie"] => "/staff/administration/",
                 $item["Mijn account"] => "/staff/account/",

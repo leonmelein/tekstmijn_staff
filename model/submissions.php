@@ -239,6 +239,7 @@ class submissions extends classroom
                 "submission_count",
                 "original_file",
                 "text",
+                "student_id"
             ],
             ["id" => $id]
         );

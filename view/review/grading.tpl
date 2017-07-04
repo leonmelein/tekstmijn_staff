@@ -45,7 +45,7 @@
             <li role="presentation" class="active"><a href="#beoordelen" aria-controls="beoordelen" role="tab" data-toggle="tab" aria-expanded="true">Lezen en beoordelen</a></li>
             <li role="presentation" class=""><a href="#beoordelingslijst" aria-controls="beoordelingslijst" role="tab" data-toggle="tab" aria-expanded="false">Beoordelingslijst</a></li>
             <?php if($questionnaire): ?>
-            <li role="presentation" class=""><a href="<?=$this->e($questionnaire)?>" target="_blank" aria-controls="beoordelingslijst" role="tab" data-toggle="" aria-expanded="false">Qualtrics <i class="glyphicon glyphicon-new-window"></i></a></li>
+            <li role="presentation" class=""><a href="<?=$this->e($questionnaire)?>?student_id=<?=$this->e($student_id)?>&submission_id=<?=$this->e($submission_id)?>&text_length=<?=$this->e($text_length)?>" target="_blank" aria-controls="beoordelingslijst" role="tab" data-toggle="" aria-expanded="false">Qualtrics <i class="glyphicon glyphicon-new-window"></i></a></li>
             <?php endif; ?>
         </ul>
 
