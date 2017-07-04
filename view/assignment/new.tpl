@@ -26,7 +26,7 @@
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="class_id">Klas</label>
                     <div class="col-md-4">
-                        <select id="class_id" name="class_id[]" class="form-control" multiple="multiple" disabled>
+                        <select id="class_id" name="class_id[]" class="form-control" multiple="multiple">
                             <?php echo $classes; ?>
                         </select>
                     </div>
@@ -53,7 +53,7 @@
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="reviewers">Beoordelaars</label>
                     <div class="col-md-4">
-                        <select id="reviewers" name="reviewers[]" class="form-control" multiple="multiple" disabled>
+                        <select id="reviewers" name="reviewers[]" class="form-control" multiple="multiple">
                             <?php echo $reviewers; ?>
                         </select>
                     </div>
