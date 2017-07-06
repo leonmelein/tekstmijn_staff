@@ -35,6 +35,7 @@
         $institution = $this->getInstitution($school_id);
         $classes = $this->getClassList($school_id);
         $personnelMember = $this->getPersonnelMember($personnel_id, $institution["id"]);
+        $klassen = $this->options_selected($this->getClassesSelect($school_id),$this->getCoupledClasses($personnel_id));
 
         if ($personnelMember) {
             $menu = $this->menu($this->bootstrap, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
@@ -56,7 +57,8 @@
                     "breadcrumbs" => $breadcrumbs,
                     "personnelmember" => $personnelMember,
                     "classes" => $this->options($classes),
-                    "page_js" => "/staff/vendor/application/load_date_picker.js"
+                    "page_js" => "/staff/vendor/application/load_date_picker.js",
+                    "klassen" => $klassen
                 ]
             );
         } else {
@@ -80,6 +82,7 @@
     function newPersonnelMember($school_id){
         $this->get_session();
         $institution = $this->getInstitution($school_id);
+        $classes = $this->options($this->getClassesSelect($school_id));
 
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = $this->breadcrumbs($this->bootstrap,
@@ -88,7 +91,7 @@
                 "Administratie" => "/staff/administration/",
                 sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
                 "Personeel" => sprintf("/staff/administration/institution/%s/personnel/", $school_id),
-                "Nieuw personeelslid" => "#"
+                "Nieuw personeelslid" => "#",
             ]
         );
 
@@ -98,7 +101,8 @@
                 "page_title" => "Nieuwe personeelslid",
                 "menu" => $menu,
                 "breadcrumbs" => $breadcrumbs,
-                "page_js" => "/staff/vendor/application/load_date_picker.js"
+                "page_js" => "/staff/vendor/application/load_date_picker.js",
+                "klassen" => $classes
             ]
         );
     }
@@ -119,5 +123,27 @@
         } else {
             $this->redirect($redir_negative);
         }
+    }
+
+    //Helper functions
+
+    function getClassesSelect($school_id){
+        $quoted_school_id = $this->database->quote($school_id);
+        $separator = "': '";
+        return $this->database->query("SELECT name, id FROM class WHERE school_id = $quoted_school_id")->fetchAll(PDO::FETCH_ASSOC);
+    }
+
+    function getCoupledClasses($id){
+        $return = Array();
+        $id = $this->database->quote($id);
+        $query = "SELECT class_id
+                  FROM class_staff
+                  WHERE staff_id = $id
+                  ";
+        $export = $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
+        foreach ($export as $index => $class_id) {
+            array_push($return, $class_id['class_id']);
+        }
+        return $return;
     }
 }

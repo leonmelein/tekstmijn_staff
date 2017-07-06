@@ -45,6 +45,15 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="reviewers">Klas(sen)</label>
+                    <div class="col-md-4">
+                        <select id="reviewers" name="klassen[]" class="form-control" multiple="multiple" min="3">
+                            <?php echo $klassen; ?>
+                        </select>
+                    </div>
+                </div>
+
                 <!-- Button -->
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="opslaan"></label>

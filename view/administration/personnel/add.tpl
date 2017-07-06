@@ -1,4 +1,5 @@
 <?php $this->layout('main_layout', ['title' => $title, 'pageJS' => $page_js]); ?>
+
 <div class="row">
     <div class="col-md-12">
         <?php echo $breadcrumbs; ?>
@@ -40,6 +41,15 @@
                     <label class="col-md-4 control-label" for="email">Emailadres</label>
                     <div class="col-md-4">
                         <input id="email" name="email" type="email" placeholder="" class="form-control input-md" required="">
+                    </div>
+                </div>
+
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="reviewers">Klas(sen)</label>
+                    <div class="col-md-4">
+                        <select id="reviewers" name="klassen[]" class="form-control" multiple="multiple" min="3">
+                            <?php echo $klassen; ?>
+                        </select>
                     </div>
                 </div>
 

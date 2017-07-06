@@ -329,6 +329,8 @@ ORDER BY year, name, level ASC";
     }
 
     function updatePersonnelMember($personnelid, $post){
+        $results = Array();
+
         //Check if a 'beoordelaar', 'beheerder' or 'personeelslid' wordt geupadte
         if (!isset($post["type"])) {
             $type = 0;
@@ -336,7 +338,7 @@ ORDER BY year, name, level ASC";
         else {
             $type = $post["type"];
         }
-        return $this->database->update(
+        $result = $this->database->update(
             "staff",
             [
                 "firstname" => $post["firstname"],
@@ -347,9 +349,40 @@ ORDER BY year, name, level ASC";
             ],
             ["id" => $personnelid]
         );
+        array_push($results, $result);
+
+        //Update class_staff
+        if (isset($post["klassen"])) {
+            $klassen = $post["klassen"];
+        }
+        else {
+            $klassen = Array();
+        }
+
+        $this->database->delete('class_staff',['staff_id' => $personnelid]);
+        foreach ($klassen as $index => $class_id) {
+            $result = $this->database->insert(
+                "class_staff",
+                [
+                    "class_id" => $class_id,
+                    "staff_id" => $personnelid
+                ]
+            );
+            array_push($results, $result);
+        }
+
+        //Check if everything went fine
+        if (!in_array(False, $results)) {
+            return True;
+        }
+        else {
+            return False;
+        }
     }
 
     function addPersonnelMember($post, $schoolid){
+        $results = Array();
+
         //Check if a 'beoordelaar', 'beheerder' or 'personeelslid' wordt toegevoegd
         if (!isset($post["type"])) {
             $type = 0;
@@ -357,7 +390,7 @@ ORDER BY year, name, level ASC";
         else {
             $type = $post["type"];
         }
-        return $this->database->insert(
+        $result = $this->database->insert(
             "staff",
             [
                 "firstname" => $post["firstname"],
@@ -368,6 +401,31 @@ ORDER BY year, name, level ASC";
                 "type" => $type
             ]
         );
+        array_push($results, $result);
+
+        //Check if there are classes to couple
+        $personnell_id = $this->database->get('staff','id',['email' => $post["email"]]);
+
+        if (isset($post["klassen"])){
+            foreach ($post["klassen"] as $index => $class_id) {
+                $result = $this->database->insert(
+                    "class_staff",
+                    [
+                        "class_id" => $class_id,
+                        "staff_id" => $personnell_id
+                    ]
+                );
+                array_push($results, $result);
+            }
+        }
+
+        //Check if everything went fine
+        if (!in_array(False, $results)) {
+            return True;
+        }
+        else {
+            return False;
+        }
     }
 
     function deletePersonnelMember($personnelid){
