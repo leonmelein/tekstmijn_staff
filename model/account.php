@@ -116,18 +116,6 @@ class account extends model {
      */
 
     /**
-     * Retrieve a user's information
-     *
-     * @param $username string containing the username
-     * @return mixed Array containing the user's full name and type
-     */
-    private function getUserInfo($username){
-        $quoted_username = $this->database->quote($username);
-        $query = "SELECT id, CONCAT_WS(' ', firstname, prefix, lastname) as name, setuptoken, type FROM staff WHERE email = $quoted_username";
-        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
-    }
-
-    /**
      * Retrieves a user's information for use during registration
      *
      * Checks if a user is eligble to register and if so, retrieves its information
