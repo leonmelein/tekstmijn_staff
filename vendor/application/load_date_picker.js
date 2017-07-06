@@ -9,6 +9,10 @@ $(function () {
         format: 'YYYY-MM-DD HH:mm',
         useCurrent: false
     });
+    $('#datetimepicker4').datetimepicker({
+        format: 'YYYY-MM-DD'
+    });
+
     $("#datetimepicker2").on("dp.change", function (e) {
         $('#datetimepicker3').data("DateTimePicker").minDate(e.date);
     });

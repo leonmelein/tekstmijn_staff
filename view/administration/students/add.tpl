@@ -47,7 +47,7 @@
 
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="birthday">Geboortedatum</label>
-                    <div class='col-md-4 input-group date' id='datetimepicker2'>
+                    <div class='col-md-4 input-group date' id='datetimepicker4'>
                         <input type='text' class="form-control input-md" name="birthday" id="birthday" value="<?=$this->escape($student['birthday'])?>" required />
                         <span class="input-group-addon"><span class="glyphicon glyphicon-calendar"></span></span>
                     </div>
@@ -70,7 +70,7 @@
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="opslaan"></label>
                     <div class="col-md-4">
-                        <button id="opslaan" name="opslaan" class="btn btn-primary">Bijwerken</button>
+                        <button id="opslaan" name="opslaan" class="btn btn-primary">Opslaan</button>
                     </div>
                 </div>
 

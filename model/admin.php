@@ -260,7 +260,7 @@ ORDER BY year, name, level ASC";
         );
     }
 
-    function addStudent( $post, $schoolid){
+    function addStudent($post, $schoolid){
         return $this->database->insert(
             "students",
             [

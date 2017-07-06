@@ -20,7 +20,7 @@ class classroom extends model
             ["Niveau", "level"],
             ["Jaar", "year"]
         ];
-        $table = generateTable($this->bootstrap, $columns, $classes, null, '<a href="%s/">%s</a>');
+        $table = $this->table($this->bootstrap, $columns, $classes, null, '<a href="%s/">%s</a>');
         echo $this->templates->render("classes::index", ["title" => "Tekstmijn | Leerlingen",
             "page_title" => "Leerlingen", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table]);

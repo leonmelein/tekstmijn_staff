@@ -5,7 +5,7 @@
         <?php if($_GET["institution_update"] == "true"): ?>
             <div class="alert alert-success alert-dismissable" role="alert">
                 <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
-                <strong>Gelukt.</strong> Uw wijzigingen is opgeslagen.
+                <strong>Gelukt.</strong> Uw wijzigingen zijn opgeslagen.
             </div>
         <?php endif; ?>
     </div>
