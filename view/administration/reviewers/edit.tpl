@@ -45,6 +45,21 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="type">Type beoordelaar</label>
+                    <div class="col-md-4">
+                        <select id="type" name="type" class="form-control">
+                            <option selected value="<?=$this->e($personnelmember['type'])?>">
+                                <?php if ($personnelmember['type'] == 1) { ?>Beoordelaar<?php } ?>
+                                <?php if ($personnelmember['type'] == 2) { ?>Beheerder<?php } ?>
+                            </option>
+                            <option disabled>──────────</option>
+                            <option value="1">Beoordelaar</option>
+                            <option value="2">Beheerder</option>
+                        </select>
+                    </div>
+                </div>
+
                 <!-- Button -->
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="opslaan"></label>

@@ -318,7 +318,7 @@ ORDER BY year, name, level ASC";
     function getPersonnelMember($personnelid, $schoolid){
         return $this->database->get(
             "staff",
-            ["id", "firstname", "prefix", "lastname", "email"],
+            ["id", "firstname", "prefix", "lastname", "email", "type"],
             [
                 "AND" => [
                     "id" => $personnelid,
@@ -329,19 +329,34 @@ ORDER BY year, name, level ASC";
     }
 
     function updatePersonnelMember($personnelid, $post){
+        //Check if a 'beoordelaar', 'beheerder' or 'personeelslid' wordt geupadte
+        if (!isset($post["type"])) {
+            $type = 0;
+        }
+        else {
+            $type = $post["type"];
+        }
         return $this->database->update(
             "staff",
             [
                 "firstname" => $post["firstname"],
                 "prefix" => $post["prefix"],
                 "lastname" => $post["lastname"],
-                "email" => $post["email"]
+                "email" => $post["email"],
+                "type" => $type
             ],
             ["id" => $personnelid]
         );
     }
 
     function addPersonnelMember($post, $schoolid){
+        //Check if a 'beoordelaar', 'beheerder' or 'personeelslid' wordt toegevoegd
+        if (!isset($post["type"])) {
+            $type = 0;
+        }
+        else {
+            $type = $post["type"];
+        }
         return $this->database->insert(
             "staff",
             [
@@ -349,7 +364,8 @@ ORDER BY year, name, level ASC";
                 "prefix" => $post["prefix"],
                 "lastname" => $post["lastname"],
                 "email" => $post["email"],
-                "school_id" => $schoolid
+                "school_id" => $schoolid,
+                "type" => $type
             ]
         );
     }

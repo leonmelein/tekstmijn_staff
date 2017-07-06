@@ -43,6 +43,16 @@
                     </div>
                 </div>
 
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="type">Type beoordelaar</label>
+                    <div class="col-md-4">
+                        <select id="type" name="type" class="form-control">
+                            <option value="1">Beoordelaar</option>
+                            <option value="2">Beheerder</option>
+                        </select>
+                    </div>
+                </div>
+
                 <!-- Button -->
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="opslaan"></label>
