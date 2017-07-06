@@ -29,7 +29,6 @@
     require("model/personnel.php");
     require("model/reviewers.php");
     require("model/questionnaires.php");
-    require("model/mail.php");
 
     // Reroute HTTP traffic to HTTPS
     if (!isset($_SERVER['HTTPS']) || $_SERVER['HTTPS'] !== 'on') {
@@ -253,11 +252,6 @@
 
             });
         });
-    });
-
-    $router->mount('/mail', function() use ($router) {
-        $router->get('/newuser/', "mail@newuser");
-        $router->get('/newpassword', "mail@newpassword");
     });
 
     $router->run();

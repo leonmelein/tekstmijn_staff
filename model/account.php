@@ -83,8 +83,19 @@ class account extends model {
      * Resets the users password on reset
      */
     public function completePasswordReset(){
+        $redir = "/staff/login/?pwd_reset=true";
+        $redir_negative = "/staff/reset_password/?failed=true";
+
         if($this->change_password($_POST["username"], $_POST["password"])){
-            $this->redirect("/staff/login/?pwd_reset=true");
+            $sanitized_email = filter_var($_POST['username'], FILTER_SANITIZE_EMAIL);
+            if (filter_var($sanitized_email, FILTER_VALIDATE_EMAIL)) {
+                $result = $this->mail($sanitized_email, "Tekstmijn - Wachtwoord gewijzigd", "mail::passwordresetnotification");
+                if(!$result) {
+                    $this->redirect($redir_negative);
+                } else {
+                    $this->redirect($redir);
+                }
+            }
         } else {
             $this->redirect("/staff/reset_password/?failed=true");
         }
