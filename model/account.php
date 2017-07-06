@@ -19,7 +19,7 @@ class account extends model {
 
         echo $this->templates->render("login::account", ["title" => "Tekstmijn | Mijn account",
             "page_title" => "Mijn account", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
-            "name" => $_SESSION["staff_name"], "email" => $_SESSION["staff_email"], "page_js" => "../vendor/application/register_validate.js"]);
+            "name" => $_SESSION["staff_name"], "email" => $_SESSION["staff_email"], "type" => $_SESSION["type"], "page_js" => "../vendor/application/register_validate.js"]);
     }
 
     public function updateAccount(){

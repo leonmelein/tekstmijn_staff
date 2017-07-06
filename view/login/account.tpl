@@ -44,6 +44,32 @@
                     </div>
                 </div>
 
+                <!-- Text input-->
+                <div class="form-group">
+                    <label class="col-md-4 control-label" for="name">Gebruikerstype</label>
+                    <div class="col-md-4">
+                        <p class="form-control-static">
+                            <?php
+                                switch ($type) {
+                                    case 0:
+                                        echo "Docent";
+                                        break;
+                                    case 1:
+                                        echo "Beoordelaar";
+                                        break;
+                                    case 2:
+                                        echo "Beheerder";
+                                        break;
+                                    default:
+                                        echo "Gebruiker";
+                                        break;
+                                }
+                            ?>
+
+                        </p>
+                    </div>
+                </div>
+
                 <!-- Password input-->
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="password">Wachtwoord</label>
