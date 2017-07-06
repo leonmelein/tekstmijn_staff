@@ -210,7 +210,7 @@ ORDER BY year, name, level ASC";
     }
 
     function getClassName($id){
-        return $this->database->select("class", ["name"], [id => $id])[0]["name"];
+        return $this->database->select("class", ["name"], ['id' => $id])[0]["name"];
     }
 
     function getClassStudents($id){

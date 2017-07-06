@@ -89,7 +89,12 @@ class account extends model {
         if($this->change_password($_POST["username"], $_POST["password"])){
             $sanitized_email = filter_var($_POST['username'], FILTER_SANITIZE_EMAIL);
             if (filter_var($sanitized_email, FILTER_VALIDATE_EMAIL)) {
-                $result = $this->mail($sanitized_email, "Tekstmijn - Wachtwoord gewijzigd", "mail::passwordresetnotification");
+                $result = $this->mail(
+                    $sanitized_email,
+                    "Tekstmijn - Wachtwoord opnieuw ingesteld",
+                    "mail::reset_notify"
+                );
+
                 if(!$result) {
                     $this->redirect($redir_negative);
                 } else {
@@ -245,41 +250,6 @@ class account extends model {
 
 
         return $rows_affected;
-    }
-
-    /**
-     *
-     */
-    function send_reset_link(){
-        $sanitized_email = filter_var($_POST['username'], FILTER_SANITIZE_EMAIL);
-        if (filter_var($sanitized_email, FILTER_VALIDATE_EMAIL)) {
-            $this->set_setup_token($sanitized_email);
-
-            // Password forgotten
-            $mail = new PHPMailer;
-            $mail->setFrom('info@tekstmijn.nl', 'Project Tekstmijn');
-            $mail->addAddress($sanitized_email);
-            $mail->isHTML(true);                                  // Set email format to HTML
-            $mail->Subject = 'Project Tekstmijn - Wachtwoord wijzigen';
-            $token = $this->get_setup_token($sanitized_email);
-            // Retrieve the email template required
-            $message = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/assets/mail/reset.html');
-            // Replace the % with the actual information
-            $info = $this->getUserInfo($_POST['username']);
-            $message = str_replace('%name%', $info['name'], $message);
-            $message = str_replace('%link%', $token, $message);
-
-
-            $mail->Body    = $message;
-            $mail->AltBody = 'Zet HTML aan in uw e-mailclient.';
-
-            if(!$mail->send()) {
-                $this->redirect("/staff/login/?reset=false");
-            } else {
-                echo $mail->ErrorInfo;
-                $this->redirect("/staff/login/?reset=true");
-            }
-        }
     }
 
 }

@@ -16,7 +16,7 @@ class submissions extends classroom
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/submissions/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "../account/", "Inzendingen" => "#"]);
 
-        $classes = $this->getSubmissions($_SESSION["staff_id"]);
+        $classes = $this->getClasses($_SESSION["staff_id"]);
         $columns = [
             ["Klas", "class"],
             ["Niveau", "level"],
@@ -30,7 +30,7 @@ class submissions extends classroom
 
     public function assignmentOverview($class_id){
         $this->get_session();
-        $class = getClassName($this->database, $class_id);
+        $class = $this->getClassName($class_id);
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/submissions/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/",
             sprintf("Klas %s", $class) => "#"]);
@@ -109,7 +109,7 @@ class submissions extends classroom
         $subtitle = sprintf("%s : %s", $assignment_name, $student_name);
         $class = $this->getClassName($class_id);
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/submissions/", "align" => "stacked"], $_SESSION['type']);
-        $breadcrumbs = generateBreadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/", sprintf("Klas %s", $class) => "/staff/submissions/$class_id", $assignment_name => "/staff/submissions/$class_id/$assignment_id", $title => "#"]);
+        $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Inzendingen" => "/staff/submissions/", sprintf("Klas %s", $class) => "/staff/submissions/$class_id", $assignment_name => "/staff/submissions/$class_id/$assignment_id", $title => "#"]);
 
         $submission_info = $this->getSubmissionInfo($submission_id);
         $page_js = "/staff/vendor/application/add_field.js";
@@ -135,7 +135,7 @@ class submissions extends classroom
     /*
      * Supporting functions
      */
-    function getSubmissions($id){
+    function getClasses($id){
         $quoted_id = $this->database->quote($id);
         $query = "SELECT class.id as id, class.year as year, level.name as level, class.name as class 
                 FROM class, level
@@ -249,9 +249,9 @@ class submissions extends classroom
     {
         $gradingtable = "";
         $basetbl = '<form id="grade_%s" class="grade" method="post" action="grade/">
-                <input name="class_id"type="hidden" value="%s">
-                <input name="assignment_id"type="hidden" value="%s">
-                <input name="submission_id"type="hidden" value="%s">
+                <input name="class_id" type="hidden" value="%s">
+                <input name="assignment_id" type="hidden" value="%s">
+                <input name="submission_id" type="hidden" value="%s">
                     <tr id="students_%s" class="students">
                         <td>%s</td>
                         <td>%s</td>
@@ -345,7 +345,7 @@ class submissions extends classroom
                        WHERE grading.staff_id = $quoted_staff_id
                        AND grading.submission_id = $quoted_submission_id
                        AND grading.type = 'Notes'";
-        $note_txt = $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0][notes];
+        $note_txt = $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['notes'];
         $current_grades['Notes'] = $note_txt;
 
         foreach ($types as $type) {
@@ -354,7 +354,7 @@ class submissions extends classroom
                      WHERE grading.staff_id = $quoted_staff_id
                      AND grading.submission_id = $quoted_submission_id
                      AND grading.type = $quoted_type";
-            $grade = $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0][grade];
+            $grade = $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['grade'];
             $current_grades[$type] = $grade;
         }
         return $current_grades;

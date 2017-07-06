@@ -230,7 +230,7 @@ class auth extends model {
     function send_reset_link(){
         $sanitized_email = filter_var($_POST['username'], FILTER_SANITIZE_EMAIL);
         if (filter_var($sanitized_email, FILTER_VALIDATE_EMAIL)) {
-            $result = $this->mail($sanitized_email, "Tekstmijn - Wachtwoord wijzigen", "mail::passwordreset");
+            $result = $this->mail($sanitized_email, "Tekstmijn - Wachtwoord wijzigen", "mail::reset");
             if(!$result) {
                 $this->redirect("/staff/login/?reset=false");
             } else {

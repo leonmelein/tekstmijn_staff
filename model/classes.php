@@ -66,7 +66,7 @@
         $this->get_session();
         $institution = $this->getInstitution($school_id);
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
-        $breadcrumbs = generateBreadcrumbs($this->bootstrap,
+        $breadcrumbs = $this->breadcrumbs($this->bootstrap,
             [
                 $_SESSION["staff_name"] => "/staff/account/",
                 "Administratie" => "/staff/administration/",
@@ -118,9 +118,9 @@
     }
     function saveUpdatedClass($school_id, $class_id){
         if ($this->updateClass($class_id, $_POST)) {
-            getRedirect("../../?institution_update=true");
+            $this->redirect("../../?institution_update=true");
         } else {
-            getRedirect("../../?institution_update=false");
+            $this->redirect("../../?institution_update=false");
         }
     }
     function delClass($school_id, $class_id){
