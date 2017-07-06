@@ -64,6 +64,10 @@
     $router->before('GET|POST', '/status/.*', 'auth@checkLogin');
     $router->before('GET|POST', '/review/','auth@checkLogin');
     $router->before('GET|POST', '/review/.*', 'auth@checkLogin');
+    $router->before('GET|POST', '/assignment/', 'auth@checkLogin');
+    $router->before('GET|POST', '/assignment/.*', 'auth@checkLogin');
+    $router->before('GET|POST', '/questionnaire/', 'auth@checkLogin');
+    $router->before('GET|POST', '/questionnaire/.*', 'auth@checkLogin');
     $router->before('GET|POST', '/administration/', 'auth@checkLogin');
     $router->before('GET|POST', '/administration/.*', 'auth@checkLogin');
     $router->before('GET', '/register/', 'auth@checkToken');
