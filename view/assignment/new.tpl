@@ -2,6 +2,17 @@
 <div class="row">
     <div class="col-md-12">
         <?php echo $breadcrumbs; ?>
+        <?php if($_GET["success"] == "true") { ?>
+        <div class="alert alert-success alert-dismissable" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
+            <strong>Gelukt.</strong> De opdracht is succesvol opgeslagen.
+        </div>
+        <?php } else if($_GET["success"] == "false") { ?>
+        <div class="alert alert-danger alert-dismissable" role="alert">
+            <button type="button" class="close" data-dismiss="alert" aria-label="Sluiten"><span aria-hidden="true">&times;</span></button>
+            <strong>Oeps.</strong> Selecteer minimaal 3 beoordelaars.
+        </div>
+        <?php } ?>
     </div>
 </div>
 
@@ -53,9 +64,10 @@
                 <div class="form-group">
                     <label class="col-md-4 control-label" for="reviewers">Beoordelaars</label>
                     <div class="col-md-4">
-                        <select id="reviewers" name="reviewers[]" class="form-control" multiple="multiple">
+                        <select id="reviewers" name="reviewers[]" class="form-control" multiple="multiple" min="3">
                             <?php echo $reviewers; ?>
                         </select>
+                        <span class="help-block">Selecteer minimaal 3 beoordelaars</span>
                     </div>
                 </div>
 

@@ -11,6 +11,8 @@
     </div>
     <div class="col-md-9">
         <h1 class="page_title"><?php echo $page_title; ?></h1>
+        <a class="btn btn-primary pull-right" href="delete/"><i class="glyphicon glyphicon-remove"></i> Verwijder opdracht</a>
+
         <form class="form-horizontal" method="post" action="save/">
             <fieldset>
 

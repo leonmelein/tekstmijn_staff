@@ -123,6 +123,11 @@ class assignment extends model {
     * @return Boolean
     */
     function addAssignment(){
+        //Check if there are at least 3 reviewers
+        if (count($_POST['reviewers']) < 3) {
+            $this->redirect("../new/?success=false", 303);
+        }
+
         //Create empty array to check if adding the assignment works fine
         $results = Array();
 
@@ -245,7 +250,7 @@ class assignment extends model {
             $this->redirect("../?success=true", 303);
         }
         else {
-            $this->redirect("../?success=false", 303);
+            $this->redirect("../?success=true", 303);
         }
     }
 
@@ -293,8 +298,41 @@ class assignment extends model {
         }
     }
 
-    function deleteAssignment(){
-        // TODO: something useful
+    function deleteAssignment($assignment_id){
+        //Create empty array to check if adding the assignment works fine
+        $results = Array();
+
+        //Remove Assignment from the assignments table
+        $result = $this->database->delete("assignments",
+            ["id" => $assignment_id]
+        );
+        array_push($results, $result);
+
+        //Remove assignment from the assignment_class table
+        $result = $this->database->delete("assignments_class",
+            ["assignment_id" => $assignment_id]
+        );
+        array_push($results, $result);
+
+        //Remove assignment from the allocations table
+        $result = $this->database->delete("allocations",
+            ["assignment_id" => $assignment_id]
+        );
+        array_push($results, $result);
+
+        //Remove assignment from the reviewerlist table
+        $result = $this->database->delete("reviewerlist",
+            ["assignment_id" => $assignment_id]
+        );
+        array_push($results, $result);
+
+        //Check if removing the assignment worked out fine
+        if (!in_array(False,$results)) {
+            $this->redirect("../../?delete=true", 303);
+        }
+        else {
+            $this->redirect("../../?delete=false", 303);
+        }
     }
 
 

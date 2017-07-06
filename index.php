@@ -149,7 +149,7 @@
         $router->get("/([a-z0-9_-]+)", "assignment@individualAssignment");
         $router->get("/([a-z0-9_-]+)/download", "assignment@downloadSubmissions");
         $router->get("/([a-z0-9_-]+)/edit", "assignment@editAssignment");
-        $router->get("/([a-z0-9_-]+)/delete", "assignment@individualAssignment");
+        $router->get("/([a-z0-9_-]+)/delete", "assignment@deleteAssignment");
         $router->post("/([a-z0-9_-]+)/save", "assignment@updateAssignment");
     });
 
