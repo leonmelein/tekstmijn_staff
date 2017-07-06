@@ -55,7 +55,7 @@
                     "menu" => $menu,
                     "breadcrumbs" => $breadcrumbs,
                     "personnelmember" => $personnelMember,
-                    "classes" => generateOptions($classes),
+                    "classes" => $this->options($classes),
                     "page_js" => "/staff/vendor/application/load_date_picker.js"
                 ]
             );
@@ -103,10 +103,21 @@
         );
     }
     function savePersonnel($school_id){
+        $redir = "../?personnel_added=true";
+        $redir_negative = "../?personnel_added=false";
+
         if ($this->addPersonnelMember($_POST, $school_id)) {
-            $this->redirect("../?personnel_added=true");
+            $sanitized_email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+            if (filter_var($sanitized_email, FILTER_VALIDATE_EMAIL)) {
+                $result = $this->mail($sanitized_email, "Tekstmijn - Nieuwe gebruiker", "mail::newuser");
+                if(!$result) {
+                    $this->redirect($redir_negative);
+                } else {
+                    $this->redirect($redir);
+                }
+            }
         } else {
-            $this->redirect("../?personnel_added=false");
+            $this->redirect($redir_negative);
         }
     }
 }

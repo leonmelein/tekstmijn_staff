@@ -101,10 +101,21 @@
         );
     }
     function saveReviewer($school_id){
+        $redir = "../?reviewer_added=true";
+        $redir_negative = "../?reviewer_added=false";
+
         if ($this->addPersonnelMember($_POST, $school_id)) {
-            $this->redirect("../?reviewer_added=true");
+            $sanitized_email = filter_var($_POST['email'], FILTER_SANITIZE_EMAIL);
+            if (filter_var($sanitized_email, FILTER_VALIDATE_EMAIL)) {
+                $result = $this->mail($sanitized_email, "Tekstmijn - Nieuwe gebruiker", "mail::newuser");
+                if(!$result) {
+                    $this->redirect($redir_negative);
+                } else {
+                    $this->redirect($redir);
+                }
+            }
         } else {
-            $this->redirect("../?reviewer_added=false");
+            $this->redirect($redir_negative);
         }
     }
 }

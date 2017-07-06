@@ -19,9 +19,9 @@ class grading extends model
 
         $result = $this->insertGrades($staff_id, $submission_id, $grading_name, $grading_grade, $grading_notes);
         if ($result){
-            getRedirect("../?success=true");
+            $this->redirect("../?success=true");
         } else {
-            getRedirect("../?success=false");
+            $this->redirect("../?success=false");
         }
     }
 

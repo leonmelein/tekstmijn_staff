@@ -19,7 +19,7 @@ class model
             'server' => $db_settings['server'],
             'username' => $db_settings['username'],
             'password' => $db_settings['password'],
-            'charset' => 'utf8',
+            'charset' => 'utf8mb4',
             'command' => [
                 'SET SQL_MODE=ANSI_QUOTES'
             ]
@@ -30,6 +30,7 @@ class model
         $templates = new League\Plates\Engine('view', 'tpl');
         $templates->addFolder("login", "view/login");
         $templates->addFolder("classes", "view/classes");
+        $templates->addFolder("mail", "view/mail");
         $templates->addFolder("submissions", "view/submissions");
         $templates->addFolder("review", "view/review");
         $templates->addFolder("analysis", "view/analysis");
@@ -202,4 +203,31 @@ class model
         exit();
     }
 
+    public function mail($to, $subject, $template){
+        // Password forgotten
+        $mail = new PHPMailer;
+        $mail->setFrom('info@tekstmijn.nl', 'Tekstmijn');
+        $mail->addAddress($to);
+        $mail->isHTML(true);                                  // Set email format to HTML
+        $mail->Subject = $subject;
+        $info = $this->getUserInfo($to);
+        $message = $this->templates->render($template, ["user" => $info]);
+
+        $mail->Body    = $message;
+        $mail->AltBody = 'Zet HTML aan in uw e-mailclient.';
+
+        return $mail->send();
+    }
+
+    /**
+     * Retrieve a user's information
+     *
+     * @param $username string containing the username
+     * @return mixed Array containing the user's full name and type
+     */
+    public function getUserInfo($username){
+        $quoted_username = $this->database->quote($username);
+        $query = "SELECT id, CONCAT_WS(' ', firstname, prefix, lastname) as name, setuptoken, type FROM staff WHERE email = $quoted_username";
+        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
+    }
 }

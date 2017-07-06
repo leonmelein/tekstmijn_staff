@@ -27,7 +27,7 @@ class students extends admin {
         ];
         $options = [
             ["<a class='pull-right' href='%s/edit'><i class='glyphicon glyphicon-pencil'></i> Bewerken</a>"],
-            ["<a class='pull-right' id='%s' onclick='reset_student_pwd(%s, self.document)'><i class='glyphicon glyphicon-repeat'></i> Wachtwoord resetten</a>", "id", '']
+            ["<a class='pull-right' id='%s' onclick='reset_student_pwd(%s, self.document);'><i class='glyphicon glyphicon-repeat'></i> Wachtwoord resetten</a>", "id", '']
         ];
 
         $table = $this->table($this->bootstrap, $columns, $students, $options, '<a href="%s/edit">%s</a>');
@@ -57,7 +57,7 @@ class students extends admin {
                 "page_title" => "Nieuwe leerling",
                 "menu" => $menu,
                 "breadcrumbs" => $breadcrumbs,
-                "classes" => generateOptions($classes),
+                "classes" => $this->options($classes),
                 "page_js" => "/staff/vendor/application/load_date_picker.js"
             ]
         );

@@ -131,9 +131,9 @@ class review extends submissions
 
         $result = $this->saveQuestionnaire($saved_data, $staff_id, $submission_id, $reviewerlist_id);
         if ($result){
-            getRedirect("../?success=true");
+            $this->redirect("../?success=true");
         } else {
-            getRedirect("../?success=false");
+            $this->redirect("../?success=false");
         }
     }
 

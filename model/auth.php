@@ -37,6 +37,7 @@ class auth extends model {
         ];
 
         if ($_POST['password_forgotten'] == 1) {
+            $this->set_setup_token($_POST['username']);
             $this->send_reset_link();
         } else {
             // Regular login
@@ -100,18 +101,6 @@ class auth extends model {
     private function check_login($username, $password){
         $retrievedPassword = $this->database->get("staff", "password", ["email" => $username]);
         return hash_equals($retrievedPassword, crypt($password, $retrievedPassword));
-    }
-
-    /**
-     * Retrieve a user's information
-     *
-     * @param $username string containing the username
-     * @return mixed Array containing the user's full name and type
-     */
-    private function getUserInfo($username){
-        $quoted_username = $this->database->quote($username);
-        $query = "SELECT id, CONCAT_WS(' ', firstname, prefix, lastname) as name, setuptoken, type FROM staff WHERE email = $quoted_username";
-        return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
     }
 
     /**
@@ -241,32 +230,14 @@ class auth extends model {
     function send_reset_link(){
         $sanitized_email = filter_var($_POST['username'], FILTER_SANITIZE_EMAIL);
         if (filter_var($sanitized_email, FILTER_VALIDATE_EMAIL)) {
-            $this->set_setup_token($sanitized_email);
-
-            // Password forgotten
-            $mail = new PHPMailer;
-            $mail->setFrom('info@tekstmijn.nl', 'Project Tekstmijn');
-            $mail->addAddress($sanitized_email);
-            $mail->isHTML(true);                                  // Set email format to HTML
-            $mail->Subject = 'Project Tekstmijn - Wachtwoord wijzigen';
-            $token = $this->get_setup_token($sanitized_email);
-            // Retrieve the email template required
-            $message = file_get_contents($_SERVER['DOCUMENT_ROOT'] . '/assets/mail/reset.html');
-            // Replace the % with the actual information
-            $info = $this->getUserInfo($_POST['username']);
-            $message = str_replace('%name%', $info['name'], $message);
-            $message = str_replace('%link%', $token, $message);
-
-
-            $mail->Body    = $message;
-            $mail->AltBody = 'Zet HTML aan in uw e-mailclient.';
-
-            if(!$mail->send()) {
+            $result = $this->mail($sanitized_email, "Tekstmijn - Wachtwoord wijzigen", "mail::reset");
+            if(!$result) {
                 $this->redirect("/staff/login/?reset=false");
             } else {
-                echo $mail->ErrorInfo;
                 $this->redirect("/staff/login/?reset=true");
             }
+        } else {
+            $this->redirect("/staff/login/?reset=false");
         }
     }
 
