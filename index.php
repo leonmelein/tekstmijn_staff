@@ -94,6 +94,11 @@
         $router->get("/", "account@startRegistration");
         $router->post("/", "account@completeRegistration");
     });
+
+    $router->mount('/forgot', function () use ($router){
+        $router->get('/', "auth@requestReset");
+        $router->post('/', "auth@sendResetLink");
+    });
     $router->mount('/reset_password', function() use ($router){
         $router->get("/", "account@startPasswordReset");
         $router->post("/", "account@completePasswordReset");

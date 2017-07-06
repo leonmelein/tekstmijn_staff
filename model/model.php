@@ -21,7 +21,7 @@ class model
             'password' => $db_settings['password'],
             'charset' => 'utf8mb4',
             'command' => [
-                'SET SQL_MODE=ANSI_QUOTES'
+                "SET SQL_MODE=ANSI_QUOTES; SET lc_time_names = 'nl_NL'"
             ]
         ]);
         $this->bootstrap = new Bootstrap;

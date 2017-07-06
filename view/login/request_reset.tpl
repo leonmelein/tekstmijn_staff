@@ -29,7 +29,7 @@
     <div class="container signin-container">
 
 
-        <form class="form-signin" method="post" action="/staff/login/">
+        <form class="form-signin" method="post" action="/staff/forgot/">
 
             <div class="row">
                 <div class="col-md-3"></div>
@@ -38,7 +38,8 @@
                 </div>
             </div>
             <div class="row">
-                <h3 class="text-center">Tekstmijn Medewerkers</h3><br>
+                <h3 class="text-center">Tekstmijn Medewerkers</h3>
+                <h4 class="text-center">Wachtwoord opnieuw instellen</h4><br>
                 <?php
                 if($_GET["logged_out"] == "true") {
                     echo '<div class="alert alert-success alert-dismissable" role="alert">
@@ -84,11 +85,8 @@
                 ?>
             </div>
             <label for="username" class="sr-only">E-mailadres</label>
-            <input type="text" name="username" id="username" class="form-control" placeholder="de.docent@school.nl" aria-label="E-mailadres" required autofocus>
-            <label for="password" class="sr-only">Wachtwoord</label>
-            <input type="password" name="password" id="password" class="form-control" placeholder="Wachtwoord" aria-label="Wachtwoord" required>
-            <button class="btn btn-lg btn-primary btn-block" type="submit" name="password_forgotten" value="0" aria-label="Inloggen">Inloggen</button>
-            <a class="btn btn-lg btn-primary btn-block" href="/staff/forgot/" aria-label="Wachtwoord vergeten?">Wachtwoord vergeten?</a>
+            <input type="text" name="username" id="username" class="form-control" placeholder="de.docent@school.nl" aria-label="E-mailadres" required autofocus><br>
+            <button class="btn btn-lg btn-primary btn-block" type="submit" name="password_forgotten" value="1" href="#" aria-label="Wachtwoord opnieuw instellen">Wachtwoord opnieuw instellen</button>
         </form>
 
     </div> <!-- /container -->

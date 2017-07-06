@@ -27,6 +27,18 @@ class auth extends model {
     }
 
     /**
+     * Renders password reset request page
+     */
+    public function requestReset(){
+        echo $this->templates->render("login::request_reset", ["title" => "Tekstmijn | Wachtwoord vergeten?"]);
+    }
+
+    public function sendResetLink(){
+        $this->set_setup_token($_POST['username']);
+        $this->send_reset_link();
+    }
+
+    /**
      * Handles user login and password reset requests
      */
     public function login(){
@@ -36,25 +48,21 @@ class auth extends model {
             2 => "../review/"
         ];
 
-        if ($_POST['password_forgotten'] == 1) {
-            $this->set_setup_token($_POST['username']);
-            $this->send_reset_link();
+        // Regular login
+        if($this->check_login($_POST['username'], $_POST['password'])){
+            $info = $this->getUserInfo($_POST['username']);
+
+            $this->get_session();
+            $_SESSION['staff_id'] = $info["id"];
+            $_SESSION['type'] = $info["type"];
+            $_SESSION["staff_email"] = $_POST["username"];
+            $_SESSION['staff_name'] = $info["name"];
+            $this->redirect($type_redir[$info['type']]);
+
         } else {
-            // Regular login
-            if($this->check_login($_POST['username'], $_POST['password'])){
-                $info = $this->getUserInfo($_POST['username']);
-
-                $this->get_session();
-                $_SESSION['staff_id'] = $info["id"];
-                $_SESSION['type'] = $info["type"];
-                $_SESSION["staff_email"] = $_POST["username"];
-                $_SESSION['staff_name'] = $info["name"];
-                $this->redirect($type_redir[$info['type']]);
-
-            } else {
-                $this->redirect("/staff/login/?failed=true");
-            }
+            $this->redirect("/staff/login/?failed=true");
         }
+
     }
 
     /**
@@ -232,12 +240,12 @@ class auth extends model {
         if (filter_var($sanitized_email, FILTER_VALIDATE_EMAIL)) {
             $result = $this->mail($sanitized_email, "Tekstmijn - Wachtwoord wijzigen", "mail::reset");
             if(!$result) {
-                $this->redirect("/staff/login/?reset=false");
+                $this->redirect("/staff/forgot/?reset=false");
             } else {
-                $this->redirect("/staff/login/?reset=true");
+                $this->redirect("/staff/forgot/?reset=true");
             }
         } else {
-            $this->redirect("/staff/login/?reset=false");
+            $this->redirect("/staff/forgot/?reset=false");
         }
     }
 
