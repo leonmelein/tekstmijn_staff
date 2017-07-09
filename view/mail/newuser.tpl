@@ -8,7 +8,7 @@
         <td class="wrapper">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
-                    <img src="https://tekstmijn.nl/mailheader.png"/>
+                    <img src="https://tekstmijn.nl/staff/assets/img/mailheader.png"/>
                 </tr>
                 <tr style="height: 20px;"> </tr>
                 <tr>

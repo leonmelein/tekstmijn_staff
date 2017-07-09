@@ -13,7 +13,8 @@
 
     // Main model
     require("model/model.php");
-    // New type Submodels
+
+    // Page models
     require("model/classroom.php");
     require("model/auth.php");
     require("model/analysis.php");
