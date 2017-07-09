@@ -49,12 +49,14 @@
 
     /*
      * Page routers
-     * - Provides routes to the individual parts of the system
+     *
+     * Provides routes to the individual parts of the system
      */
 
     /**
      * Authentication
-     * Checking if a user is logged in or has the required
+     *
+     * Checking if a user is logged in or has the required tokens.
      */
     $router->before('GET|POST', '/account/', 'auth@checkLogin');
     $router->before('GET|POST', '/classes/', 'auth@checkLogin');
@@ -75,6 +77,8 @@
 
     /**
      * Login
+     *
+     * Handles authentication of users.
      */
     $router->get("/", "auth@homepage");
     $router->mount('/login', function() use ($router){
@@ -85,12 +89,14 @@
     $router->get('/logout', "auth@logout");
 
     /**
-    * Account
-    */
+     * Account
+     *
+     * Handles user account actions like registration and password resets.
+     */
     $router->mount('/account', function() use ($router){
-    $router->get("/", "account@showAccount");
-    $router->post("/", "account@updateAccount");
-});
+        $router->get("/", "account@showAccount");
+        $router->post("/", "account@updateAccount");
+    });
     $router->mount('/register', function() use ($router){
         $router->get("/", "account@startRegistration");
         $router->post("/", "account@completeRegistration");
@@ -104,19 +110,24 @@
         $router->get("/", "account@startPasswordReset");
         $router->post("/", "account@completePasswordReset");
     });
+
+    // Resetting student passwords from staff interface by teachers and administrators
     $router->get("/reset/(\d+)/", "classroom@resetStudentPwd");
 
     /**
      * Classes
+     *
+     * Displays a list of classes and their respective students to teachers.
      */
     $router->mount('/classes', function() use ($router){
         $router->get("/", "classroom@teacherOverview");
-
         $router->get("/(\d+)", "classroom@individualClass");
     });
 
     /**
      * Submissions
+     *
+     * Displays submissions for assignments to teachers and enables grading.
      */
     $router->mount('/submissions', function() use ($router){
         $router->get("/", "submissions@overview");
@@ -128,6 +139,8 @@
 
     /**
      * Review
+     *
+     * Displays submissions for assignments to reviewers and administrators, enabling grading and element scoring.
      */
     $router->mount('/review', function() use ($router){
         $router->get("/", "review@overview");
@@ -140,6 +153,9 @@
 
     /**
      * Analysis
+     *
+     * Provides insight into the amount of grades entered per assignment and per reviewer and provides exports of
+     * grades, element scores and texts for further analysis.
      */
     $router->mount("/analysis", function() use ($router){
         $router->get("/", 'analysis@overview');
@@ -151,6 +167,8 @@
 
     /**
      * Assignments
+     *
+     * Enables creation and modification of student assignments.
      */
     $router->mount('/assignment', function() use ($router){
         $router->get("/", "assignment@overview");
@@ -165,6 +183,8 @@
 
     /**
      * Questionnaires
+     *
+     * Enables creation and modification of student questionnaires.
      */
     $router->mount('/questionnaire', function () use ($router) {
         $router->get('/', "questionnaires@overview");
@@ -178,13 +198,12 @@
     /**
      * Administration
      *
-     * Routes to administration pages
-     *
+     * Provides tools to manage institutions and their personnel; classes and their students.
      */
     $router->mount('/administration', function() use ($router) {
 
         /*
-         * Show all institutions
+         * Display a list of all institutions, seperated in schools and universities (providing reviewers)
          */
         $router->get("/", "institution@overview");
 

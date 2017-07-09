@@ -4,6 +4,7 @@
 Dit is het stafgedeelte van het Tekstmijnproject. 
 Dit ontsluit de volgende functionaliteiten (en gebruikersrollen):
 *   Opdrachten inzien en inzendingen beoordelen (allen);
+*   Leerlingen en klassen inzien (docenten);
 *   Opdrachten aanmaken en toewijzen (beheerders);
 *   Vragenlijsten aanmaken en toewijzen (beheerders);
 *   Analyseren van beoordelingen en downloaden van teksten (beheerders);
