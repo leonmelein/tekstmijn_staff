@@ -1,12 +1,16 @@
 <?php
-
 /**
- * Created by PhpStorm.
- * User: leon
- * Date: 28-06-17
- * Time: 12:29
+ * Students
+ *
+ * Enables management of school students.
  */
 class students extends admin {
+
+    /**
+     * Renders an overview of all students of a school.
+     *
+     * @param $school_id int containing the school ID
+     */
     function overview($school_id){
         $this->get_session();
         $institution = $this->getInstitution($school_id);
@@ -35,6 +39,12 @@ class students extends admin {
             "page_title" => "Leerlingen", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table, "page_js" => "/staff/vendor/application/reset_pwd_students.js"]);
     }
+
+    /**
+     * Provides a form to add a new student to the system
+     *
+     * @param $school_id int containing the school ID
+     */
     function newStudent($school_id){
         $this->get_session();
         $classes = $this->getClassList($school_id);
@@ -62,13 +72,13 @@ class students extends admin {
             ]
         );
     }
-    function saveStudent($school_id){
-        if ($this->addStudent($_POST, $school_id)) {
-            $this->redirect("../?student_added=true");
-        } else {
-            $this->redirect("../?student_added=false");
-        }
-    }
+
+    /**
+     * Provides a form to edit the details of an existing student.
+     *
+     * @param $school_id int containing the school ID
+     * @param $student_id
+     */
     function editStudent($school_id, $student_id){
         $this->get_session();
 
@@ -103,6 +113,26 @@ class students extends admin {
             echo "U heeft geen toegang tot deze gegevens."; // TODO: better error message?
         }
     }
+
+    /**
+     * Adds a new student to the system
+     *
+     * @param $school_id int containing the school ID
+     */
+    function saveStudent($school_id){
+        if ($this->addStudent($_POST, $school_id)) {
+            $this->redirect("../?student_added=true");
+        } else {
+            $this->redirect("../?student_added=false");
+        }
+    }
+
+    /**
+     * Updates the students's details.
+     *
+     * @param $school_id int containing the school ID
+     * @param $student_id int containing the student ID
+     */
     function saveUpdatedStudent($school_id, $student_id){
         if ($this->updateStudent($student_id, $_POST)) {
             $this->redirect("../../?student_update=true");
@@ -110,6 +140,13 @@ class students extends admin {
             $this->redirect("../../?student_update=false");
         }
     }
+
+    /**
+     * Removes the student from the system.
+     *
+     * @param $school_id int containing the school ID
+     * @param $student_id int containing the student ID
+     */
     function delStudent($school_id, $student_id){
         if ($this->deleteStudent($student_id)) {
             $this->redirect("../../?student_deleted=true");

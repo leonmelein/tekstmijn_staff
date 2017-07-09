@@ -1,10 +1,8 @@
 <?php
-
 /**
- * Created by PhpStorm.
- * User: leon
- * Date: 19-06-17
- * Time: 00:05
+ * Auth
+ *
+ * Handles authentication of users.
  */
 class auth extends model {
 
@@ -13,21 +11,21 @@ class auth extends model {
      */
 
     /**
-     * Redirects homepage to login page
+     * Redirects homepage to login page.
      */
     public function homepage(){
         $this->redirect("/staff/login");
     }
 
     /**
-     * Renders login page
+     * Renders login page.
      */
     public function loginpage(){
         echo $this->templates->render("login::login", ["title" => "Tekstmijn | Inloggen"]);
     }
 
     /**
-     * Renders password reset request page
+     * Renders password reset request page.
      */
     public function requestReset(){
         echo $this->templates->render("login::request_reset", ["title" => "Tekstmijn | Wachtwoord vergeten?"]);
@@ -39,7 +37,7 @@ class auth extends model {
     }
 
     /**
-     * Handles user login and password reset requests
+     * Handles user login and password reset requests.
      */
     public function login(){
         $type_redir = [
@@ -66,7 +64,7 @@ class auth extends model {
     }
 
     /**
-     * Handles user logout requests
+     * Handles user logout requests.
      */
     public function logout(){
         $this->get_session();
@@ -75,7 +73,7 @@ class auth extends model {
     }
 
     /**
-     * Checks if a user is (still) logged in
+     * Checks if a user is (still) logged in.
      */
     public function checkLogin(){
         $this->get_session();
@@ -86,7 +84,7 @@ class auth extends model {
     }
 
     /**
-     * Checks if a setup token is present on first registration
+     * Checks if a setup token is present on first registration.
      */
     public function checkToken(){
         if (!isset($_GET["token"])) {
@@ -100,7 +98,7 @@ class auth extends model {
      */
 
     /**
-     * Check if user's credentials are valid
+     * Check if user's credentials are valid.
      *
      * @param $username string containing the username
      * @param $password string containing the password
@@ -112,9 +110,9 @@ class auth extends model {
     }
 
     /**
-     * Retrieves a user's information for use during registration
+     * Retrieves a user's information for use during registration.
      *
-     * Checks if a user is eligble to register and if so, retrieves its information
+     * Checks if a user is eligible to register and if so, retrieves its information
      *
      * @param $token string containing the setup token
      * @return mixed Array containing the user's full name and email address
@@ -129,9 +127,10 @@ class auth extends model {
     }
 
     /**
+     * Retrieved relevant user info for a valid setup token.
      *
-     * @param $token
-     * @return mixed
+     * @param $token string containing the reset token
+     * @return array containing the user's name and username or False if the token is invalid
      */
     function getResetInfo($token){
         $quoted_token = $this->database->quote($token);
@@ -142,8 +141,10 @@ class auth extends model {
     }
 
     /**
-     * @param $password
-     * @return string
+     * Hashes the password with salt on first registration to enable safe storage and login.
+     *
+     * @param $password String containing the chosen password
+     * @return string containing the hashed, salted password for storage in the user database
      */
     function hash_password($password){
         $cost = 10;
@@ -154,9 +155,11 @@ class auth extends model {
     }
 
     /**
-     * @param $username
-     * @param $password
-     * @return bool|int
+     * Sets the password for a user upon first registration.
+     *
+     * @param $username String containing the username
+     * @param $password String containing the password
+     * @return bool|int indicating if the operation succeeded
      */
     function set_initial_password($username, $password){
         $rows_affected = 0;
@@ -175,9 +178,11 @@ class auth extends model {
     }
 
     /**
-     * @param $username
-     * @param $password
-     * @return int
+     * Changes password upon user's request.
+     *
+     * @param $username string containing the username
+     * @param $password string containing the password
+     * @return int indicating if the operation succeeded
      */
     function change_password($username, $password){
         $rows_affected = 0;
@@ -195,8 +200,10 @@ class auth extends model {
     }
 
     /**
-     * @param $username
-     * @return bool|int
+     * Inserts a setup token for either a new user or a user that has requested a password reset.
+     *
+     * @param $username string containing the username
+     * @return bool|int indicating if the operation succeeded
      */
     function set_setup_token($username){
         return $this->database->update("staff",
@@ -206,6 +213,8 @@ class auth extends model {
     }
 
     /**
+     * Retrieves the setup token for a given user to check for validity.
+     *
      * @param $username
      * @return mixed
      */
@@ -214,8 +223,10 @@ class auth extends model {
     }
 
     /**
-     * @param $username
-     * @param $password
+     * Resets the password after a valid reset request.
+     *
+     * @param $username string containing the username
+     * @param $password string containing the password
      * @return bool|int
      */
     function reset_password($username, $password){
@@ -233,7 +244,7 @@ class auth extends model {
     }
 
     /**
-     *
+     * Sends out the password reset token to the user's email address.
      */
     function send_reset_link(){
         $sanitized_email = filter_var($_POST['username'], FILTER_SANITIZE_EMAIL);

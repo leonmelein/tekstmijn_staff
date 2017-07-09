@@ -1,15 +1,15 @@
 <?php use BootPress\Bootstrap\v3\Component as Bootstrap;
 
 /**
- * Model base
- *
- * Provides all basic tools for building models
+ * Base model providing supporting functions and access to templates, databases and libraries.
  */
-
-
 class model
 {
-
+    /**
+     * Model constructor.
+     *
+     * Sets up access to database, templates and bootstrap library.
+     */
     public function __construct()
     {
         $db_settings = parse_ini_file($_SERVER['DOCUMENT_ROOT'] . "/config/config.ini");
@@ -44,6 +44,18 @@ class model
         $this->templates = $templates;
     }
 
+    /**
+     * Generates a table from an array for use in templates.
+     *
+     * @param $bp Bootstrap instance
+     * @param $columns array containing child arrays with the internal column name and the display name
+     * @param $data array containing all data used to fill the table
+     * @param null $options array (optional) to provide additional links for every item; these items are arrays in itself
+     * @param string $format string (optional) containing the formatting for each table entry
+     * @param string $classes string (optional) containing the CSS classes to be assigned to each entry
+     * @param bool $external bool indicating if the given format provides an external link
+     * @return string containing the finalized table
+     */
     public function table($bp, $columns, $data, $options = null, $format = "", $classes = "class=responsive hover"){
         $table = $bp->table->open($classes);
         $table .= $bp->table->head();
@@ -84,6 +96,13 @@ class model
         return $table;
     }
 
+    /**
+     * Generate menu for use in templates.
+     *
+     * @param $bp Bootstrap instance
+     * @param $active string indicating the active menu item
+     * @return string containing the menu as HTML
+     */
     public function menu($bp, $active, $type){
         $item = [
             "Inzendingen" => "<i class='glyphicon glyphicon-pencil' aria-hidden='true'></i>&nbsp;&nbsp;Inzendingen",
@@ -143,10 +162,25 @@ class model
         return sprintf($menu_panel, $bp->pills($menu_options, $active));
     }
 
+    /**
+     * Generates breadcrumbs for use in templates.
+     *
+     * @param $bp Bootstrap instance
+     * @param $path array containing the individual breadcrumb items
+     * @return mixed string containing the breadcrumbs as HTML
+     */
     public function breadcrumbs($bp, $path){
         return $bp->breadcrumbs($path);
     }
 
+    /**
+     * Generate tabs for use in templates.
+     *
+     * @param $bp Bootstrap instance
+     * @param $tabsarray array containing the individual tabs
+     * @param string $active string indicating the active tab
+     * @return mixed string containing the tabs as HTML
+     */
     public function tabs($bp, $tabsarray, $active = 'Info'){
         return $bp->tabs($tabsarray, array(
             'active' => $active,
@@ -154,11 +188,23 @@ class model
         ));
     }
 
+    /**
+     * Performs a browser redirect by sending out headers.
+     *
+     * @param $url string containing the URL to redirect to
+     * @param int $statusCode Int containing the status code associated (default: 303 Found)
+     */
     public function redirect($url, $statusCode = 303) {
         header('Location: ' . $url, true, $statusCode);
         die();
     }
 
+    /**
+     * Provides <option> entries for a <select> element
+     *
+     * @param $array array containing an associative array with id and name values for each option
+     * @return string containing the <option> elements
+     */
     public function options($array){
         $option = "<option value='%s'>%s</option>";
         $options = "";
@@ -170,6 +216,13 @@ class model
         return $options;
     }
 
+    /**
+     * Provides <option> entries for a <select> element and sets pre-selected options
+     *
+     * @param $array array containing an associative array with id and name values for each option
+     * @param $selected int containing the selected item's id
+     * @return string containing the <option> elements
+     */
     public function options_selected($array, $selected){
         $option = "<option value='%s'>%s</option>";
         $option_selected = "<option value='%s' selected>%s</option>";
@@ -185,10 +238,18 @@ class model
         return $options;
     }
 
+    /**
+     * Starts PHP's $_SESSION
+     */
     public function get_session(){
         session_start("staff");
     }
 
+    /**
+     * Debug function for pretty printing of arrays.
+     *
+     * @param $array array to be printed
+     */
     public function pparray($array){
         echo "<pre>";
         print_r($array);
@@ -196,6 +257,11 @@ class model
         exit();
     }
 
+    /**
+     * Debug function for pretty printing of strings.
+     *
+     * @param $string string to be printed
+     */
     public function ppstring($string){
         echo "<pre>";
         echo $string;
@@ -203,6 +269,14 @@ class model
         exit();
     }
 
+    /**
+     * Mailer function for sending out system notifications.
+     *
+     * @param $to string containing the recipient's email address
+     * @param $subject string containing the email subject
+     * @param $template string indicating which template should be used
+     * @return bool indicating if the mail has been sent
+     */
     public function mail($to, $subject, $template){
         // Password forgotten
         $mail = new PHPMailer;

@@ -1,4 +1,16 @@
-<?php class reviewers extends admin {
+<?php
+/**
+ * Reviewers
+ *
+ * Enables management of university reviewing staff.
+ */
+class reviewers extends admin {
+
+    /**
+     * Renders an overview of all reviewers for a given institution.
+     *
+     * @param $school_id int containing the university ID
+     */
     function overview($school_id){
         $this->get_session();
         $institution = $this->getInstitution($school_id);
@@ -29,6 +41,44 @@
             "tbl" => $table,
         ]);
     }
+
+    /**
+     * Provides a form to add a new reviewer.
+     *
+     * @param $school_id int containing the university ID
+     */
+    function newReviewer($school_id){
+        $this->get_session();
+        $institution = $this->getInstitution($school_id);
+
+        $menu = $this->menu($this->bootstrap, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+        $breadcrumbs = $this->breadcrumbs($this->bootstrap,
+            [
+                $_SESSION["staff_name"] => "/staff/account/",
+                "Administratie" => "/staff/administration/",
+                sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
+                "Beoordelaars" => sprintf("/staff/administration/institution/%s/personnel/", $school_id),
+                "Nieuwe beoordelaar" => "#"
+            ]
+        );
+
+        echo $this->templates->render("admin_reviewers::add",
+            [
+                "title" => "Tekstmijn | Administratie",
+                "page_title" => "Nieuwe beoordelaar",
+                "menu" => $menu,
+                "breadcrumbs" => $breadcrumbs,
+                "page_js" => "/staff/vendor/application/load_date_picker.js"
+            ]
+        );
+    }
+
+    /**
+     * Provides a form to edit an existing reviewer.
+     *
+     * @param $school_id int containing the university ID
+     * @param $personnel_id int containing the reviewer ID
+     */
     function editReviewer($school_id, $personnel_id){
         $this->get_session();
 
@@ -61,45 +111,13 @@
             echo "U heeft geen toegang tot deze gegevens."; // TODO: better error message?
         }
     }
-    function updateReviewer($school_id, $personnel_id){
-        if ($this->updatePersonnelMember($personnel_id, $_POST)) {
-            $this->redirect("../../?reviewer_update=true");
-        } else {
-            $this->redirect("../../?reviewer_update=false");
-        }
-    }
-    function deleteReviewer($school_id, $personnel_id){
-        if ($this->deletePersonnelMember($personnel_id)) {
-            $this->redirect("../../?reviewer_deleted=true");
-        } else {
-            $this->redirect("../../?reviewer_deleted=false");
-        }
-    }
-    function newReviewer($school_id){
-        $this->get_session();
-        $institution = $this->getInstitution($school_id);
 
-        $menu = $this->menu($this->bootstrap, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
-        $breadcrumbs = $this->breadcrumbs($this->bootstrap,
-            [
-                $_SESSION["staff_name"] => "/staff/account/",
-                "Administratie" => "/staff/administration/",
-                sprintf("%s: %s", $institution['type'], $institution['name']) => sprintf("/staff/administration/institution/%s/edit", $school_id),
-                "Beoordelaars" => sprintf("/staff/administration/institution/%s/personnel/", $school_id),
-                "Nieuwe beoordelaar" => "#"
-            ]
-        );
 
-        echo $this->templates->render("admin_reviewers::add",
-            [
-                "title" => "Tekstmijn | Administratie",
-                "page_title" => "Nieuwe beoordelaar",
-                "menu" => $menu,
-                "breadcrumbs" => $breadcrumbs,
-                "page_js" => "/staff/vendor/application/load_date_picker.js"
-            ]
-        );
-    }
+    /**
+     * Saves a new reviewer to the system.
+     *
+     * @param $school_id int containing the university ID
+     */
     function saveReviewer($school_id){
         $redir = "../?reviewer_added=true";
         $redir_negative = "../?reviewer_added=false";
@@ -116,6 +134,34 @@
             }
         } else {
             $this->redirect($redir_negative);
+        }
+    }
+
+    /**
+     * Updates the details of an existing reviewer.
+     *
+     * @param $school_id int containing the school ID
+     * @param $personnel_id int containing the reviewer ID
+     */
+    function updateReviewer($school_id, $personnel_id){
+        if ($this->updatePersonnelMember($personnel_id, $_POST)) {
+            $this->redirect("../../?reviewer_update=true");
+        } else {
+            $this->redirect("../../?reviewer_update=false");
+        }
+    }
+
+    /**
+     * Removes the reviewer from the system.
+     *
+     * @param $school_id int containing the school ID
+     * @param $personnel_id int containing the reviewer ID
+     */
+    function deleteReviewer($school_id, $personnel_id){
+        if ($this->deletePersonnelMember($personnel_id)) {
+            $this->redirect("../../?reviewer_deleted=true");
+        } else {
+            $this->redirect("../../?reviewer_deleted=false");
         }
     }
 }

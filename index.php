@@ -56,8 +56,9 @@
     /**
      * Authentication
      *
-     * Checking if a user is logged in or has the required tokens.
+     * Handles authentication of users.
      */
+    // Pre-routing checks
     $router->before('GET|POST', '/account/', 'auth@checkLogin');
     $router->before('GET|POST', '/classes/', 'auth@checkLogin');
     $router->before('GET|POST', '/classes/.*', 'auth@checkLogin');
@@ -75,11 +76,7 @@
     $router->before('GET|POST', '/administration/.*', 'auth@checkLogin');
     $router->before('GET', '/register/', 'auth@checkToken');
 
-    /**
-     * Login
-     *
-     * Handles authentication of users.
-     */
+    // User-facing login-logout routes
     $router->get("/", "auth@homepage");
     $router->mount('/login', function() use ($router){
         $router->get("/", "auth@loginpage");
@@ -101,7 +98,6 @@
         $router->get("/", "account@startRegistration");
         $router->post("/", "account@completeRegistration");
     });
-
     $router->mount('/forgot', function () use ($router){
         $router->get('/', "auth@requestReset");
         $router->post('/', "auth@sendResetLink");
@@ -115,7 +111,7 @@
     $router->get("/reset/(\d+)/", "classroom@resetStudentPwd");
 
     /**
-     * Classes
+     * Classrooms
      *
      * Displays a list of classes and their respective students to teachers.
      */

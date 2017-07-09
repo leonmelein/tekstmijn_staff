@@ -1,15 +1,17 @@
 <?php
-
 /**
- * Created by PhpStorm.
- * User: leon
- * Date: 21-06-17
- * Time: 11:54
+ * Submissions
+ *
+ * Displays submissions for assignments to teachers and enables grading.
  */
 class submissions extends classroom
 {
     /*
      * Routing functions
+     */
+
+    /**
+     * Renders an overview of all classes assigned to the teacher.
      */
     public function overview(){
         $this->get_session();
@@ -28,6 +30,11 @@ class submissions extends classroom
             "table" => $table]);
     }
 
+    /**
+     * Renders an overview of all assignments available for the chosen class.
+     *
+     * @param $class_id int containing the class ID
+     */
     public function assignmentOverview($class_id){
         $this->get_session();
         $class = $this->getClassName($class_id);
@@ -49,6 +56,12 @@ class submissions extends classroom
             "table" => $table]);
     }
 
+    /**
+     * Renders an overview of all submissions for a chosen assignment.
+     *
+     * @param $class_id int containing the class ID
+     * @param $assignment_id string containing the assignment UUID
+     */
     public function assignmentSubmissions($class_id, $assignment_id){
         $this->get_session();
         $staff_id = $_SESSION['staff_id'];
@@ -101,6 +114,13 @@ class submissions extends classroom
             "gradingtable" => $gradingtable]);
     }
 
+    /**
+     * Displays an individual submission and provides tools for both regular and element grading.
+     *
+     * @param $class_id int containing the class ID
+     * @param $assignment_id string containing the assignment UUID
+     * @param $submission_id int containing the submission ID
+     */
     public function individualSubmission($class_id, $assignment_id, $submission_id){
         $this->get_session();
         $title = "Inzending";
@@ -135,6 +155,13 @@ class submissions extends classroom
     /*
      * Supporting functions
      */
+
+    /**
+     * Gather a list of classes for the teacher.
+     *
+     * @param $id
+     * @return array
+     */
     function getClasses($id){
         $quoted_id = $this->database->quote($id);
         $query = "SELECT class.id as id, class.year as year, level.name as level, class.name as class 
@@ -149,6 +176,12 @@ class submissions extends classroom
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Gather a list of assignments for the chosen class.
+     *
+     * @param $id string containing the assignment UUID
+     * @return array containing the ID, title, status and start and end date for each assignment
+     */
     function getAssignments($id){
         $quoted_id = $this->database->quote($id);
         $query = "SELECT id, title, status, DATE_FORMAT(start_date, '%d %M %Y %H:%i') as start_date, DATE_FORMAT(end_date, '%d %M %Y %H:%i') AS end_date
@@ -166,9 +199,16 @@ class submissions extends classroom
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    function getAssignmentSubmissions($id_class, $id_assignment){
-        $quoted_id_class = $this->database->quote($id_class);
-        $quoted_id_assignment = $this->database->quote($id_assignment);
+    /**
+     * Gather timely submissions for the chosen assignment.
+     *
+     * @param $class_id int containing the class ID
+     * @param $assignment_id string containing the assignment UUID
+     * @return array containing the ID, student ID, student name, date and submission count of each submission
+     */
+    function getAssignmentSubmissions($class_id, $assignment_id){
+        $quoted_id_class = $this->database->quote($class_id);
+        $quoted_id_assignment = $this->database->quote($assignment_id);
         $query = "SELECT submissions.id as id, students.id as student_id, CONCAT_WS(' ',students.firstname, students.prefix, students.lastname) as name, DATE_FORMAT(submissions.time, '%d %M %Y, %H:%i') as submission_date, submissions.submission_count as submission_count
                 FROM students, submissions
                 WHERE students.class_id = $quoted_id_class
@@ -178,9 +218,16 @@ class submissions extends classroom
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    function getAssignmentLateSubmissions($id_class, $id_assignment){
-        $quoted_id_class = $this->database->quote($id_class);
-        $quoted_id_assignment = $this->database->quote($id_assignment);
+    /**
+     * Gather late submissions for the chosen assignment.
+     *
+     * @param $class_id int containing the class ID
+     * @param $assignment_id string containing the assignment UUID
+     * @return array containing the ID, student ID, student name, date and submission count of each late submission
+     */
+    function getAssignmentLateSubmissions($class_id, $assignment_id){
+        $quoted_id_class = $this->database->quote($class_id);
+        $quoted_id_assignment = $this->database->quote($assignment_id);
         $query = "SELECT submissions.id as id, students.id as student_id, CONCAT_WS(' ',students.firstname, students.prefix, students.lastname) as name, DATE_FORMAT(submissions.time, '%d %M %Y, %H:%i') as submission_date, submissions.submission_count as submission_count
                 FROM students, submissions
                 WHERE students.class_id = $quoted_id_class
@@ -196,9 +243,16 @@ class submissions extends classroom
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    function getAssignmentMissingSubmissions($id_class, $id_assignment){
-        $quoted_id_class = $this->database->quote($id_class);
-        $quoted_id_assignment = $this->database->quote($id_assignment);
+    /**
+     * Gather students that did not submit this assignment.
+     *
+     * @param $class_id int containing the class ID
+     * @param $assignment_id string containing the assignment UUID
+     * @return array containing the names of each student that did not submit anything
+     */
+    function getAssignmentMissingSubmissions($class_id, $assignment_id){
+        $quoted_id_class = $this->database->quote($class_id);
+        $quoted_id_assignment = $this->database->quote($assignment_id);
         $query = "SELECT students.id, CONCAT_WS(' ',students.firstname, students.prefix, students.lastname) as name
                 FROM students
                 WHERE students.class_id = $quoted_id_class
@@ -210,6 +264,12 @@ class submissions extends classroom
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Retrieve the name of an assignment.
+     *
+     * @param $id int containing the assignment ID
+     * @return string containing the assignment title
+     */
     function getAssignmentName($id){
         $quoted_id = $this->database->quote($id);
         $query = "SELECT assignments.title
@@ -218,6 +278,12 @@ class submissions extends classroom
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['title'];
     }
 
+    /**
+     * Retrieve the name of a student.
+     *
+     * @param $id int containing the student ID
+     * @return string containing the student's name
+     */
     function getStudentName($id){
         $quoted_id = $this->database->quote($id);
         $query = "SELECT CONCAT_WS(' ',students.firstname, students.prefix, students.lastname) as name
@@ -230,6 +296,14 @@ class submissions extends classroom
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['name'];
     }
 
+    /**
+     * Retrieve the details of the submission: file on server, raw text of submission, time of submission, original file
+     * name and the submitter's student ID.
+     *
+     * @param $id int containing the submission ID
+     * @return array containing the file on server, raw text of submission, time of submission, original file
+     * name and the submitter's student ID.
+     */
     function getSubmissionInfo($id){
         return $this->database->get(
             "submissions",
@@ -245,6 +319,15 @@ class submissions extends classroom
         );
     }
 
+    /**
+     * Generate a table for grading multiple submissions at once.
+     *
+     * @param $submissions array containing all submissions
+     * @param $staff_id int containing the staff ID
+     * @param $class_id int containing the class ID
+     * @param $assignment_id string containing the assignment UUID
+     * @return string containing the grading table as HTML
+     */
     function generateGradingTable($submissions, $staff_id, $class_id, $assignment_id)
     {
         $gradingtable = "";
@@ -300,6 +383,12 @@ class submissions extends classroom
         return $gradingtable;
     }
 
+    /**
+     * Generates an array of submission ID's for use during submission of the grading table.
+     *
+     * @param $submissions array containing all submissions
+     * @return string containing the array of submission ID's
+     */
     function generateGradingArray($submissions){
         $submission_ids = Array();
         foreach ($submissions as $key => $value) {
@@ -315,6 +404,15 @@ class submissions extends classroom
         return substr($submission_array, 0, -1);
     }
 
+    /**
+     * Gets the grades for a single submission for use in the grading table.
+     *
+     * @param $staff_id int containing the staff ID
+     * @param $submission_id int containing the submission ID
+     * @param $types array containing the requested grade types (default "Score", not currently in use but preparation
+     * for later expansion)
+     * @return array of grades and notes
+     */
     function getSubmissionGrades($staff_id, $submission_id, $types){
         $current_grades = [];
         $quoted_staff_id = $this->database->quote($staff_id);
@@ -337,6 +435,15 @@ class submissions extends classroom
         return $current_grades;
     }
 
+    /**
+     * Gets the grades for a single submission for use in the individual overview.
+     *
+     * @param $staff_id int containing the staff ID
+     * @param $submission_id int containing the submission ID
+     * @param $types array containing the requested grade types (default "Score", not currently in use but preparation
+     * for later expansion)
+     * @return array of grades and notes
+     */
     function getIndividualGrades($staff_id, $submission_id, $types){
         $current_grades = [];
         $quoted_staff_id = $this->database->quote($staff_id);

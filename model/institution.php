@@ -1,4 +1,15 @@
-<?php class institution extends admin {
+<?php
+/**
+ * Institution
+ *
+ * Enables management of schools (providing students and teaching personnel)
+ * and universities (providing reviewers and administrators).
+ */
+class institution extends admin {
+
+    /**
+     * Renders an overview of all included institutions, split between schools and universities.
+     */
     function overview(){
         $this->get_session();
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
@@ -36,8 +47,14 @@
             "tabs" => $tabs
         ]);
     }
+
+    /**
+     * Provides a form to create new institutions.
+     */
     function newInstitution(){
         $this->get_session();
+
+        // Set the type for the new institution
         $type = $_GET["type"];
         if ($type == "school") {
             $school_type = 0;
@@ -45,9 +62,11 @@
             $school_type = 1;
         }
 
+        // Generate navigational items
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", "Onderwijsinstelling toevoegen" => "#"]);
 
+        // Generate page
         echo $this->templates->render("administration::institutions_add", [
             "title" => "Tekstmijn | Administratie",
             "page_title" => "Onderwijsinstelling toevoegen",
@@ -56,16 +75,16 @@
             "school_type" => $school_type
         ]);
     }
-    function saveInstitution(){
-        if ($this->addInstitution($_POST)) {
-            $this->redirect("/staff/administration/?institution_update=true");
-        } else {
-            $this->redirect("/staff/administration/?institution_update=false");
-        }
-    }
+
+    /**
+     * Provides a form to edit an existing institution.
+     *
+     * @param $school_id int containing the institution ID
+     */
     function editInstitution($school_id){
         $this->get_session();
-        $menu = $this->menu($this->bootstrap, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
+
+        // Retrieve institution info
         $school_name = $this->getSchoolName($school_id);
         $school_type = $this->getSchoolType($school_id);
 
@@ -74,8 +93,11 @@
             $typestring = "Universiteit";
         }
 
+        // Generate navigational items
+        $menu = $this->menu($this->bootstrap, ["active" => "/staff/administration/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Administratie" => "/staff/administration/", sprintf("%s: %s", $typestring, $school_name) => "#"]);
 
+        // Generate page
         echo $this->templates->render("administration::institutions_edit", [
             "title" => "Tekstmijn | Administratie",
             "page_title" => sprintf("%s: %s", $typestring, $school_name),
@@ -87,6 +109,24 @@
         ]);
 
     }
+
+
+    /**
+     * Saves the newly created institution to the system.
+     */
+    function saveInstitution(){
+        if ($this->addInstitution($_POST)) {
+            $this->redirect("/staff/administration/?institution_update=true");
+        } else {
+            $this->redirect("/staff/administration/?institution_update=false");
+        }
+    }
+
+    /**
+     * Saves updates to the existing institution to the system.
+     *
+     * @param $school_id int containing the institution ID
+     */
     function saveUpdatedInstitution($school_id){
         $this->get_session();
         if ($this->updateInstitution($school_id, $_POST)) {
@@ -95,6 +135,12 @@
             $this->redirect("/staff/administration/?institution_update=false");
         }
     }
+
+    /**
+     * Removes an existing institution from the system.
+     *
+     * @param $school_id int containing the institution ID
+     */
     function delInstitution($school_id){
         if ($this->deleteInstitution($school_id)) {
             $this->redirect("/staff/administration/?institution_update=true");

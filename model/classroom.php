@@ -1,19 +1,23 @@
 <?php
-
 /**
- * Created by PhpStorm.
- * User: leon
- * Date: 18-06-17
- * Time: 23:48
+ * Classrooms
+ *
+ * Displays a list of classes and their respective students to teachers.
  */
 class classroom extends model
 {
 
+    /**
+     * Renders an overview of all classes assigned to the teacher.
+     */
     public function teacherOverview(){
-        session_start("staff");
+        $this->get_session();
+
+        // Generating navigational items
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/classes/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "../account/", "Leerlingen" => "#"]);
 
+        // Generating classes overview
         $classes = $this->getClassesForStaff($_SESSION["staff_id"]);
         $columns = [
             ["Naam", "name"],
@@ -21,11 +25,18 @@ class classroom extends model
             ["Jaar", "year"]
         ];
         $table = $this->table($this->bootstrap, $columns, $classes, null, '<a href="%s/">%s</a>');
+
+        // Generating page
         echo $this->templates->render("classes::index", ["title" => "Tekstmijn | Leerlingen",
             "page_title" => "Leerlingen", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table]);
     }
 
+    /**
+     * Renders an overview of all students in an individual class.
+     *
+     * @param $class_id int containing the class ID
+     */
     public function individualClass($class_id){
         session_start("staff");
 
@@ -49,6 +60,12 @@ class classroom extends model
             "table" => $table, "page_js" => "/staff/vendor/application/reset_pwd_students.js"]);
     }
 
+    /**
+     * Resets a student's password on the request of a teacher or administrator.
+     *
+     * @param $student_id int containing the ID of the student involved
+     * @return array containing the status of the action, encoded in JSON
+     */
     public function resetStudentPwd($student_id){
         if($this->resetStudentPassword($student_id)){
             echo '{"status": "success"}';
@@ -57,9 +74,15 @@ class classroom extends model
         }
     }
 
+    /*
+     * Supporting functions
+     */
 
     /**
-     * Supporting functions
+     * Gets a list of classes assigned to a given member of staff.
+     *
+     * @param $id int containing the staff member's ID
+     * @return array containing the different classes, their respective level and years.
      */
     private function getClassesForStaff($id){
         $quoted_id = $this->database->quote($id);
@@ -75,10 +98,22 @@ class classroom extends model
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Retrieves the name of a class for a given class ID.
+     *
+     * @param $id int containing the class ID
+     * @return bool|string containing the name or False if the class ID does not exist.
+     */
     function getClassName($id){
         return $this->database->get("class", "name", ["id" => $id]);
     }
 
+    /**
+     * Retrieves a list of all students included in a given class.
+     *
+     * @param $id int containing the class ID
+     * @return array containing the name and ID of each student
+     */
     private function getClassStudents($id){
         $quoted_id = $this->database->quote($id);
         $query = "SELECT CONCAT_WS(' ', firstname, prefix, lastname) AS name, id
@@ -88,6 +123,12 @@ class classroom extends model
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Resets the student password in the database by null'ing the password.
+     *
+     * @param $student_id int containing the student ID
+     * @return bool|int indicating if the operation succeeded
+     */
     private function resetStudentPassword($student_id){
         return $this->database->update("students", ["password" => null], ["id" => $student_id]);
     }

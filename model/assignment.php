@@ -1,10 +1,8 @@
 <?php
-
 /**
- * Created by PhpStorm.
- * User: leon
- * Date: 28-06-17
- * Time: 11:48
+ * Assignments
+ *
+ * Enables creation and modification of student assignments.
  */
 class assignment extends model {
 

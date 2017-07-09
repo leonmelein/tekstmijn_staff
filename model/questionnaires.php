@@ -1,5 +1,14 @@
-<?php class questionnaires extends model {
+<?php
+/**
+ * Questionnaires
+ *
+ * Enables creation and modification of student questionnaires.
+ */
+class questionnaires extends model {
 
+    /**
+     * Renders an overview of all active questionnaires.
+     */
     function overview(){
         $this->get_session();
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Vragenlijsten" => "#"]);
@@ -27,6 +36,9 @@
             ]);
     }
 
+    /**
+     * Provides a form to add a new questionnaire for a school.
+     */
     function newQuestionnaire(){
         $this->get_session();
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Vragenlijsten" => "/staff/questionnaire", "Nieuwe vragenlijst" => "#"]);
@@ -43,22 +55,11 @@
             ]);
     }
 
-    function addQuestionnaire(){
-        $result = $this->database->insert("questionnaire",
-            [
-                "title" => $_POST['title'],
-                "qualtrics_url" => $_POST['qualtrics_url'],
-                "school_id" => $_POST['school_id']
-            ]);
-
-        if ($result) {
-            $this->redirect("../?success=true", 303);
-        }
-        else {
-            $this->redirect("../?success=false", 303);
-        }
-    }
-
+    /**
+     * Provides a form to edit an existing questionnaire.
+     *
+     * @param $questionnaire_id int containing the questionnaire ID
+     */
     function editQuestionnaire($questionnaire_id){
         $this->get_session();
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Vragenlijsten" => "/staff/questionnaire", "Vragenlijst bewerken" => "#"]);
@@ -76,6 +77,30 @@
             ]);
     }
 
+    /**
+     * Adds a new questionnaire to the system.
+     */
+    function addQuestionnaire(){
+        $result = $this->database->insert("questionnaire",
+            [
+                "title" => $_POST['title'],
+                "qualtrics_url" => $_POST['qualtrics_url'],
+                "school_id" => $_POST['school_id']
+            ]);
+
+        if ($result) {
+            $this->redirect("../?success=true", 303);
+        }
+        else {
+            $this->redirect("../?success=false", 303);
+        }
+    }
+
+    /**
+     * Saves updates to a questionnaire to the system.
+     *
+     * @param $questionnaire_id int containing the questionnaire ID
+     */
     function updateQuestionnaire($questionnaire_id){
         $result = $this->database->update(
             "questionnaire",
@@ -95,6 +120,11 @@
         }
     }
 
+    /**
+     * Removes a questionnaire from the system.
+     *
+     * @param $questionnaire_id int containing the questionnaire ID
+     */
     function deleteQuestionnaire($questionnaire_id){
         $result = $this->database->delete(
             "questionnaire",
@@ -112,6 +142,12 @@
     /*
      * Supporting functions
      */
+
+    /**
+     * Retrieves a list of all questionnaires entered into the system.
+     *
+     * @return array of all questionnaires with ID, title and assigned school per questionnaire
+     */
     function getQuestionnaires(){
         return $this->database
             ->query("SELECT questionnaire.id, questionnaire.title, questionnaire.school_id, schools.name 
@@ -119,6 +155,12 @@
             ->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Retrieves an individual questionnaire.
+     *
+     * @param $id int containing the questionnaire ID
+     * @return array containing the title and URL of the questionnaire and name and ID of the relevant school
+     */
     function getQuestionnaire($id){
         $qid = $this->database->quote($id);
         return $this->database->query(
@@ -126,6 +168,11 @@
         )->fetch();
     }
 
+    /**
+     * Retrieves a list of schools for use in a <select> element.
+     *
+     * @return array of schools, containing id and name for each school
+     */
     function getSchools() {
         return $this->database->select("schools", ["id", "name"], ["type_school" => 0]);
     }

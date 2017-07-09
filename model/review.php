@@ -1,17 +1,18 @@
 <?php
-
 /**
- * Created by PhpStorm.
- * User: leon
- * Date: 21-06-17
- * Time: 11:54
+ * Review
+ *
+ * Displays submissions for assignments to reviewers and administrators, enabling grading and element scoring.
  */
 class review extends submissions
 {
     /*
-     * Routing functions
+     * Page functions
      */
 
+    /**
+     * Renders an overview for all assignments relevant to the reviewer.
+     */
     public function overview(){
         $this->get_session();
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/review/", "align" => "stacked"], $_SESSION['type']);
@@ -32,6 +33,11 @@ class review extends submissions
             "table" => $table]);
     }
 
+    /**
+     * Displays all assigned submissions for a certain assignment.
+     *
+     * @param $assignmentid string containing the assignment UUID
+     */
     public function assignment($assignmentid){
         $this->get_session();
         $staff_id = $_SESSION['staff_id'];
@@ -73,6 +79,12 @@ class review extends submissions
         );
     }
 
+    /**
+     * Displays an individual assignment and provides grading functionality.
+     *
+     * @param $assignmentid string containing the assignment UUID
+     * @param $submissionid int containing the submission ID
+     */
     public function submission($assignmentid, $submissionid){
         session_start("staff");
 
@@ -119,6 +131,10 @@ class review extends submissions
         );
     }
 
+    /**
+     * Processes element scores by parsing the POST request and saving the contents to the relevant tables
+     * in the database.
+     */
     public function questionnaire(){
         $this->get_session();
         $staff_id = $_POST['staff_id'];
@@ -140,6 +156,8 @@ class review extends submissions
     public function downloadSubmissions($assignmentid){
         $this->get_session();
         $staff_id = $_SESSION['staff_id'];
+
+        // Generate ZIP file containing all submissions for the reviewer
         $files = $this->gatherSubmissionFiles($staff_id, $assignmentid);
         $filename_vars = $this->gatherNames($staff_id, $assignmentid);
         chdir("tmp");
@@ -150,6 +168,7 @@ class review extends submissions
         }
         $zip->close();
 
+        // Check if the ZIP if valid
         $is_valid = false;
         try {
             $is_valid = \Comodojo\Zip\Zip::check($filename);
@@ -157,6 +176,7 @@ class review extends submissions
             $this->redirect('../../?download_generated=false');
         }
 
+        // If it is, download it
         if ($is_valid) {
             header("Content-Description: File Transfer");
             header("Content-Type: application/octet-stream");
@@ -173,6 +193,12 @@ class review extends submissions
      * Supporting functions
      */
 
+    /**
+     * Retrieves the ID and title of assignments relevant to the reviewer.
+     *
+     * @param $staff int containing the staff ID
+     * @return array containing the assignments
+     */
     function getAssignment($staff){
         $quoted_staff_id = $this->database->quote($staff);
         $query = "SELECT DISTINCT assignments.id, assignments.title
@@ -186,6 +212,14 @@ class review extends submissions
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Retrieves an array of all submissions assigned to the reviewer.
+     *
+     * @param $assignment string containing the assignment UUID
+     * @param $staff int containing the staff ID
+     * @return array containing each submission with its respective ID, assignment ID, student ID, student name, submission date
+     * and submission count.
+     */
     function getSubmissions($assignment, $staff){
         $quoted_assignment_id = $this->database->quote($assignment);
         $quoted_staff_id = $this->database->quote($staff);
@@ -203,10 +237,24 @@ class review extends submissions
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Retrieve the element scoring list from the database.
+     *
+     * @param $assignment_id string containing the assignment UUID
+     * @return string containing the URL to the element scoring list
+     */
     function getQuestionnaire($assignment_id){
         return $this->database->get("reviewerlist", "qualtrics_url", ["assignment_id" => $assignment_id]);
     }
 
+    /**
+     * Generate an old style element scoring list from database entries.
+     *
+     * @param $assignment_id string containing the assignment UUID
+     * @param $staff_id int containing the staff member's ID
+     * @param $submission_id int containing the submission ID
+     * @return string containing the questionnaire as HTML form
+     */
     function generateQuestionnaire($assignment_id, $staff_id, $submission_id) {
         ob_start();
         $staff_id_quoted = $this->database->quote($staff_id);
@@ -287,6 +335,15 @@ class review extends submissions
         return $form;
     }
 
+    /**
+     * Saves an old style element scoring list to the database.
+     *
+     * @param $values array containing the element scoring list responses
+     * @param $staff_id int containing the staff member's ID
+     * @param $submission_id int containing the submission ID
+     * @param $reviewerlist_id int containing the element scoring list ID
+     * @return int
+     */
     function saveQuestionnaire($values, $staff_id, $submission_id, $reviewerlist_id) {
         $this->database->delete("reviewing", [
             "AND" => [
@@ -309,6 +366,13 @@ class review extends submissions
         return $result;
     }
 
+    /**
+     * Retrieves a list of files for the assigned submissions for a assignment.
+     *
+     * @param $staffid int containing the staff member's ID
+     * @param $assignmentid string containing the assignment UUID
+     * @return array containing the file names on server and on submission time
+     */
     function gatherSubmissionFiles($staffid, $assignmentid){
         $quoted_staffid = $this->database->quote($staffid);
         $quoted_assignmentid = $this->database->quote($assignmentid);
@@ -323,6 +387,13 @@ class review extends submissions
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Gathers the name parts of the resulting zip file.
+     *
+     * @param $staffid int containing the staff member's ID
+     * @param $assignmentid string containing the assignment UUID
+     * @return array containing the staff member's full name and the assignment title
+     */
     function gatherNames($staffid, $assignmentid){
         $quoted_staffid = $this->database->quote($staffid);
         $quoted_assignemntid = $this->database->quote($assignmentid);

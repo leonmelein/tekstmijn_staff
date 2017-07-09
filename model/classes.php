@@ -1,4 +1,19 @@
-<?php class classes extends admin {
+<?php
+/**
+ * Classes
+ *
+ * Enables management of classes and their respective students.
+ */
+class classes extends admin {
+    /*
+     * Page routers
+     */
+
+    /**
+     * Renders an overview of all classes for a given institutions.
+     *
+     * @param $school_id int containing the institution ID
+     */
     function overview($school_id){
         $this->get_session();
         $institution = $this->getInstitution($school_id);
@@ -32,6 +47,13 @@
             "tbl_class" => $tbl_schools
         ]);
     }
+
+    /**
+     * Renders an overview of all students in a given class.
+     *
+     * @param $school_id int containing the institution ID
+     * @param $class_id int containing the class ID
+     */
     function individualClass($school_id, $class_id){
         $this->get_session();
         $institution = $this->getInstitution($school_id);
@@ -62,6 +84,12 @@
             "page_title" => $name, "menu" => $menu, "breadcrumbs" => $breadcrumbs,
             "table" => $table, "page_js" => "/staff/vendor/application/reset_pwd_students.js"]);
     }
+
+    /**
+     * Provides a form to create a new class for a given institution.
+     *
+     * @param $school_id int containing the institution ID
+     */
     function newClass($school_id){
         $this->get_session();
         $institution = $this->getInstitution($school_id);
@@ -83,13 +111,13 @@
             "breadcrumbs" => $breadcrumbs,
         ]);
     }
-    function saveClass($school_id){
-        if ($this->addClass($school_id, $_POST)) {
-            $this->redirect("../?institution_update=true");
-        } else {
-            $this->redirect("../?institution_update=false");
-        }
-    }
+
+    /**
+     * Provides a form to edit the details of an existing class.
+     *
+     * @param $school_id int containing the institution ID
+     * @param $class_id int containing the class ID
+     */
     function editClass($school_id, $class_id){
         $this->get_session();
         $institution = $this->getInstitution($school_id);
@@ -116,6 +144,26 @@
             "year" => $class["year"]
         ]);
     }
+
+    /**
+     * Saves the new class to the system.
+     *
+     * @param $school_id int containing the institution ID
+     */
+    function saveClass($school_id){
+        if ($this->addClass($school_id, $_POST)) {
+            $this->redirect("../?institution_update=true");
+        } else {
+            $this->redirect("../?institution_update=false");
+        }
+    }
+
+    /**
+     * Saves updates to an existing class to the system.
+     *
+     * @param $school_id int containing the institution ID
+     * @param $class_id int containing the class ID
+     */
     function saveUpdatedClass($school_id, $class_id){
         if ($this->updateClass($class_id, $_POST)) {
             $this->redirect("../../?institution_update=true");
@@ -123,6 +171,13 @@
             $this->redirect("../../?institution_update=false");
         }
     }
+
+    /**
+     * Deletes a class from the system.
+     *
+     * @param $school_id int containing the institution ID
+     * @param $class_id int containing the class ID
+     */
     function delClass($school_id, $class_id){
         if ($this->deleteClass($class_id)) {
             $this->redirect("../../?institution_update=true");
