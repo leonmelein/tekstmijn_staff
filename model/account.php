@@ -1,27 +1,38 @@
 <?php
 /**
- * Created by PhpStorm.
- * User: leon
- * Date: 19-06-17
- * Time: 00:05
+ * Account
+ *
+ * Enabling account actions like password changes and resets.
  */
 class account extends model {
 
     /*
-     * Routing functions
+     * Page functions
      */
 
+    /**
+     * Displays the account page, enabling users to change their password.
+     */
     public function showAccount(){
         $this->get_session();
-        // Generate menu
+
+        // Generate navigational items
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/account/", "align" => "stacked"], $_SESSION['type']);
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "../account/", "Mijn account" => "#"]);
 
-        echo $this->templates->render("login::account", ["title" => "Tekstmijn | Mijn account",
-            "page_title" => "Mijn account", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
-            "name" => $_SESSION["staff_name"], "email" => $_SESSION["staff_email"], "type" => $_SESSION["type"], "page_js" => "../vendor/application/register_validate.js"]);
+        echo $this->templates->render("login::account",
+            [
+                "title" => "Tekstmijn | Mijn account",
+                "page_title" => "Mijn account", "menu" => $menu, "breadcrumbs" => $breadcrumbs,
+                "name" => $_SESSION["staff_name"], "email" => $_SESSION["staff_email"], "type" => $_SESSION["type"],
+                "page_js" => "../vendor/application/register_validate.js"
+            ]
+        );
     }
 
+    /**
+     * Change password according to the user's request.
+     */
     public function updateAccount(){
         if($this->change_password($_POST["username"], $_POST["password"])){
             $this->redirect("/staff/account/?password_changed=true");
@@ -29,6 +40,10 @@ class account extends model {
             $this->redirect("/staff/register/?password_changed=true");
         }
     }
+
+    /*
+     * Supporting functions
+     */
 
     /**
      * Loads the user's info on first registration
@@ -127,10 +142,6 @@ class account extends model {
         }
     }
 
-    /*
-     * Supporting functions
-     */
-
     /**
      * Retrieves a user's information for use during registration
      *
@@ -149,9 +160,10 @@ class account extends model {
     }
 
     /**
+     * Checks token and loads user info needed for password reset.
      *
-     * @param $token
-     * @return mixed
+     * @param $token string containing the users reset token
+     * @return mixed False when the token is invalid or an array containing the user's name and email address if it is valid
      */
     function getResetInfo($token){
         $quoted_token = $this->database->quote($token);
@@ -162,8 +174,10 @@ class account extends model {
     }
 
     /**
-     * @param $password
-     * @return string
+     * Hashes the password with salt on first registration to enable safe storage and login.
+     *
+     * @param $password String containing the chosen password
+     * @return string containing the hashed, salted password for storage in the user database
      */
     function hash_password($password){
         $cost = 10;
@@ -174,9 +188,11 @@ class account extends model {
     }
 
     /**
-     * @param $username
-     * @param $password
-     * @return bool|int
+     * Sets the password for a user upon first registration.
+     *
+     * @param $username String containing the username
+     * @param $password String containing the password
+     * @return bool|int 1 if the password was succesfully set or False if it failed
      */
     function set_initial_password($username, $password){
         $rows_affected = 0;
@@ -195,9 +211,11 @@ class account extends model {
     }
 
     /**
-     * @param $username
-     * @param $password
-     * @return int
+     * Changes the password for a user in the database upon user's request.
+     *
+     * @param $username string containing the username
+     * @param $password string containing the password
+     * @return int indicating if the password change succeeded
      */
     function change_password($username, $password){
         $rows_affected = 0;
@@ -215,8 +233,10 @@ class account extends model {
     }
 
     /**
-     * @param $username
-     * @return bool|int
+     * Creates a setup token for use in first registration or password reset.
+     *
+     * @param $username string containing the username
+     * @return bool|int False if the user does not exist, 0 if the operation failed or 1 if the operation succeeded
      */
     function set_setup_token($username){
         return $this->database->update("staff",
@@ -226,17 +246,21 @@ class account extends model {
     }
 
     /**
-     * @param $username
-     * @return mixed
+     * Retrieves the setup token for a given user.
+     *
+     * @param $username string containing the username
+     * @return mixed string containing the setup token if there is one, or False when there is none.
      */
     function get_setup_token($username){
         return $this->database->select("staff", ["setuptoken"], ["email" => $username])[0]['setuptoken'];
     }
 
     /**
-     * @param $username
-     * @param $password
-     * @return bool|int
+     * Performs the password reset after the reset link has been clicked and the form has been filled in.
+     *
+     * @param $username string containing the username
+     * @param $password string containing the new password
+     * @return bool|int False if the user does not exist, 0 if the operation failed or 1 if the operation succeeded
      */
     function reset_password($username, $password){
         $rows_affected = 0;

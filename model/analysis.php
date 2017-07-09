@@ -1,19 +1,17 @@
 <?php
 
 /**
- * Created by PhpStorm.
- * User: leon
- * Date: 19-06-17
- * Time: 14:38
+ * Analysis
+ *
+ * Provides insight into the amount of grades entered per assignment and per reviewer and provides exports of
+ * grades, element scores and texts for further analysis.
  */
 
 class analysis extends model
 {
-    /*
-    * Generates a page with the status and statistics
-    *
-    * @return page
-    */
+    /**
+     * Generates a page with the status and statistics
+     */
     public function overview(){
         $this->get_session();
         $menu = $this->menu($this->bootstrap, ["active" => "/staff/analysis/", "align" => "stacked"], $_SESSION['type']);
@@ -35,9 +33,9 @@ class analysis extends model
             ["Opdracht", "title"]
         ];
         $options = [
-                ["<a download='' class='pull-right' href='beoordelingen/%s'><i class='glyphicon glyphicon-signal'></i> Beoordelingen</a>"],
-                ["<a download='' class='pull-right' href='beoordelingslijsten/%s'><i class='glyphicon glyphicon-th-list'></i> Beoordelingslijsten</a>"],
-                ["<a download='' class='pull-right' href='teksten/%s'><i class='glyphicon glyphicon-file'></i> Teksten</a>"]
+                ["<a download='' class='pull-right' href='gradings/%s'><i class='glyphicon glyphicon-signal'></i> Beoordelingen</a>"],
+                ["<a download='' class='pull-right' href='elementscores/%s'><i class='glyphicon glyphicon-th-list'></i> Beoordelingslijsten</a>"],
+                ["<a download='' class='pull-right' href='texts/%s'><i class='glyphicon glyphicon-file'></i> Teksten</a>"]
         ];
 
         $analysis_tbl = $this->table($this->bootstrap, $columns, $data, $options);
@@ -53,12 +51,11 @@ class analysis extends model
             ]);
     }
 
-    /*
-    * Generates a page with the number of items reviewed for a specific assignment
-    *
-    * @param Medoo $assignment_id An assignment ID
-    * @return page
-    */
+    /**
+     * Generates a page with the number of items reviewed for a specific assignment
+     *
+     * @param $assignment_id int containing the assignment's ID
+     */
     public function generateStatusDetail($assignment_id){
         $this->get_session();
         $title = $this->getAssignmentName($assignment_id);
@@ -101,17 +98,17 @@ class analysis extends model
         ]);
     }
 
-    /*
-    * Generates a csv file with the reviews of a specific assignement
-    * @param $assignment_id An assignment id
-    * @return csv
-    */
-    public function downloadBeoordelingen($assignment_id){
+    /**
+     * Generates a csv file with the reviews of a specific assignment
+     *
+     * @param $assignment_id int containing the assignment id
+     */
+    public function downloadGradings($assignment_id){
         $assignment_name = $this->getAssignmentName($assignment_id);
 
         //Get reviews from database
         //Based on Python Program export_grades.py
-        $data = $this->downloadReviews($assignment_id);
+        $data = $this->getReviews($assignment_id);
         $grades = Array();
         $students = Array();
         $beoordelaars = Array();
@@ -181,15 +178,15 @@ class analysis extends model
         echo $file;
     }
 
-    /*
-    * Generates a csv file with the answers of the reviewerslists
-    * @param $assignment_id An assignment id
-    * @return csv
-    */
-    public function downloadBeoordelingslijsten($assignment_id){
-        //Gather all data of the reviewings
+    /**
+     * Generates a csv file with the element scores per submissions
+     *
+     * @param $assignment_id Int containing the assignment's ID
+     */
+    public function downloadElementScores($assignment_id){
+        //Gather all data of the gradings
         $assignment_name = $this->getAssignmentName($assignment_id);
-        $reviewings = Array();
+        $gradings = Array();
         $questions = Array();
         $data = $this->getReviewingsOfSubmission($assignment_id);
         $staff_members = Array();
@@ -202,7 +199,7 @@ class analysis extends model
             array_push($questions, $question_id);
             $question_value = $value['value'];
             $reviewerlist_id = $value['reviewerlist_id'];
-            $reviewings[$staff_id][$student_id][$question_id] = $question_value;
+            $gradings[$staff_id][$student_id][$question_id] = $question_value;
         }
 
         //Make questions array
@@ -222,7 +219,7 @@ class analysis extends model
         }
 
         //Fill csv files with data
-        foreach ($reviewings as $staff_id => $students) {
+        foreach ($gradings as $staff_id => $students) {
             foreach ($students as $student_id => $question_answer) {
                 //Initialize variables
                 $student_name = $this->getStudentName($student_id);
@@ -285,12 +282,12 @@ class analysis extends model
     }
 
 
-    /*
-    * Generates a csv file with the texts of the assignements
-    * @param $assignment_id An assignment id
-    * @return
-    */
-    public function downloadTeksten($assignment_id){
+    /**
+     * Generates a csv file with the texts of the assignments
+     *
+     * @param $assignment_id int containing the assignment's ID
+     */
+    public function downloadTexts($assignment_id){
         //Get texts from database
         $assignment_name = $this->getAssignmentName($assignment_id);
         $texts = $this->getTexts($assignment_id);
@@ -337,27 +334,29 @@ class analysis extends model
 
 
     /*
-    * Returns an array with all the reviews of an speciffic assignment
-    * @param Medoo $database A database instance passed as an Medoo object.
-    * @param $assignment_id An assignment id
-    * @return Array
+     * Supporting functions
+     */
+
+    /**
+    * Gets array with all the texts submitted for an specific assignment
+    *
+    * @param $assignment_id String containing the assignment's UUID
+    * @return array containing the student id and text of each submission for the assignment
     */
-    private function getTexts($assignement_id){
-        $quoted_assignement_id = $this->database->quote($assignement_id);
-        $query = "
-                    SELECT student_id, text from submissions WHERE assignment_id = $quoted_assignement_id
-           ";
+    private function getTexts($assignment_id){
+        $quoted_assignment_id = $this->database->quote($assignment_id);
+        $query = "SELECT student_id, text from submissions WHERE assignment_id = $quoted_assignment_id";
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /*
-    * Returns an array with all the reviews of an speciffic assignment
-    * @param Medoo $database A database instance passed as an Medoo object.
-    * @param $assignment_id An assignment id
-    * @return Array
+    /**
+     * Gets array with all the reviews of an specific assignment
+     *
+     * @param $assignment_id Int containing the assignment's ID
+     * @return array containing the reviews per submission
     */
-    private function downloadReviews($assignement_id){
-        $quoted_assignement_id = $this->database->quote($assignement_id);
+    private function getReviews($assignment_id){
+        $quoted_assignement_id = $this->database->quote($assignment_id);
         $query = "
                     SELECT `student_id`, `staff_id`, CONCAT_WS(' ', `s_firstname`, `s_prefix`, `s_lastname`) as `staff_name`, CONCAT_WS(' ', `firstname`, `prefix`, `lastname`) as `student_name`, `grade` FROM
                     (
@@ -403,14 +402,14 @@ class analysis extends model
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /*
-    * Returns an string with the formatted name
-    * @param Medoo $database A database instance passed as an Medoo object.
-    * @param $firstname
-    * @param $prefix
-    * @param $lastname
-    * @return Str
-    */
+    /**
+     * Returns an string with the formatted name.
+     *
+     * @param $firstname string containing the user's first name
+     * @param $prefix string containing the user's prefix, if there is one
+     * @param $lastname string containing the user's last name
+     * @return string containing the concatenated, full name
+     */
     private function generateNameStr($firstname, $prefix, $lastname){
         if (isset($prefix)){
             return sprintf("%s %s %s", $firstname, $prefix, $lastname);
@@ -419,13 +418,12 @@ class analysis extends model
         }
     }
 
-    /*
-    * Returns the question txt of a question id
-    * @param Medoo $database A database instance passed as an Medoo object.
-    * @param $question_id An question id
-    * @param $questionnaire_id An questionnaire_id id
-    * @return String
-    */
+    /**
+     * Returns the question string beloning to a question ID.
+     *
+     * @param $question_id int containing the question ID
+     * @return string containing the question
+     */
     private function getQuestionTxt($question_id) {
         $quoted_question_id = $this->database->quote($question_id);
         $query = "SELECT label FROM reviewerlistsquestions
@@ -433,12 +431,12 @@ class analysis extends model
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['label'];
     }
 
-    /*
-    * Returns the firstname, prefix and lastname of a student
-    * @param Medoo $database A database instance passed as an Medoo object.
-    * @param $student_id An assignment id
-    * @return Array
-    */
+    /**
+     * Returns the firstname, prefix and lastname of a student.
+     *
+     * @param $student_id int containing the student ID
+     * @return array containing the student's first and last name, including a possible prefix
+     */
     private function getStudentName($student_id) {
         $quoted_student_id = $this->database->quote($student_id);
         $query = "SELECT firstname, prefix, lastname FROM students
@@ -446,12 +444,12 @@ class analysis extends model
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
     }
 
-    /*
-    * Returns the firstname, prefix and lastname of a staff member
-    * @param Medoo $database A database instance passed as an Medoo object.
-    * @param $staff_id An assignment id
-    * @return Array
-    */
+    /**
+     * Returns the firstname, prefix and lastname of a staff member.
+     *
+     * @param $staff_id int containing the staff member's ID
+     * @return array containing the staff member's first and last name, including a possible prefix
+     */
     private function getStaffName($staff_id) {
         $quoted_staff_id = $this->database->quote($staff_id);
         $query = "SELECT firstname, prefix, lastname FROM staff
@@ -459,14 +457,14 @@ class analysis extends model
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
     }
 
-    /*
-    * Returns an array with all the reviewings of the submissions of a specific assignment
-    * @param Medoo $database A database instance passed as an Medoo object.
-    * @param $assignment_id An assignment id
-    * @return Array
-    */
-    private function getReviewingsOfSubmission($assignement_id) {
-        $quoted_assignement_id = $this->database->quote($assignement_id);
+    /**
+     * Returns an array with all the element gradings of the submissions of a specific assignment.
+     *
+     * @param $assignment_id int containing the assignment's ID
+     * @return array containing all element grades per reviewer per submission
+     */
+    private function getReviewingsOfSubmission($assignment_id) {
+        $quoted_assignement_id = $this->database->quote($assignment_id);
         $query = "SELECT * FROM reviewing
                   WHERE reviewerlist_id IN (
                   SELECT id FROM reviewerlists WHERE assignment_id = $quoted_assignement_id
@@ -474,12 +472,11 @@ class analysis extends model
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /*
-     * Gets the id of a student based on a submissions id.
+    /**
+     * Gets the student's ID belonging to a particular submission ID.
      *
-     * @param Medoo $database A database instance passed as an Medoo object.
-     * @param $submission_id An submissions id
-     * @return Array, associative
+     * @param $submission_id int containing the submission ID
+     * @return string containing the student ID
      */
     private function getStudentID($submission_id){
         $quoted_submission_id = $this->database->quote($submission_id);
@@ -488,12 +485,11 @@ class analysis extends model
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['student_id'];
     }
 
-    /*
-    * Gets an overview of the assignments in the system and the number of texts that are reviewed by the reviewers
-    *
-    * @param Medoo $database A database instance passed as an Medoo object.
-    * @return Array, associative
-    */
+    /**
+     * Gets an overview of the assignments in the system and the number of texts that are reviewed by the reviewers
+     *
+     * @return array containing all assignments with their respective number of promised and fullfilled grades
+     */
     private function getTotalOverview(){
         $query = "SELECT promised_grades.assignment_id AS id, title, promised, fullfilled
                     FROM (
@@ -515,13 +511,12 @@ class analysis extends model
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /*
-    * Gets an overview of the number of reviews made by the reviewers
-    *
-    * @param Medoo $database A database instance passed as an Medoo object.
-    * @param $id An assignment id
-    * @return Array, associative
-    */
+    /**
+     * Gets an overview of the number of reviews made by the reviewers
+     *
+     * @param $assignment_id int containing the assignment ID
+     * @return array containing all reviewers with the # of assigned submissions and the # they've already graded
+     */
     private function getAssignmentOverview($assignment_id){
         $quoted_assignment_id = $this->database->quote($assignment_id);
         $query = "SELECT CONCAT_WS(' ', firstname, prefix, lastname) AS StaffName, Promised, Fullfilled
@@ -550,12 +545,11 @@ class analysis extends model
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
-    /*
-     * Gets the name of an assignment by selecting an assignment with a specific ID.
+    /**
+     * Gets the name of an assignment using it's corresponding ID.
      *
-     * @param Medoo $database A database instance passed as an Medoo object.
-     * @param $id An assignment id
-     * @return Array, associative
+     * @param $id int containing the assignment's ID
+     * @return array containing the assignment title
      */
     private function getAssignmentName($id){
         return $this->database->get(
@@ -565,11 +559,10 @@ class analysis extends model
         );
     }
 
-    /*
+    /**
      * Gets an array of assignments in the system.
      *
-     * @param Medoo $database A database instance passed as an Medoo object.
-     * @return Array, associative
+     * @return array of assignments, including title and ID
      */
     private function getAssignments()
     {

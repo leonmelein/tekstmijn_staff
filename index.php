@@ -160,9 +160,9 @@
     $router->mount("/analysis", function() use ($router){
         $router->get("/", 'analysis@overview');
         $router->get("/status/(.*)", 'analysis@generateStatusDetail');
-        $router->get("/beoordelingen/(.*)", 'analysis@downloadBeoordelingen');
-        $router->get("/beoordelingslijsten/(.*)", 'analysis@downloadBeoordelingslijsten');
-        $router->get("/teksten/(.*)", 'analysis@downloadTeksten');
+        $router->get("/gradings/(.*)", 'analysis@downloadGradings');
+        $router->get("/elementscores/(.*)", 'analysis@downloadElementScores');
+        $router->get("/texts/(.*)", 'analysis@downloadTexts');
     });
 
     /**

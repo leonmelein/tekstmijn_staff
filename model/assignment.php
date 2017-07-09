@@ -12,6 +12,9 @@ class assignment extends model {
      * Page functions
      */
 
+    /**
+     * Displays an overview of all assigments.
+     */
     function overview(){
         $this->get_session();
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Opdrachten" => "#"]);
@@ -33,6 +36,11 @@ class assignment extends model {
         ]);
     }
 
+    /**
+     * Displays an individual assignment.
+     *
+     * @param $assignmentid string containing the assignment ID
+     */
     function individualAssignment($assignmentid){
         $this->get_session();
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Opdrachten" => "/staff/assignment", "Bewerk opdracht" => "#"]);
@@ -53,6 +61,9 @@ class assignment extends model {
         ]);
     }
 
+    /**
+     * Provides a zip download of all texts per reviewer.
+     */
     function downloadSubmissions($assignmentid){
         $this->get_session();
 
@@ -101,6 +112,9 @@ class assignment extends model {
         }
     }
 
+    /**
+     * Provides a form to create a new assignment.
+     */
     function newAssignment(){
         $this->get_session();
         $breadcrumbs = $this->breadcrumbs($this->bootstrap, [$_SESSION["staff_name"] => "/staff/account/", "Opdrachten" => "/staff/assignment", "Nieuwe opdracht" => "#"]);
@@ -117,11 +131,9 @@ class assignment extends model {
         ]);
     }
 
-    /*
-    * Saves the new assignment form into the database
-    *
-    * @return Boolean
-    */
+    /**
+     * Saves the new assignment to the database
+     */
     function addAssignment(){
         //Check if there are at least 3 reviewers
         if (count($_POST['reviewers']) < 3) {
@@ -254,11 +266,11 @@ class assignment extends model {
         }
     }
 
-    /*
-    * Updates the assignment in the database based on the changes made on the edit page
-    *
-    * @return Boolean
-    */
+    /**
+     * Updates the assignment in the system based on the changes made on the edit page.
+     *
+     * @param $assignment_id string containing the assignment ID
+     */
     function updateAssignment($assignment_id){
         //Quote assignment id
         $assignment_id_quoted = $this->database->quote($assignment_id);
@@ -298,6 +310,11 @@ class assignment extends model {
         }
     }
 
+    /**
+     * Removes an assignment from the system.
+     *
+     * @param $assignment_id
+     */
     function deleteAssignment($assignment_id){
         //Create empty array to check if adding the assignment works fine
         $results = Array();
@@ -340,6 +357,11 @@ class assignment extends model {
      * Supporting functions
      */
 
+    /**
+     * Gets the element scoring list URL from the database.
+     * @param $id string containing the assignment ID
+     * @return string containing the URL
+     */
     function getQualtricsURL($id){
         $assignmentid = $this->database->quote($id);
         $query = "SELECT qualtrics_url
@@ -348,6 +370,12 @@ class assignment extends model {
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['qualtrics_url'];
     }
 
+    /**
+     * Get a list of all reviewers in use for this assignment.
+     *
+     * @param $id string containing the assignment ID
+     * @return array containing a list of staff ID's
+     */
     function getReviewersforAssignment($id) {
         $assignment_id = $this->database->quote($id);
         $query = "SELECT DISTINCT staff_id
@@ -361,6 +389,13 @@ class assignment extends model {
         return $reviewers;
     }
 
+    /**
+     * Gathers a list of files for submissions assigned to a certain member of staff for a particular assignment.
+     *
+     * @param $staffid int containing the staff member's ID
+     * @param $assignmentid string containing the assignment ID
+     * @return array containing both the file names on server and the file names at submission time
+     */
     function gatherSubmissionFiles($staffid, $assignmentid){
         $quoted_staffid = $this->database->quote($staffid);
         $quoted_assignmentid = $this->database->quote($assignmentid);
@@ -375,6 +410,13 @@ class assignment extends model {
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Generates name parts for review package.
+     *
+     * @param $staffid int containing the staff member's ID
+     * @param $assignmentid string containing the assignment ID
+     * @return array containing the full name of the staff member and the assignment title
+     */
     function gatherNames($staffid, $assignmentid){
         $quoted_staffid = $this->database->quote($staffid);
         $quoted_assignemntid = $this->database->quote($assignmentid);
@@ -385,6 +427,12 @@ class assignment extends model {
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0];
     }
 
+    /**
+     * Retrieves assignment name for given ID.
+     *
+     * @param $assignmentid string containing the assignment ID
+     * @return string containing the assignment name
+     */
     function gatherAssignmentName($assignmentid){
         $quoted_assignemntid = $this->database->quote($assignmentid);
         $query = "SELECT title as assignment_name
@@ -393,6 +441,12 @@ class assignment extends model {
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC)[0]['assignment_name'];
     }
 
+    /**
+     * Retrieves all assignment details for a given ID.
+     *
+     * @param $id string containing the assignment ID
+     * @return array containing title, start and end date
+     */
     function getAssignment($id){
         $id = $this->database->quote($id);
         return $this->database->query("SELECT assignments.title, assignments_class.start_date, assignments_class.end_date
@@ -402,6 +456,12 @@ class assignment extends model {
                                               LIMIT 1")->fetch();
     }
 
+    /**
+     * Retrieves all classes assigned to a certain assignment.
+     *
+     * @param $id string containing the assignment ID
+     * @return array containing all class ID's
+     */
     function getCoupledClasses($id){
         $return = Array();
         $id = $this->database->quote($id);
@@ -416,6 +476,12 @@ class assignment extends model {
         return $return;
     }
 
+    /**
+     * Retrieves all reviewers assigned to a certain assignment.
+     *
+     * @param $id string containing the assignment ID
+     * @return array containing all staff ID's
+     */
     function getCoupledReviewers($id){
         $return = Array();
         $id = $this->database->quote($id);
@@ -430,16 +496,31 @@ class assignment extends model {
         return $return;
     }
 
+    /**
+     * Retrieves all known assignments in the system.
+     *
+     * @return array containing all assignments with their title and ID
+     */
     function getAssignments(){
         $query = "SELECT assignments.title, assignments.id FROM assignments ORDER BY title ASC";
         return $this->database->query($query)->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Generates a list of classes for use in adding new assignments.
+     *
+     * @return array of all classes prepended with their school name.
+     */
     function getSchoolsAndClasses(){
         $separator = "': '";
         return $this->database->query("SELECT CONCAT_WS($separator, schools.name, class.name) AS name, class.id FROM schools, class WHERE schools.id = class.school_id")->fetchAll(PDO::FETCH_ASSOC);
     }
 
+    /**
+     * Generates a list of reviewers for use in adding new assignmnts.
+     *
+     * @return array of all reviewers
+     */
     function getReviewers(){
         $reviewers =  $this->database->select(
             "staff",
@@ -471,6 +552,15 @@ class assignment extends model {
         return $reviewers;
     }
 
+
+    /**
+     * Returns an string with the formatted name.
+     *
+     * @param $firstname string containing the user's first name
+     * @param $prefix string containing the user's prefix, if there is one
+     * @param $lastname string containing the user's last name
+     * @return string containing the concatenated, full name
+     */
     private function generateNameStr($firstname, $prefix, $lastname){
         if (isset($prefix)){
             return sprintf("%s %s %s", $firstname, $prefix, $lastname);
