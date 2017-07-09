@@ -32,7 +32,7 @@ password = <Wachtwoord databasegebruiker>
 ```
 
 3.  Plaats de bestanden uit deze repository op de server.
-4.  Laad de benodigde tabellen in via phpMyAdmin of vergelijkbare databasebeheersoftware.
+4.  Laad [de benodigde tabellen](https://github.com/leonmelein/tekstmijn_staff/blob/master/database.sql) in via phpMyAdmin of vergelijkbare databasebeheersoftware.
 
 Hierna kan het systeem in gebruik worden genomen door in een browser naar `/staff` op de server te navigeren en in te loggen.
 
