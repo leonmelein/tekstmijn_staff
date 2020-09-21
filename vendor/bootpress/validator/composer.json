@@ -1,0 +1,27 @@
+{
+    "name": "bootpress/validator",
+    "description": "Form validation that is designed to simplify and work seamlessly with Jörn's jQuery Validation Plugin.",
+    "keywords": ["bootpress", "form", "validation"],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Kyle Gadd",
+            "email": "kyle.gadd@gmail.com"
+        }
+    ],
+    "require": {
+        "php": ">=5.4",
+        "bootpress/page": "^1.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^4.0",
+        "friendsofphp/php-cs-fixer": "^1.0",
+        "squizlabs/php_codesniffer": "^2.5"
+    },
+    "suggest": {
+        "bootpress/form": "Coordinates form validation, errors, messages, values, and inputs in a DRY KISS way." 
+    },
+    "autoload": {
+        "psr-4": { "BootPress\\Validator\\": "src" }
+    }
+}
