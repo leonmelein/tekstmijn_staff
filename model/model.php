@@ -279,7 +279,7 @@ class model
      */
     public function mail($to, $subject, $template){
         // Password forgotten
-        $mail = new PHPMailer;
+        $mail = new PHPMailer\PHPMailer\PHPMailer;
         $mail->setFrom('info@tekstmijn.nl', 'Tekstmijn');
         $mail->addAddress($to);
         $mail->isHTML(true);                                  // Set email format to HTML
